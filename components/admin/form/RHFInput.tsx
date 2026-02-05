@@ -10,6 +10,9 @@ interface RHFInputProps<T extends FieldValues> {
   label?: string;
   placeholder?: string;
   type?: string;
+  description?: string;
+  required?: boolean;
+  disabled?: boolean;
   className?: string;
 }
 

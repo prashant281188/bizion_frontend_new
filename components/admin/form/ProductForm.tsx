@@ -66,264 +66,271 @@ const ProductForm = () => {
     <>
       {/* Header */}
 
-      <form onSubmit={handleSubmit(save)} className="space-y-10">
-        {/* Product Information Section */}
-        <section>
-          <h2 className="text-lg font-medium text-gray-700 mb-5">
-            Product Information
-          </h2>
-          <FieldGroup>
-            <FieldSet>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <RHFInput
-                  control={form.control}
-                  name="brand"
-                  label="Brand"
-                  placeholder="Enter Brand"
-                  type="text"
-                />
+     <form
+  onSubmit={handleSubmit(save)}
+  className="space-y-10"
+>
+  {/* ================= PRODUCT INFO ================= */}
+  <section className="rounded-xl border bg-card p-6">
+    <header className="mb-6 space-y-1">
+      <h2 className="text-lg font-semibold">
+        Product Information
+      </h2>
+      <p className="text-sm text-muted-foreground">
+        Basic details used across catalog, pricing, and inventory
+      </p>
+    </header>
 
-                <RHFInput
-                  control={form.control}
-                  name="model"
-                  label="Model"
-                  placeholder="Enter Model"
-                  type="text"
-                />
+    <FieldGroup>
+      <FieldSet>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <RHFInput
+            control={form.control}
+            name="brand"
+            label="Brand"
+            placeholder="e.g. HINI"
+          />
 
-                <RHFInput
-                  control={form.control}
-                  name="manufactureId"
-                  label="Manufacturer"
-                  placeholder="Enter Manufacturer"
-                  type="text"
-                />
+          <RHFInput
+            control={form.control}
+            name="model"
+            label="Model"
+            placeholder="e.g. SH-2001"
+          />
 
-                <RHFInput
-                  control={form.control}
-                  name="metal"
-                  label="Metal"
-                  placeholder="Enter Metal"
-                  type="text"
-                />
-              </div>
+          <RHFInput
+            control={form.control}
+            name="manufactureId"
+            label="Manufacturer"
+            placeholder="Select manufacturer"
+          />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start ">
-                <RHFSelect
-                  control={form.control}
-                  name="unitId"
-                  label="Unit"
-                  otpions={[
-                    { label: "Pcs.", value: "pcs" },
-                    { label: "set", value: "set" },
-                  ]}
-                  placeholder="Select Unit"
-                  addButton={
-                    <DialogButton
-                      tooltip="Create new Unit"
-                      form={<UnitForm />}
-                    />
-                  }
-                />
+          <RHFInput
+            control={form.control}
+            name="metal"
+            label="Metal"
+            placeholder="e.g. Brass"
+          />
+        </div>
 
-                <RHFSelect
-                  control={form.control}
-                  name="categoryId"
-                  label="Category"
-                  otpions={[
-                    { label: "Pcs.", value: "pcs" },
-                    { label: "set", value: "set" },
-                  ]}
-                  placeholder="Select Category"
-                  addButton={
-                    <DialogButton
-                      tooltip="Create Category"
-                      form={<CategoryForm />}
-                    />
-                  }
-                />
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <RHFSelect
+            control={form.control}
+            name="unitId"
+            label="Unit"
+            placeholder="Select unit"
+            otpions={[
+              { label: "Pcs", value: "pcs" },
+              { label: "Set", value: "set" },
+            ]}
+            addButton={
+              <DialogButton
+                tooltip="Create Unit"
+                form={<UnitForm />}
+              />
+            }
+          />
 
-                <RHFSelect
-                  control={form.control}
-                  name="taxId"
-                  label="Tax"
-                  otpions={[
-                    { label: "Pcs.", value: "pcs" },
-                    { label: "set", value: "set" },
-                  ]}
-                  placeholder="Select Tax"
-                  addButton={
-                    <DialogButton tooltip="Create Tax" form={<TaxForm />} />
-                  }
-                />
+          <RHFSelect
+            control={form.control}
+            name="categoryId"
+            label="Category"
+            placeholder="Select category"
+            otpions={[
+              { label: "Profile", value: "profile" },
+              { label: "Cabinet Handle", value: "cabinet" },
+            ]}
+            addButton={
+              <DialogButton
+                tooltip="Create Category"
+                form={<CategoryForm />}
+              />
+            }
+          />
 
-                <RHFSelect
-                  control={form.control}
-                  name="hsnId"
-                  label="HSN"
-                  otpions={[
-                    { label: "Pcs.", value: "pcs" },
-                    { label: "set", value: "set" },
-                  ]}
-                  placeholder="Select HSN"
-                  addButton={
-                    <DialogButton tooltip="Create HSN" form={<HSNForm />} />
-                  }
-                />
-              </div>
-            </FieldSet>
-          </FieldGroup>
-        </section>
+          <RHFSelect
+            control={form.control}
+            name="taxId"
+            label="Tax"
+            placeholder="Select tax"
+            otpions={[
+              { label: "GST 18%", value: "18" },
+              { label: "GST 12%", value: "12" },
+            ]}
+            addButton={
+              <DialogButton
+                tooltip="Create Tax"
+                form={<TaxForm />}
+              />
+            }
+          />
 
-        {/* Variants Section */}
-        <section>
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-lg font-medium text-gray-700">
-              Product Variants
-            </h2>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                append({
-                  size: "",
-                  finish: "",
-                  mrp: "",
-                  packing: "",
-                  purchasePrice: "",
-                  salePrice: "",
-                })
-              }
-            >
-              + Add Variant
-            </Button>
-          </div>
+          <RHFSelect
+            control={form.control}
+            name="hsnId"
+            label="HSN"
+            placeholder="Select HSN"
+            otpions={[
+              { label: "8302", value: "8302" },
+            ]}
+            addButton={
+              <DialogButton
+                tooltip="Create HSN"
+                form={<HSNForm />}
+              />
+            }
+          />
+        </div>
+      </FieldSet>
+    </FieldGroup>
+  </section>
 
-          <div className="space-y-5">
-            {fields.length === 0 && (
-              <div className="text-sm text-gray-500 italic border border-dashed border-gray-300 p-6 rounded-xl text-center">
-                No variants yet. Click “+ Add Variant” to add one.
-              </div>
-            )}
+  {/* ================= VARIANTS ================= */}
+  <section className="rounded-xl border bg-card p-6">
+    <header className="mb-6 flex items-center justify-between">
+      <div className="space-y-1">
+        <h2 className="text-lg font-semibold">
+          Product Variants
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Size, finish, and pricing combinations
+        </p>
+      </div>
 
-            <Table>
-              {fields.length !== 0 && (
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[120px] max-w[200px]">
-                      Size
-                    </TableHead>
-                    <TableHead className="min-w-[120px] max-w[200px]">
-                      Finish
-                    </TableHead>
-                    <TableHead className="min-w-[120px] max-w[200px]">
-                      Packing
-                    </TableHead>
-                    <TableHead className="min-w-[120px] max-w[200px]">
-                      MRP
-                    </TableHead>
-                    <TableHead className="min-w-[120px] max-w[200px]">
-                      Purchase Price
-                    </TableHead>
-                    <TableHead className="min-w-[120px] max-w[200px]">
-                      Sale Price
-                    </TableHead>
-                    <TableHead className="w-auto">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-              )}
+      <Button
+        type="button"
+        size="sm"
+        onClick={() =>
+          append({
+            size: "",
+            finish: "",
+            packing: "",
+            mrp: "",
+            purchasePrice: "",
+            salePrice: "",
+          })
+        }
+      >
+        + Add Variant
+      </Button>
+    </header>
 
-              <TableBody>
-                {fields.map((variant, index) => (
-                  <TableRow key={variant.id}>
-                    <TableCell className="w-[200px]">
-                      <RHFInput
-                        control={form.control}
-                        name={`variants.${index}.size`}
-                        placeholder="e.g. 96mm"
-                        type="text"
-                      />
-                    </TableCell>
-                    <TableCell className="w-[200px]">
-                      <RHFInput
-                        control={form.control}
-                        name={`variants.${index}.finish`}
-                        placeholder="eg. Rose Gold"
-                        type="text"
-                      />
-                    </TableCell>
-                    <TableCell className="w-[200px]">
-                      <RHFInput
-                        control={form.control}
-                        name={`variants.${index}.packing`}
-                        placeholder="eg. 10 "
-                        type="number"
-                      />
-                    </TableCell>
-                    <TableCell className="w-[200px]">
-                      <RHFInput
-                        control={form.control}
-                        name={`variants.${index}.mrp`}
-                        placeholder="0.00"
-                        type="number"
-                      />
-                    </TableCell>
-                    <TableCell className="w-[200px]">
-                      <RHFInput
-                        control={form.control}
-                        name={`variants.${index}.purchasePrice`}
-                        placeholder="0.00"
-                        type="number"
-                      />
-                    </TableCell>
-                    <TableCell className="w-[200px]">
-                      <RHFInput
-                        control={form.control}
-                        name={`variants.${index}.salePrice`}
-                        placeholder="0.00"
-                        type="number"
-                      />
-                    </TableCell>
-                    <TableCell className="w-[200px]">
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon-sm"
-                        onClick={() => remove(index)}
-                      >
-                        <Trash2Icon />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+    {/* Empty State */}
+    {fields.length === 0 && (
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        No variants added yet.
+        <div className="mt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              append({
+                size: "",
+                finish: "",
+                packing: "",
+                mrp: "",
+                purchasePrice: "",
+                salePrice: "",
+              })
+            }
+          >
+            Add First Variant
+          </Button>
+        </div>
+      </div>
+    )}
 
-            {fields.length !== 0 && (
-              <div className="text-sm text-gray-500 italic border border-dashed border-gray-300 p-6 rounded-xl text-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    append({
-                      size: "",
-                      finish: "",
-                      mrp: "",
-                      packing: "",
-                      purchasePrice: "",
-                      salePrice: "",
-                    })
-                  }
-                >
-                  + Add Variant
-                </Button>
-              </div>
-            )}
-          </div>
-        </section>
-      </form>
+    {/* Variants Table */}
+    {fields.length > 0 && (
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Size</TableHead>
+              <TableHead>Finish</TableHead>
+              <TableHead>Packing</TableHead>
+              <TableHead>MRP</TableHead>
+              <TableHead>Purchase</TableHead>
+              <TableHead>Sale</TableHead>
+              <TableHead className="w-[60px]" />
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {fields.map((variant, index) => (
+              <TableRow key={variant.id}>
+                <TableCell>
+                  <RHFInput
+                    control={form.control}
+                    name={`variants.${index}.size`}
+                    placeholder="96mm"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <RHFInput
+                    control={form.control}
+                    name={`variants.${index}.finish`}
+                    placeholder="Rose Gold"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <RHFInput
+                    control={form.control}
+                    name={`variants.${index}.packing`}
+                    type="number"
+                    placeholder="10"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <RHFInput
+                    control={form.control}
+                    name={`variants.${index}.mrp`}
+                    type="number"
+                    placeholder="0.00"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <RHFInput
+                    control={form.control}
+                    name={`variants.${index}.purchasePrice`}
+                    type="number"
+                    placeholder="0.00"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <RHFInput
+                    control={form.control}
+                    name={`variants.${index}.salePrice`}
+                    type="number"
+                    placeholder="0.00"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2Icon className="h-4 w-4 text-destructive" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    )}
+  </section>
+</form>
+
       <div className="flex gap-3">
         <Button variant="outline" type="button">
           Cancel

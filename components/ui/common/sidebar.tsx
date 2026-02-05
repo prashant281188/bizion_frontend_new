@@ -53,7 +53,7 @@ export const sidebarConfig = [
         icon: Package,
         children: [
           { title: "Product List", url: "/admin/products" },
-          { title: "Add Product", url: "/admin/products/new" },
+          { title: "Add Product", url: "/admin/products/create" },
           { title: "Categories", url: "/admin/categories" },
           { title: "Brands", url: "/admin/brands" },
         ],
