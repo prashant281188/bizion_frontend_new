@@ -4,7 +4,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
@@ -13,7 +12,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-
 
 import {
   Home,
@@ -63,7 +61,11 @@ export const sidebarConfig = [
   {
     label: "Sales",
     items: [
-      { title: "Sales Invoice", url: "/admin/sales/invoice", icon: ShoppingCart },
+      {
+        title: "Sales Invoice",
+        url: "/admin/sales/invoice",
+        icon: ShoppingCart,
+      },
       { title: "Sales Estimate", url: "/admin/sales/estimate", icon: Layers },
       { title: "Customers", url: "/admin/customers", icon: Users },
     ],
@@ -71,7 +73,11 @@ export const sidebarConfig = [
   {
     label: "Purchase",
     items: [
-      { title: "Purchase Invoice", url: "/admin/purchase/invoice", icon: Truck },
+      {
+        title: "Purchase Invoice",
+        url: "/admin/purchase/invoice",
+        icon: Truck,
+      },
       { title: "Vendors", url: "/admin/vendors", icon: Users },
     ],
   },
@@ -91,13 +97,7 @@ export const sidebarConfig = [
   },
 ];
 
-import {
-  ChevronRight,
-  ChevronUp,
-  TvIcon,
-  User2,
-} from "lucide-react";
-
+import { ChevronRight, ChevronUp, TvIcon, User2 } from "lucide-react";
 
 const AdminSidebar = () => {
   return (
@@ -126,7 +126,7 @@ const AdminSidebar = () => {
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton>
-                            <item.icon className="mr-2 h-4 w-4" />
+                            <item.icon className=" h-4 w-4" />
                             {item.title}
                             <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                           </SidebarMenuButton>
@@ -137,9 +137,7 @@ const AdminSidebar = () => {
                             {item.children.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuButton asChild>
-                                  <Link href={child.url}>
-                                    {child.title}
-                                  </Link>
+                                  <Link href={child.url}>{child.title}</Link>
                                 </SidebarMenuButton>
                               </SidebarMenuSubItem>
                             ))}
@@ -150,13 +148,16 @@ const AdminSidebar = () => {
                   ) : (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
-                        <Link href={item.url} className="flex items-center gap-2">
+                        <Link
+                          href={item.url}
+                          className="flex items-center gap-2"
+                        >
                           <item.icon className="h-4 w-4" />
                           {item.title}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  )
+                  ),
                 )}
               </SidebarMenu>
             </SidebarGroup>

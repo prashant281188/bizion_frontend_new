@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 const ResetPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <section className="min-h-screen w-full bg-neutral-50 flex items-center justify-center px-6">
       <div className="w-full max-w-md rounded-2xl bg-white p-10 ring-1 ring-black/5 shadow-sm">
@@ -45,11 +46,20 @@ const ResetPage = () => {
             <label className="mb-1 block text-sm font-medium">
               Confirm Password
             </label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              className="w-full rounded-md border border-black/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="w-full rounded-md border border-black/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground"
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
 
           {/* Password Rules */}

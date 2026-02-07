@@ -6,8 +6,9 @@ import React from "react";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Collection", href: "/products" },
+  { label: "Products", href: "/products" },
   { label: "About Us", href: "/about" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 const PublicNavbar = () => {

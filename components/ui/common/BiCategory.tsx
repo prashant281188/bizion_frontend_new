@@ -1,38 +1,48 @@
 import React from "react";
 import { Card, CardContent } from "../card";
 import Image from "next/image";
+import Link from "next/link";
 
 type BiCategoryProps = {
   title: string;
   image: string;
   subtitle?: string;
   onClick?: () => void;
+  link: string;
 };
-const BiCategory = ({ title, image, subtitle, onClick }: BiCategoryProps) => {
+const BiCategory = ({
+  title,
+  image,
+  subtitle,
+  onClick,
+  link,
+}: BiCategoryProps) => {
   return (
-    <Card
-      onClick={onClick}
-      className="group cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-lg"
-    >
-      {/* Image */}
-      <div className="relative h-48 w-full overflow-hidden">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-      </div>
+    <Link href={link}>
+      <Card
+        onClick={onClick}
+        className="group cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-lg"
+      >
+        {/* Image */}
+        <div className="relative h-48 w-full overflow-hidden">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+        </div>
 
-      {/* Content */}
-      <CardContent className="p-4 text-center">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {subtitle && (
-          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-        )}
-      </CardContent>
-    </Card>
+        {/* Content */}
+        <CardContent className="p-4 text-center">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          {subtitle && (
+            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 

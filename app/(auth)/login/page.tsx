@@ -1,14 +1,9 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+
+import Image from "next/image";
 import React from "react";
 
 const LoginPage = () => {
-  const handleLogin = () => {
-    redirect("/dashboard");
-  };
   return (
     <section className="min-h-screen w-full bg-white">
       <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
@@ -91,7 +86,7 @@ const LoginPage = () => {
 
         {/* RIGHT: Image */}
         <div className="relative hidden md:block">
-          <img
+          <Image
             src="/images/login/login-cover.jpg"
             alt="Premium architectural hardware"
             className="absolute inset-0 h-full w-full object-cover"

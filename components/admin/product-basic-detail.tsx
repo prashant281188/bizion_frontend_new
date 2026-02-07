@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { cn } from "@/lib/utils";
-import { Edit, Edit2 } from "lucide-react";
+import {  Edit2 } from "lucide-react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 

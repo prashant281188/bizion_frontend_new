@@ -11,36 +11,43 @@ const categories = [
     title: "Door Handles",
     image: "/cateogries/cabinet-handle.jpg",
     subtitle: "Premium finishes",
+    link: "/products",
   },
   {
     title: "Cabinet Handles",
     image: "/cateogries/mortice-handle.jpg",
     subtitle: "Modern & classic",
+    link: "/products",
   },
   {
     title: "Profiles",
     image: "/cateogries/profile-handle.jpg",
     subtitle: "Aluminium solutions",
+    link: "/products",
   },
   {
     title: "Accessories",
     image: "/cateogries/cabinet-handle.jpg",
     subtitle: "Functional details",
+    link: "/products",
   },
   {
     title: "Cabinet Handles 1",
     image: "/cateogries/mortice-handle.jpg",
     subtitle: "Modern & classic",
+    link: "/products",
   },
   {
     title: "Profiles 1",
     image: "/cateogries/profile-handle.jpg",
     subtitle: "Aluminium solutions",
+    link: "/products",
   },
   {
     title: "Accessories 1",
     image: "/cateogries/cabinet-handle.jpg",
     subtitle: "Functional details",
+    link: "/products",
   },
 ];
 
@@ -83,6 +90,7 @@ const HomePage = () => {
                   title={cat.title}
                   image={cat.image}
                   subtitle={cat.subtitle}
+                  link={cat.link}
                   onClick={() => console.log(cat.title)}
                 />
               ))}

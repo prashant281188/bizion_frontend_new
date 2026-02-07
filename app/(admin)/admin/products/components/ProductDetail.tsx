@@ -54,7 +54,7 @@ const ProductDetail = ({
     description,
     metal,
   },
-  className,
+  
 }: ProductDetailProps) => {
   return (
     <div className="space-y-4">

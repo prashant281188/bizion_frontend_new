@@ -1,4 +1,7 @@
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+
+import Link from "next/link";
 import React from "react";
 function VariantGroup({
   title,
@@ -32,11 +35,14 @@ const ProductDetailPage = () => {
     <>
       <section className="w-full bg-white py-24">
         <div className="container mx-auto px-6">
-          <div className="grid gap-16 md:grid-cols-2">
+          <Button variant={"secondary"} >
+            <Link href={"/products"}> Back to Products</Link>
+          </Button>
+          <div className="pt-4 grid gap-16 md:grid-cols-2">
             {/* LEFT: Image Gallery */}
             <div>
               <div className="aspect-square overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-black/5">
-                <img
+                <Image
                   src="/images/products/handle-main.jpg"
                   alt="Product"
                   className="h-full w-full object-cover"
@@ -50,7 +56,7 @@ const ProductDetailPage = () => {
                     key={i}
                     className="aspect-square w-20 overflow-hidden rounded-xl ring-1 ring-black/5 hover:ring-amber-500"
                   >
-                    <img
+                    <Image
                       src={`/images/products/handle-${i}.jpg`}
                       alt="Thumbnail"
                       className="h-full w-full object-cover"

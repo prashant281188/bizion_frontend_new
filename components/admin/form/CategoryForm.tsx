@@ -2,12 +2,10 @@
 
 import CategorySchema, { CategorySchemaType } from "@/app/schema/category";
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { FieldGroup } from "@/components/ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import z from "zod";
 import RHFInput from "./RHFInput";
 
 const CategoryForm = () => {

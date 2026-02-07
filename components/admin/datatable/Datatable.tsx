@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -35,7 +34,7 @@ const Datatable = <TData,>({
   columns,
   data,
 }: {
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData>[];
   data: TData[];
 }) => {
   const [sorting, setSorting] = useState<SortingState>([]);

@@ -5,7 +5,7 @@ import React from "react";
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="bg-neutral-50">
+    <div className="bg-neutral-50 w-full">
       <PublicNavbar />
       {children}
       <PublicFooter />

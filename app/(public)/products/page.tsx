@@ -1,14 +1,4 @@
-import { Button } from "@/components/ui/button";
-import PublicProductCard from "@/components/ui/common/card/public-product-card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeftIcon, HomeIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 const products = [
@@ -17,24 +7,28 @@ const products = [
     image: "/images/products/handle-1.jpg",
     category: "Door Handle",
     finish: "Matt Black",
+    link: "products/1",
   },
   {
     name: "Slim Cabinet Handle",
     image: "/images/products/handle-2.jpg",
     category: "Cabinet Handle",
     finish: "Brushed Brass",
+    link: "products/2",
   },
   {
     name: "Profile Handle Pro",
     image: "/images/products/handle-3.jpg",
     category: "Profile Handle",
     finish: "Aluminium",
+    link: "products/3",
   },
   {
     name: "Luxury Pull Handle",
     image: "/images/products/handle-4.jpg",
     category: "Door Handle",
     finish: "Rose Gold",
+    link: "products/4",
   },
 ];
 const PublicProdcutsPage = () => {
@@ -98,24 +92,33 @@ interface ProductCardProps {
   image: string;
   category: string;
   finish: string;
+  link: string;
 }
 
-function ProductCard({ name, image, category, finish }: ProductCardProps) {
+function ProductCard({
+  name,
+  image,
+  category,
+  finish,
+  link,
+}: ProductCardProps) {
   return (
     <div className="group rounded-2xl bg-white ring-1 ring-black/5 transition-all hover:-translate-y-1 hover:shadow-lg">
-      <div className="aspect-square overflow-hidden rounded-t-2xl">
-        <img
-          src={image}
-          alt={name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
+      <Link href={link}>
+        <div className="aspect-square overflow-hidden rounded-t-2xl">
+          <Image
+            src={image}
+            alt={name}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
 
-      <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
-        <p className="mt-1 text-xs text-muted-foreground">{category}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{finish}</p>
-      </div>
+        <div className="p-4">
+          <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
+          <p className="mt-1 text-xs text-muted-foreground">{category}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{finish}</p>
+        </div>
+      </Link>
     </div>
   );
 }

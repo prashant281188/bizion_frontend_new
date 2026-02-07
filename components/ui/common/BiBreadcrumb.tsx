@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-import { Home, HomeIcon } from 'lucide-react'
+import { Home } from 'lucide-react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../breadcrumb'
 const BiBreadcrumb = () => {
   return (

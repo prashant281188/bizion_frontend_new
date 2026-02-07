@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardTitle } from "../ui/card";
-import { ScrollArea } from "../ui/scroll-area";
+
 import {
   Pagination,
   PaginationContent,
@@ -22,14 +21,12 @@ import {
 
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
