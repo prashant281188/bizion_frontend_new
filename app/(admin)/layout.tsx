@@ -3,36 +3,30 @@
 import AdminNavbar from "@/components/ui/common/admin-navbar";
 import AdminSidebar from "@/components/ui/common/sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useAuth } from "@/providers/auth-provider";
-import { useRouter } from "next/navigation";
+import { AuthProvider } from "@/providers/auth-provider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import React, { useEffect } from "react";
+import React, { useState } from "react";
+import { Toaster } from "sonner";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  (useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/login");
-    }
-  }),
-    [isAuthenticated, isLoading]);
-
-  if (isLoading) return <>Loading...</>;
-
+  const [queryClient] = useState(() => new QueryClient());
   return (
-    <SidebarProvider>
-      <AdminSidebar />
-
-      <SidebarInset className="flex min-h-screen flex-col">
-        <AdminNavbar className="sticky top-0 z-30 border-b bg-background" />
-
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-6">{children}</div>
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>
+        
+          <AdminSidebar />
+          <SidebarInset className="flex min-h-screen flex-col">
+            <AdminNavbar className="sticky top-0 z-30 border-b bg-background" />
+            <AuthProvider>
+              <main className="flex-1 overflow-y-auto">
+                <div className="p-6">{children}</div>
+              </main>
+            </AuthProvider>
+          </SidebarInset>
+       
+      </SidebarProvider>
+    </QueryClientProvider>
   );
 };
 

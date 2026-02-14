@@ -9,9 +9,26 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { LogOut, Settings, User, Keyboard } from "lucide-react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogOut, Settings, User, Keyboard } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { logout } from "@/lib/api/auth";
 const BiUserIcon = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: logout,
+    onSuccess: async () => {
+      await queryClient.clear();
+      router.push("/logout");
+    },
+  });
+
+  const handleLogout = () => {
+    mutation.mutate();
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,11 +46,7 @@ const BiUserIcon = () => {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        sideOffset={8}
-        className="w-56"
-      >
+      <DropdownMenuContent align="end" sideOffset={8} className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <span className="text-sm font-medium">Prashant Garg</span>
@@ -67,7 +80,10 @@ const BiUserIcon = () => {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
+        <DropdownMenuItem
+          className="text-destructive focus:text-destructive"
+          onClick={handleLogout}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

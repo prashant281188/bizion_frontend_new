@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -16,7 +17,13 @@ const LoginPage = () => {
       await queryClient.invalidateQueries({
         queryKey: ["me"],
       });
-      router.push("/dashboard");
+      router.push("/admin/dashboard");
+      toast.success("Logged In...");
+    },
+    onError: (error: Error) => {
+      toast.error("Login Failed", {
+        description: error.message,
+      });
     },
   });
 
