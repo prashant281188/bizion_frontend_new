@@ -64,6 +64,7 @@ const HomePage = () => {
   return (
     <div className="bg-white">
       <BiCarousel />
+      
       <section className="relative w-full bg-neutral-50 py-24">
         <div className="container mx-auto px-6">
           {/* Heading */}

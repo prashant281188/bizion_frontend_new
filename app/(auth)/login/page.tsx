@@ -1,9 +1,33 @@
 "use client";
 
+import { login } from "@/lib/api/auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const LoginPage = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: login,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
+      router.push("/dashboard");
+    },
+  });
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    mutation.mutate({ email, password });
+  };
   return (
     <section className="min-h-screen w-full bg-white">
       <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
@@ -22,12 +46,13 @@ const LoginPage = () => {
             </div>
 
             {/* Login Form */}
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label className="mb-1 block text-sm font-medium">
                   Email Address
                 </label>
                 <input
+                  name="email"
                   type="email"
                   placeholder="you@company.com"
                   className="w-full rounded-md border border-black/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -39,6 +64,7 @@ const LoginPage = () => {
                   Password
                 </label>
                 <input
+                  name="password"
                   type="password"
                   placeholder="••••••••"
                   className="w-full rounded-md border border-black/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -87,7 +113,8 @@ const LoginPage = () => {
         {/* RIGHT: Image */}
         <div className="relative hidden md:block">
           <Image
-            src="/images/login/login-cover.jpg"
+            fill
+            src="/products/1.jpg"
             alt="Premium architectural hardware"
             className="absolute inset-0 h-full w-full object-cover"
           />

@@ -46,6 +46,7 @@ const ProductDetailPage = () => {
                   src="/images/products/handle-main.jpg"
                   alt="Product"
                   className="h-full w-full object-cover"
+                  fill
                 />
               </div>
 
@@ -60,6 +61,7 @@ const ProductDetailPage = () => {
                       src={`/images/products/handle-${i}.jpg`}
                       alt="Thumbnail"
                       className="h-full w-full object-cover"
+                      fill
                     />
                   </button>
                 ))}
