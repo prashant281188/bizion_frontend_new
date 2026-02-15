@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { BiCarousel } from "@/components/ui/common/BiCarousel";
+import { BiCarousel } from "@/components/carousel/BiCarousel";
 import BiCategory from "@/components/ui/common/BiCategory";
 import Image from "next/image";
 import React from "react";

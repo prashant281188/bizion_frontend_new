@@ -22,3 +22,17 @@ export async function login(data: {
 export async function logout() {
     await api.post("/auth/logout")
 }
+
+
+export async function forgot(data: {
+    email: string
+}) {
+    try {
+
+        const res = await api.post("/auth/forgot-password", data)
+        return res.data
+    }
+    catch {
+        return null
+    }
+}

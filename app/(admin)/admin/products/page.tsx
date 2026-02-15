@@ -1,9 +1,9 @@
 import Datatable from "@/components/admin/datatable/Datatable";
 import { Button } from "@/components/ui/button";
 import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
-import PageHeader from "@/components/ui/common/PageHeader";
+import PageHeader from "@/components/navigation/public/PageHeader";
 import React from "react";
-import { productListColumns } from "./components/ProductListColums";
+import { productListColumns } from "../../../../components/product/ProductListColums";
 import Link from "next/link";
 const dataDemo = [
   // ---------- PROFILE (SH models) ----------

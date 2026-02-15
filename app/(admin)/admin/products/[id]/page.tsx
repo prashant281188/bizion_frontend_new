@@ -1,6 +1,6 @@
 import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
 import React from "react";
-import ProductDetail from "../components/ProductDetail";
+import ProductDetail from "../../../../../components/product/ProductDetail";
 
 const productDemo = {
   model: "SH-2001",

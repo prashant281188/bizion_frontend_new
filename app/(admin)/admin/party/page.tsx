@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 
-import PageHeader from "@/components/ui/common/PageHeader";
+import PageHeader from "@/components/navigation/public/PageHeader";
 
 import React from "react";
 import PartyDataTable from "./components/PartyDataTable";

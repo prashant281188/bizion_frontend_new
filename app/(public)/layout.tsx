@@ -1,5 +1,5 @@
-import PublicFooter from "@/components/ui/common/public-footer";
-import PublicNavbar from "@/components/ui/common/public-navbar";
+import PublicFooter from "@/components/navigation/public/public-footer";
+import PublicNavbar from "@/components/navigation/public/public-navbar";
 
 import React from "react";
 

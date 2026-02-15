@@ -3,6 +3,7 @@
 import { login } from "@/lib/api/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
@@ -97,9 +98,12 @@ const LoginPage = () => {
                   <input type="checkbox" className="accent-amber-500" />
                   Remember me
                 </label>
-                <a href="#" className="text-amber-500 hover:underline">
+                <Link
+                  href={"/forgot"}
+                  className="text-amber-500 hover:underline"
+                >
                   Forgot password?
-                </a>
+                </Link>
               </div>
 
               <button

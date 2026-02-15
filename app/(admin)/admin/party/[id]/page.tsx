@@ -1,6 +1,6 @@
 import React from "react";
 import PartyDetailCard from "../components/PartyDetailCard";
-import PageHeader from "@/components/ui/common/PageHeader";
+import PageHeader from "@/components/navigation/public/PageHeader";
 import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
 import PartyBalanceCard from "../components/PartyBalanceCard";
 

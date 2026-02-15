@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PageHeader from "@/components/ui/common/PageHeader";
+import PageHeader from "@/components/navigation/public/PageHeader";
 import RHFInput from "@/components/admin/form/RHFInput";
 
 type SettingsFormValues = {

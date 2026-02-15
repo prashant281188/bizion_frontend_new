@@ -1,8 +1,8 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { SidebarTrigger } from "../sidebar";
+import { SidebarTrigger } from "../../ui/sidebar";
 
-import BiNotification from "./admin-navbar/BiNotification";
+import BiNotification from "./BiNotification";
 import BiSettings from "./admin-navbar/BiSettings";
 import BiUserIcon from "./admin-navbar/BiUserIcon";
 import BiSearchBar from "./admin-navbar/BiSearchBar";
