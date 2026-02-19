@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const token = req.cookies.get("token")?.value;
 
-    const token = req.cookies.get("token")?.value
-    const isProtected = req.nextUrl.pathname.startsWith("/admin")
-    const isAuthPage = req.nextUrl.pathname.startsWith("/login")
+  const isAdminRoute = pathname.startsWith("/admin");
+  const authRoutes = ["/login", "/register"];
 
-    if (isProtected && !token) {
-        return NextResponse.redirect(new URL("/login", req.url))
-    }
+  // If no token → block admin
+  if (isAdminRoute && !token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
-    if (isAuthPage && token) {
+  // If token exists → block login
+  if (authRoutes.includes(pathname) && token) {
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+  }
 
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url))
-    }
-    return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/login"]
-}
+  matcher: ["/admin/:path*", "/login", "/register"],
+};

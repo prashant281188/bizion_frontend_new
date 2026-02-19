@@ -1,6 +1,5 @@
 "use client";
 
-import CategorySchema, { CategorySchemaType } from "@/app/schema/category";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";

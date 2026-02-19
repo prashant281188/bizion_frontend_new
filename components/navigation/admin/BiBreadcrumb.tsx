@@ -2,7 +2,7 @@ import React from 'react'
 
 
 import { Home } from 'lucide-react'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../breadcrumb'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../../ui/breadcrumb'
 const BiBreadcrumb = () => {
   return (
    <Breadcrumb>

@@ -1,7 +1,7 @@
 import React from "react";
-import { Card, CardContent, CardHeader } from "../card";
 import Image from "next/image";
 import Link from "next/link";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 type BiCategoryProps = {
   title: string;
@@ -10,19 +10,10 @@ type BiCategoryProps = {
   onClick?: () => void;
   link: string;
 };
-const BiCategory = ({
-  title,
-  image,
-  subtitle,
-  onClick,
-  link,
-}: BiCategoryProps) => {
+const BiCategory = ({ title, image, subtitle, link }: BiCategoryProps) => {
   return (
-    <Link href={link}>
-      <Card
-        onClick={onClick}
-        className="group py-0 cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-lg"
-      >
+    <Link href={`/products/?category=${link}`}>
+      <Card className="group py-0 cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-lg">
         <CardHeader className="p-0">
           {/* Image */}
           <div className="relative h-48 w-full overflow-hidden">
@@ -38,7 +29,7 @@ const BiCategory = ({
 
         {/* Content */}
         <CardContent className="px-4 pb-4 text-center">
-          <h3 className="text-lg font-semibold">{title}</h3>
+          <h3 className="text-lg font-semibold  ">{title}</h3>
           {subtitle && (
             <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
           )}

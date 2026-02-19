@@ -9,22 +9,14 @@ import React from "react";
 import { toast } from "sonner";
 
 const LoginPage = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["me"],
-      });
-      router.push("/admin/dashboard");
-      toast.success("Logged In...");
-    },
-    onError: (error: Error) => {
-      toast.error("Login Failed", {
-        description: error.message,
-      });
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      router.replace("admin/dashboard");
     },
   });
 

@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils";
 import { SidebarTrigger } from "../../ui/sidebar";
 
 import BiNotification from "./BiNotification";
-import BiSettings from "./admin-navbar/BiSettings";
-import BiUserIcon from "./admin-navbar/BiUserIcon";
-import BiSearchBar from "./admin-navbar/BiSearchBar";
+import BiSearchBar from "./BiSearchBar";
+import BiSettings from "./BiSettings";
+import BiUserIcon from "./BiUserIcon";
+
 
 const AdminNavbar = ({ className }: { className?: string }) => {
   return (

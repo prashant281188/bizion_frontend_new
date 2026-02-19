@@ -23,18 +23,18 @@ import {
   Users,
   Settings,
 } from "lucide-react";
-import { ScrollArea } from "../scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../collapsible";
+} from "@/components/ui/collapsible";
 import Link from "next/link";
 
 export const sidebarConfig = [

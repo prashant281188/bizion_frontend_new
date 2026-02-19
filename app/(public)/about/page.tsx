@@ -69,14 +69,18 @@ const AboutPage = () => {
           <div className="relative grid grid-cols-2 gap-6">
             <div className="overflow-hidden rounded-2xl shadow-sm">
               <Image
-                src="/images/about/about-1.jpg"
+                src="/products/1.jpg"
+                width={1000}
+                height={1000}
                 alt="Premium interior hardware"
                 className="h-full w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-2xl shadow-sm">
               <Image
-                src="/images/about/about-2.jpg"
+                width={1000}
+                height={1000}
+                src="/products/2.jpg"
                 alt="Modern hardware detailing"
                 className="h-full w-full object-cover"
               />

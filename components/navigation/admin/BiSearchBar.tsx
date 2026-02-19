@@ -1,6 +1,6 @@
 import React from "react";
-import { Input } from "../../input";
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const BiSearchBar = () => {
   return (

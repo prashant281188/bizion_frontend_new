@@ -1,7 +1,11 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { useProduct } from "@/hooks/useProduct";
 import Image from "next/image";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import React from "react";
 function VariantGroup({
   title,
@@ -20,7 +24,7 @@ function VariantGroup({
           <button
             key={opt}
             className={`rounded-full px-4 py-2 text-sm ring-1 ring-black/10 transition
-              hover:ring-amber-500 ${color ? "capitalize" : ""}`}
+            hover:ring-amber-500 ${color ? "capitalize" : ""}`}
           >
             {opt}
           </button>
@@ -31,11 +35,14 @@ function VariantGroup({
 }
 
 const ProductDetailPage = () => {
+  const { id } = useParams();
+
+  const { data, isLoading } = useProduct(id as string);
   return (
     <>
       <section className="w-full bg-white py-24">
         <div className="container mx-auto px-6">
-          <Button variant={"secondary"} >
+          <Button variant={"secondary"}>
             <Link href={"/products"}> Back to Products</Link>
           </Button>
           <div className="pt-4 grid gap-16 md:grid-cols-2">
@@ -43,10 +50,11 @@ const ProductDetailPage = () => {
             <div>
               <div className="aspect-square overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-black/5">
                 <Image
-                  src="/images/products/handle-main.jpg"
+                  src="/products/1.jpg"
                   alt="Product"
                   className="h-full w-full object-cover"
-                  fill
+                  height={1000}
+                  width={1000}
                 />
               </div>
 
@@ -58,10 +66,11 @@ const ProductDetailPage = () => {
                     className="aspect-square w-20 overflow-hidden rounded-xl ring-1 ring-black/5 hover:ring-amber-500"
                   >
                     <Image
-                      src={`/images/products/handle-${i}.jpg`}
+                      src={`/products/${i}.jpg`}
                       alt="Thumbnail"
                       className="h-full w-full object-cover"
-                      fill
+                      height={1000}
+                      width={1000}
                     />
                   </button>
                 ))}
@@ -73,7 +82,7 @@ const ProductDetailPage = () => {
               <span className="inline-block mb-3 h-1 w-12 rounded-full bg-amber-500" />
 
               <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
-                Linear Door Handle – Premium Series
+               {data?.model}
               </h1>
 
               <p className="mt-3 text-muted-foreground">

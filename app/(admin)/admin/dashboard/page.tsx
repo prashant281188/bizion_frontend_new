@@ -1,10 +1,10 @@
 import React from "react";
 import { Calendar1Icon } from "lucide-react";
 
-import InfoCard from "../components/InfoCard";
-import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
 import PageHeader from "@/components/navigation/public/PageHeader";
 import BiDataTable from "@/components/datatable/BiDataTable";
+import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
+import InfoCard from "../components/InfoCard";
 
 
 const AdminDashboardPage = () => {

@@ -5,7 +5,7 @@ import PageHeader from "@/components/navigation/public/PageHeader";
 
 import React from "react";
 import PartyDataTable from "./components/PartyDataTable";
-import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
+import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
 
 const page = () => {
   return (
