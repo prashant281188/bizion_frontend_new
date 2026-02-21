@@ -1,9 +1,9 @@
 "use client";
 
-import { Smile } from "lucide-react";
+import { Smile, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -14,11 +14,10 @@ const navLinks = [
 
 const PublicNavbar = () => {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const isActive = (href: string) => {
-    if (href === "/") {
-      return pathname === "/";
-    }
+    if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
 
@@ -37,7 +36,7 @@ const PublicNavbar = () => {
               <span className="text-gray-900">HINI</span>
             </Link>
 
-            {/* Nav Links */}
+            {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
@@ -54,8 +53,6 @@ const PublicNavbar = () => {
                     `}
                   >
                     {link.label}
-
-                    {/* Underline */}
                     <span
                       className={`absolute -bottom-1 left-0 h-[2px] bg-amber-500 transition-all duration-300
                         ${active ? "w-full" : "w-0 group-hover:w-full"}
@@ -66,15 +63,62 @@ const PublicNavbar = () => {
               })}
             </div>
 
-            {/* CTA */}
+            {/* Desktop CTA */}
             <Link
               href="/login"
               className="hidden md:inline-flex items-center rounded-full bg-amber-500 px-5 py-2 text-sm font-semibold text-black transition hover:bg-amber-300 hover:shadow-md"
             >
               Login
             </Link>
+
+            {/* Mobile Hamburger */}
+            <button
+              className="md:hidden"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? (
+                <X className="h-6 w-6 text-gray-900" />
+              ) : (
+                <Menu className="h-6 w-6 text-gray-900" />
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown */}
+        {isOpen && (
+          <div className="md:hidden bg-white shadow-md border-t">
+            <div className="flex flex-col px-6 py-4 space-y-4">
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`text-base transition
+                      ${active
+                        ? "font-semibold text-amber-500"
+                        : "text-gray-700 hover:text-amber-500"
+                      }
+                    `}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="mt-2 inline-flex justify-center rounded-full bg-amber-500 px-5 py-2 text-sm font-semibold text-black transition hover:bg-amber-300"
+              >
+                Login
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );

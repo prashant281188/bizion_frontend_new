@@ -1,12 +1,19 @@
 import { z } from "zod";
 import { api } from "./axios";
-import { title } from "process";
 
 
 type ApiResponse<T> = {
     success: boolean,
     message: string,
-    data: T
+    data: T,
+    meta: meta
+}
+
+type meta = {
+    page: number,
+    limit: number,
+    total: number,
+    totalPages: number
 }
 
 /* ---------- Schema ---------- */
@@ -80,4 +87,13 @@ export async function getProduct(id: string): Promise<Product> {
 export async function getCarouselData(): Promise<CarouselData[]> {
     const res = await api.get<ApiResponse<CarouselData[]>>("/public/carousel")
     return res.data.data
+}
+
+export async function getProductsWithFilter(params: {
+    page: number;
+    limit: number;
+    search?: string
+}) {
+    const res = await api.get<ApiResponse<Product[]>>("/public/products", { params })
+    return res.data
 }
