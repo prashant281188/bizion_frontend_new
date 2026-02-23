@@ -1,5 +1,5 @@
 import ProductForm from "@/components/admin/form/ProductForm";
-import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
+import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
 import PageHeader from "@/components/navigation/public/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";

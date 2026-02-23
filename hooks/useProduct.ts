@@ -5,6 +5,7 @@ export function useProduct(id: string) {
     return useQuery({
         queryKey: ["product", id],
         queryFn: () => getProduct(id),
+        
        
     });
 }

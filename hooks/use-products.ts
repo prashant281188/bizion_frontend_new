@@ -1,4 +1,4 @@
-import { getProducts, getProductsWithFilter } from "@/lib/api/public";
+import {  getProductsWithFilter } from "@/lib/api/public";
 import { useQuery } from "@tanstack/react-query";
 
 export function useProducts({ page, limit, search }: { page: number, limit: number, search?: string }) {

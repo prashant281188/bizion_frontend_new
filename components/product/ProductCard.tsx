@@ -19,8 +19,8 @@ const ProductCard = ({ id, model, brand, category }: ProductCardProps) => {
           <Image
             src={"/products/1.jpg"}
             alt={model}
-            width={500}
-            height={500}
+            width={1000}
+            height={1000}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>

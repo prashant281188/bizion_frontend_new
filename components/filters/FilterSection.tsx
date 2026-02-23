@@ -1,25 +1,32 @@
 import { usePublicCategories } from "@/hooks/use-categories";
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+
 import { Input } from "../ui/input";
+import Filter from "./Filter";
+import { useBrands } from "@/hooks/use-brands";
 
 const FilterSection = ({
   onFilterChange,
 }: {
   onFilterChange: (val: string) => void;
 }) => {
-  const { data, isLoading } = usePublicCategories();
+  const categories = usePublicCategories();
+  const brands = useBrands();
+
+  const categoryOptions = categories.data?.map((cat) => ({
+    label: cat.name,
+    value: cat.id,
+  }));
+
+  const brandOptions = brands.data?.map((brand) => ({
+    label: brand.name,
+    value: brand.id,
+  }));
 
   const handlePageSelect = () => {
     console.log("Select Page Items clicked");
   };
-  const handleCategorySelect = () => {
+  const handleCategoryChange = () => {
     console.log("Select Category clicked");
   };
   return (
@@ -36,39 +43,19 @@ const FilterSection = ({
         />
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-4">
-          <Select onValueChange={handleCategorySelect}>
-            <SelectTrigger className="rounded-md border border-black/10 px-4 py-2 text-sm focus:ring-amber-500 selection:ring-amber-500">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {isLoading ? (
-                <SelectItem value="#">Loading...</SelectItem>
-              ) : (
-                <>
-                  {data?.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </>
-              )}
-            </SelectContent>
-          </Select>
+        <Filter
+          className="w-full"
+          label="category"
+          options={categoryOptions}
+          onChange={handleCategoryChange}
+        />
 
-          <Select>
-            <SelectTrigger className="rounded-md border border-black/10 px-4 py-2 text-sm focus:ring-amber-500">
-              <SelectValue placeholder="Select Finish" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">All Finishes</SelectItem>
-              <SelectItem value="2">Matt Black</SelectItem>
-              <SelectItem value="3">Brushed Brass</SelectItem>
-              <SelectItem value="4">Chrome</SelectItem>
-              <SelectItem value="5">Rose Gold</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Filter
+          className="w-full"
+          label="brand"
+          options={brandOptions}
+          onChange={handlePageSelect}
+        />
       </div>
     </div>
   );

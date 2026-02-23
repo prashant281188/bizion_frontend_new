@@ -40,6 +40,7 @@ const ProductDetailPage = () => {
   const { data, isLoading } = useProduct(id as string);
   return (
     <>
+      {isLoading ? <>Loading....</> : <></>}
       <section className="w-full bg-white py-24">
         <div className="container mx-auto px-6">
           <Button variant={"secondary"}>
@@ -82,7 +83,7 @@ const ProductDetailPage = () => {
               <span className="inline-block mb-3 h-1 w-12 rounded-full bg-amber-500" />
 
               <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
-               {data?.model}
+                {data?.model}
               </h1>
 
               <p className="mt-3 text-muted-foreground">

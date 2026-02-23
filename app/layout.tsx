@@ -39,7 +39,7 @@ export default function RootLayout({
     `}
       >
         <QueryProvider>
-          <div className="flex min-h-screen">
+          <div className=" min-h-screen">
             {children}
             <Toaster />
           </div>

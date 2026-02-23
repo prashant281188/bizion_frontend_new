@@ -11,6 +11,7 @@ import SortToggle from "@/components/SortToggle";
 import { ViewToggle } from "@/components/ViewToggle";
 
 const PublicProductsPage = () => {
+
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState("");
   const [search, setSearch] = useState("");
@@ -93,7 +94,6 @@ const PublicProductsPage = () => {
         onPageChange={setPage}
         totalPages={meta?.totalPages ?? 1}
       />
-
     </>
   );
 };
