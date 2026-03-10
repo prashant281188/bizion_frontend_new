@@ -1,4 +1,3 @@
-import ProductForm from "@/components/admin/form/ProductForm";
 import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
 import PageHeader from "@/components/navigation/public/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ const page = () => {
         </Link>
       </div>
       <PageHeader title="Add New Product" description="Create New Product" />
-      <ProductForm />
     </div>
   );
 };

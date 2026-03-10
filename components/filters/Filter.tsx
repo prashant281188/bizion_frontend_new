@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { cn } from "@/lib/utils";
+import { titleCase } from "@/utils";
 
 type SelectOption = {
   label: string;
@@ -16,22 +17,41 @@ type SelectOption = {
 interface FilterProps {
   label: string;
   options?: SelectOption[];
-  onChange: (val: string) => void;
+  onChange: (option: SelectOption) => void;
   className?: string;
+  value?: string;
 }
 
-const Filter = ({ label, options, onChange, className }: FilterProps) => {
+const Filter = ({
+  label,
+  options,
+  onChange,
+  className,
+  value,
+}: FilterProps) => {
+  const handleChange = (value: string) => {
+    const selected = options?.find((opt) => opt.value === value) ?? {
+      label: "All",
+      value: "",
+    };
+    if (selected) {
+      onChange(selected);
+    }
+  };
+  const selectedLabel = options?.find((opt) => opt.value === value)?.label;
+
   return (
     <div>
-      <Select onValueChange={onChange}>
+      <Select onValueChange={handleChange} value={value ?? ""}>
         <SelectTrigger className={cn(className)}>
-          <SelectValue placeholder={label} />
+          <SelectValue placeholder={label}>{titleCase(selectedLabel ?? "")}</SelectValue>
         </SelectTrigger>
 
         <SelectContent>
+          <SelectItem value=" ">All {label}</SelectItem>
           {options?.map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
+              {titleCase(opt.label)}
             </SelectItem>
           ))}
         </SelectContent>

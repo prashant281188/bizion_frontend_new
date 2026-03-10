@@ -2,6 +2,7 @@
 import { useBrands } from "@/hooks/use-brands";
 import React from "react";
 import { Card } from "./ui/card";
+import { titleCase } from "@/utils";
 
 const BrandSection = () => {
   const { data, isLoading, error } = useBrands();
@@ -15,12 +16,12 @@ const BrandSection = () => {
             Trusted Brands We Offer
           </h2>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-            Partnering with industry-leading hardware manufacturers
+            Partnering with industry-leading hardware manufacturers of Rajkot
           </p>
         </div>
 
         {/* Brand Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
           {isLoading ? (
             <>Loading...</>
           ) : (
@@ -28,9 +29,9 @@ const BrandSection = () => {
               {data?.map((brand) => (
                 <Card
                   key={brand.id}
-                  className="group flex items-center justify-center rounded-2xl bg-white px-3 py-3 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                  className="group flex items-center justify-center rounded-2xl bg-white px-10 py-3 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                 >
-                  {brand.name}
+                  {titleCase(brand.name)}
                 </Card>
               ))}
             </>

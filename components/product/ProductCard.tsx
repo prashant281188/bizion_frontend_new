@@ -1,3 +1,4 @@
+import { titleCase } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -5,7 +6,10 @@ import React from "react";
 interface ProductCardProps {
   id: string;
   model: string;
-  brand: string;
+  brand: {
+    name?: string;
+    logo?: string;
+  };
   category: {
     name: string;
   };
@@ -27,8 +31,12 @@ const ProductCard = ({ id, model, brand, category }: ProductCardProps) => {
 
         <div className="p-4">
           <h3 className="text-sm font-semibold text-gray-900">{model}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">{category.name}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{brand}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {titleCase(category.name)}
+          </p>
+          <p className="mt-1 text-xs  text-amber-500">
+            {brand.name ? titleCase(brand.name) : ""}
+          </p>
         </div>
       </Link>
     </div>

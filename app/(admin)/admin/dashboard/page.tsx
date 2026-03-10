@@ -1,25 +1,15 @@
 import React from "react";
-import { Calendar1Icon } from "lucide-react";
-
-import PageHeader from "@/components/navigation/public/PageHeader";
-import BiDataTable from "@/components/datatable/BiDataTable";
-import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
-import InfoCard from "../components/InfoCard";
 
 
 const AdminDashboardPage = () => {
   return (
-   <div className="max-w-9xl mx-auto gap-4 grid">
-      <BiBreadcrumb/>
-      <PageHeader title="Dashboard" description="Realtime Dashboard Snapshot"/>
-      {/* page content */}
-      <InfoCard
-        changePercentage={10}
-        title="Info"
-        value="10"
-        icon={<Calendar1Icon />}
-      />
-      <BiDataTable />
+    <div className="p-6 space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
+        <p className="text-muted-foreground">
+          Manage your account and system preferences.
+        </p>
+      </div>
     </div>
   );
 };

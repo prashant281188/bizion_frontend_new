@@ -11,11 +11,7 @@ const page = () => {
   return (
     <div className="max-w-9xl mx-auto gap-4 grid">
       <BiBreadcrumb />
-     <PageHeader
-        title="Parties"
-        description="Manage customers, suppliers, and their balances."
-        action={<Button>Add Party</Button>}
-      />
+  
 
       {/* content */}
       <PartyDataTable />

@@ -1,11 +1,22 @@
-import React from 'react'
+"use client";
 
+import React from "react";
 
-import { Home } from 'lucide-react'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../../ui/breadcrumb'
+import { Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../ui/breadcrumb";
+import { usePathname } from "next/navigation";
 const BiBreadcrumb = () => {
+  const path = usePathname();
   return (
-   <Breadcrumb>
+    <Breadcrumb>
+    {path.toLowerCase()}
       <BreadcrumbList className="text-sm text-muted-foreground">
         <BreadcrumbItem>
           <BreadcrumbLink
@@ -22,10 +33,7 @@ const BiBreadcrumb = () => {
         </BreadcrumbSeparator>
 
         <BreadcrumbItem>
-          <BreadcrumbLink
-            href="/documents"
-            className="hover:text-foreground"
-          >
+          <BreadcrumbLink href="/documents" className="hover:text-foreground">
             Documents
           </BreadcrumbLink>
         </BreadcrumbItem>
@@ -41,7 +49,7 @@ const BiBreadcrumb = () => {
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
-  )
-}
+  );
+};
 
-export default BiBreadcrumb
+export default BiBreadcrumb;

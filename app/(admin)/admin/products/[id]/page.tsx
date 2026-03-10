@@ -1,4 +1,3 @@
-import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
 import React from "react";
 import ProductDetail from "../../../../../components/product/ProductDetail";
 
@@ -78,7 +77,6 @@ const productDemo = {
 const page = () => {
   return (
     <div className="max-w-9xl mx-auto gap-4 grid">
-      <BiBreadcrumb />
       
       <ProductDetail Product={productDemo} />
     </div>

@@ -22,6 +22,7 @@ import {
   BarChart3,
   Users,
   Settings,
+  User,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -52,42 +53,48 @@ export const sidebarConfig = [
         children: [
           { title: "Product List", url: "/admin/products" },
           { title: "Add Product", url: "/admin/products/create" },
-          { title: "Categories", url: "/admin/categories" },
-          { title: "Brands", url: "/admin/brands" },
+        ],
+      },
+      {
+        title: "Party",
+        icon: User,
+        children: [
+          { title: "Party List", url: "/admin/parties" },
+          { title: "Add Party", url: "/admin/parties/add" },
         ],
       },
     ],
   },
-  {
-    label: "Sales",
-    items: [
-      {
-        title: "Sales Invoice",
-        url: "/admin/sales/invoice",
-        icon: ShoppingCart,
-      },
-      { title: "Sales Estimate", url: "/admin/sales/estimate", icon: Layers },
-      { title: "Customers", url: "/admin/customers", icon: Users },
-    ],
-  },
-  {
-    label: "Purchase",
-    items: [
-      {
-        title: "Purchase Invoice",
-        url: "/admin/purchase/invoice",
-        icon: Truck,
-      },
-      { title: "Vendors", url: "/admin/vendors", icon: Users },
-    ],
-  },
-  {
-    label: "Reports",
-    items: [
-      { title: "Sales Report", url: "/admin/reports/sales", icon: BarChart3 },
-      { title: "Stock Report", url: "/admin/reports/stock", icon: BarChart3 },
-    ],
-  },
+  // {
+  //   label: "Sales",
+  //   items: [
+  //     {
+  //       title: "Sales Invoice",
+  //       url: "/admin/sales/invoice",
+  //       icon: ShoppingCart,
+  //     },
+  //     { title: "Sales Estimate", url: "/admin/sales/estimate", icon: Layers },
+  //     { title: "Customers", url: "/admin/customers", icon: Users },
+  //   ],
+  // },
+  // {
+  //   label: "Purchase",
+  //   items: [
+  //     {
+  //       title: "Purchase Invoice",
+  //       url: "/admin/purchase/invoice",
+  //       icon: Truck,
+  //     },
+  //     { title: "Vendors", url: "/admin/vendors", icon: Users },
+  //   ],
+  // },
+  // {
+  //   label: "Reports",
+  //   items: [
+  //     { title: "Sales Report", url: "/admin/reports/sales", icon: BarChart3 },
+  //     { title: "Stock Report", url: "/admin/reports/stock", icon: BarChart3 },
+  //   ],
+  // },
   {
     label: "System",
     items: [
@@ -98,6 +105,7 @@ export const sidebarConfig = [
 ];
 
 import { ChevronRight, ChevronUp, TvIcon, User2 } from "lucide-react";
+import { title } from "process";
 
 const AdminSidebar = () => {
   return (

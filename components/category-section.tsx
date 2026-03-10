@@ -37,7 +37,7 @@ const CategorySection = () => {
                     title={cat.name}
                     image={`/products/${(idx + 1) % 5}.jpg`}
                     subtitle={cat.description}
-                    link={cat.name}
+                    link={cat.id}
                   />
                 ))}
               </>

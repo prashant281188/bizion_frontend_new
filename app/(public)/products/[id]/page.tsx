@@ -2,56 +2,78 @@
 
 import { Button } from "@/components/ui/button";
 import { useProduct } from "@/hooks/useProduct";
+import { titleCase } from "@/utils";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React from "react";
-function VariantGroup({
-  title,
-  options,
-  color,
-}: {
-  title: string;
-  options: string[];
-  color?: boolean;
-}) {
-  return (
-    <div>
-      <h4 className="mb-2 text-sm font-semibold">{title}</h4>
-      <div className="flex flex-wrap gap-3">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            className={`rounded-full px-4 py-2 text-sm ring-1 ring-black/10 transition
-            hover:ring-amber-500 ${color ? "capitalize" : ""}`}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
+import React, { useState } from "react";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
 
   const { data, isLoading } = useProduct(id as string);
+  const [image, setImage] = useState("/products/1.jpg");
+
+  let uniqueSizes: string[] = [];
+  let uniqueFinishes: string[] = [];
+  if (data?.variants) {
+    uniqueSizes = Array.from(
+      new Set(
+        data?.variants
+          .map((d) => d.size)
+          .filter((size): size is string => size !== undefined),
+      ),
+    );
+    uniqueFinishes = Array.from(
+      new Set(
+        data?.variants
+          .map((d) => d.finish)
+          .filter((finish): finish is string => finish !== undefined),
+      ),
+    ).sort();
+  }
+
+  // useEffect(() => {
+
+  //     if (data?.variants) {
+  //       uniqueSizes = Array.from(
+  //         new Set(
+  //           data?.variants
+  //             .map((d) => d.size)
+  //             .filter((size): size is string => size !== undefined),
+  //         ),
+  //       );
+  //       uniqueFinishes = Array.from(
+  //         new Set(
+  //           data?.variants
+  //             .map((d) => d.finish)
+  //             .filter((finish): finish is string => finish !== undefined),
+  //         ),
+  //       ).sort();
+  //     }
+
+  // }, []);
+
   return (
     <>
       {isLoading ? <>Loading....</> : <></>}
-      <section className="w-full bg-white py-24">
+
+      <section className="w-full bg-white py-10">
         <div className="container mx-auto px-6">
           <Button variant={"secondary"}>
-            <Link href={"/products"}> Back to Products</Link>
+            <Link href={"/products"} className="flex gap-2 items-center">
+              <ArrowLeft />
+              <span>Back</span>
+            </Link>
           </Button>
           <div className="pt-4 grid gap-16 md:grid-cols-2">
             {/* LEFT: Image Gallery */}
-            <div>
-              <div className="aspect-square overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-black/5">
+            <div className="">
+              <div className="min-h-auto max-h-[500px] overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-black/5">
                 <Image
-                  src="/products/1.jpg"
+                  src={image}
                   alt="Product"
                   className="h-full w-full object-cover"
                   height={1000}
@@ -60,11 +82,12 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Thumbnails */}
-              <div className="mt-4 flex gap-4">
-                {["1", "2", "3"].map((i) => (
+              <div className="mt-4 flex flex-wrap gap-4 ">
+                {["2", "3", "4", "5"].map((i) => (
                   <button
                     key={i}
-                    className="aspect-square w-20 overflow-hidden rounded-xl ring-1 ring-black/5 hover:ring-amber-500"
+                    onMouseEnter={() => setImage(`/products/${i}.jpg`)}
+                    className="aspect-square w-12 overflow-hidden rounded-xl ring-1 ring-black/5 hover:ring-amber-500"
                   >
                     <Image
                       src={`/products/${i}.jpg`}
@@ -79,59 +102,45 @@ const ProductDetailPage = () => {
             </div>
 
             {/* RIGHT: Product Info */}
-            <div>
-              <span className="inline-block mb-3 h-1 w-12 rounded-full bg-amber-500" />
-
-              <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
-                {data?.model}
+            <div className="">
+              <h1 className="text-sm flex w-auto justify-center  items-center py-1 rounded-full border-amber-500 border-[1px] text-amber-500 ">
+                {titleCase(data?.brand.name)}
+              </h1>
+              <h1 className="pt-4 text-3xl md:text-4xl font-semibold text-gray-900">
+                {titleCase(data?.model)}
               </h1>
 
               <p className="mt-3 text-muted-foreground">
                 Modern architectural door handle designed for residential and
                 commercial interiors with premium finishes.
               </p>
-
-              {/* Variant Selectors */}
-              <div className="mt-10 space-y-6">
-                <VariantGroup
-                  title="Model"
-                  options={["SH-2001", "SH-2006", "SH-2026"]}
-                />
-                <VariantGroup
-                  title="Size"
-                  options={["150 mm", "200 mm", "250 mm"]}
-                />
-                <VariantGroup
-                  title="Finish"
-                  options={[
-                    "Matt Black",
-                    "Brushed Brass",
-                    "Rose Gold",
-                    "Chrome",
-                  ]}
-                  color
-                />
+              <h1 className="text-amber-500/80 mt-4  mb-2">
+                Sizes Available :
+              </h1>
+              <div className="flex flex-wrap gap-2">
+                {uniqueFinishes ? (
+                  <>
+                    {uniqueSizes?.map((size) => (
+                      <span className="px-2 py-1 text-sm rounded-full w-20 flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2 ">
+                        {size}
+                      </span>
+                    ))}
+                  </>
+                ) : (
+                  <span className="px-2 py-1 text-sm rounded-full w-20 flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2">
+                    N/A
+                  </span>
+                )}
               </div>
-
-              {/* SKU & Stock */}
-              <div className="mt-8 rounded-xl bg-neutral-50 p-4 ring-1 ring-black/5">
-                <p className="text-sm">
-                  <span className="font-medium">SKU:</span> SH-2001-MB-200
-                </p>
-                <p className="mt-1 text-sm">
-                  <span className="font-medium">Availability:</span>{" "}
-                  <span className="text-green-600 font-medium">In Stock</span>
-                </p>
-              </div>
-
-              {/* CTA */}
-              <div className="mt-8 flex gap-4">
-                <button className="rounded-full bg-amber-500 px-8 py-3 text-sm font-semibold text-black hover:bg-amber-600">
-                  Enquire Now
-                </button>
-                <button className="rounded-full border border-black/10 px-8 py-3 text-sm hover:border-black">
-                  Download Catalogue
-                </button>
+              <h1 className="text-amber-500/80 mt-4  mb-2">
+                Finishes Available :
+              </h1>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                {uniqueFinishes?.map((finish) => (
+                  <span className="px-2 py-1 text-sm rounded-full w-auto flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2 ">
+                    {titleCase(finish)}
+                  </span>
+                ))}
               </div>
             </div>
           </div>

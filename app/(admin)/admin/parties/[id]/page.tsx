@@ -1,7 +1,6 @@
 import React from "react";
 import PartyDetailCard from "../components/PartyDetailCard";
 import PageHeader from "@/components/navigation/public/PageHeader";
-import BiBreadcrumb from "@/components/ui/common/BiBreadcrumb";
 import PartyBalanceCard from "../components/PartyBalanceCard";
 
 const PartyDemo = {
@@ -14,7 +13,6 @@ const PartyDemo = {
 const page = () => {
   return (
    <div className="max-w-9xl mx-auto gap-4 grid">
-      <BiBreadcrumb/>
       <PageHeader title="Party" description="Party Realtime Snapshot" />
       <PartyDetailCard partyDetail={PartyDemo}/> 
       <PartyBalanceCard/> 
