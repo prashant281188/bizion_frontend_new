@@ -113,7 +113,7 @@ const ProductDetailPage = () => {
               <p className="mt-3 text-muted-foreground">
                 Modern architectural door handle designed for residential and
                 commercial interiors with premium finishes.
-              </p>
+              </p> 
               <h1 className="text-amber-500/80 mt-4  mb-2">
                 Sizes Available :
               </h1>
