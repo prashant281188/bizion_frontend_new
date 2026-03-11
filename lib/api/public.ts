@@ -34,6 +34,8 @@ export const productSchema = z.object({
     id: z.uuid(),
     model: z.string(),
     metal: z.string(),
+    unit: z.string().optional(),
+    sizeType: z.string().optional(),
     brand: z.object({
         name: z.string(),
         logo: z.string()
@@ -96,9 +98,9 @@ export async function getProductsWithFilter(params: {
     page: number;
     limit: number;
     search?: string
-    brand?:string;
-    category?:string
-    sort?:string
+    brand?: string;
+    category?: string
+    sort?: string
 }) {
     const res = await api.get<ApiResponse<Product[]>>("/public/products", { params })
     return res.data

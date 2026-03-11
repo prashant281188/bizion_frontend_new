@@ -113,16 +113,19 @@ const ProductDetailPage = () => {
               <p className="mt-3 text-muted-foreground">
                 Modern architectural door handle designed for residential and
                 commercial interiors with premium finishes.
-              </p> 
+              </p>
               <h1 className="text-amber-500/80 mt-4  mb-2">
                 Sizes Available :
               </h1>
               <div className="flex flex-wrap gap-2">
-                {uniqueFinishes ? (
+                {uniqueSizes ? (
                   <>
                     {uniqueSizes?.map((size) => (
-                      <span className="px-2 py-1 text-sm rounded-full w-20 flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2 ">
-                        {size}
+                      <span
+                        key={size}
+                        className="px-2 py-1 text-sm rounded-full w-20 flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2 "
+                      >
+                        {size} {data?.sizeType}
                       </span>
                     ))}
                   </>
@@ -136,11 +139,22 @@ const ProductDetailPage = () => {
                 Finishes Available :
               </h1>
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2">
-                {uniqueFinishes?.map((finish) => (
-                  <span className="px-2 py-1 text-sm rounded-full w-auto flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2 ">
-                    {titleCase(finish)}
+                {uniqueFinishes ? (
+                  <>
+                    {uniqueFinishes?.map((finish) => (
+                      <span
+                        key={finish}
+                        className="px-2 py-1 text-sm rounded-full justify-center text-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2 "
+                      >
+                        {finish}
+                      </span>
+                    ))}
+                  </>
+                ) : (
+                  <span className="px-2 py-1 text-sm rounded-full w-20 flex justify-center hover:bg-amber-500 hover:text-white border-[0.01rem] border-amber-500 mr-2">
+                    N/A
                   </span>
-                ))}
+                )}
               </div>
             </div>
           </div>
