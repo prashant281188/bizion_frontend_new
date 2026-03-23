@@ -1,8 +1,5 @@
 import axios, { AxiosError } from "axios";
 
-
-
-
 const getApiUrl = () => {
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
@@ -28,17 +25,18 @@ export const api = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
+
   },
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message?: string }>) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
       window.location.href = "/login"
     }
     return Promise.reject(
-      error.response?.data.message || "Something went wrong"
+      error.response?.data?.message || "Something went wrong"
     )
   }
 )

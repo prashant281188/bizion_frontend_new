@@ -22,8 +22,8 @@ const PublicNavbar = () => {
   };
 
   return (
-    <header className="w-full">
-      <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm ring-1 ring-black/5">
+    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm ring-1 ring-black/5">
+      <nav className="w-full">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex h-16 items-center justify-between">
             
@@ -87,7 +87,7 @@ const PublicNavbar = () => {
 
         {/* Mobile Dropdown */}
         {isOpen && (
-          <div className="md:hidden bg-white shadow-md border-t">
+          <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-black/5">
             <div className="flex flex-col px-6 py-4 space-y-4">
               {navLinks.map((link) => {
                 const active = isActive(link.href);

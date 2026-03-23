@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Sidebar,
@@ -12,33 +14,37 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-
 import {
   Home,
   Package,
-  Layers,
-  ShoppingCart,
-  Truck,
-  BarChart3,
-  Users,
   Settings,
-  User,
+  ChevronRight,
+  LayoutGrid,
+  Building2,
+  BookOpen,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/providers/auth-provider";
+import { cn } from "@/lib/utils";
+import { titleCase } from "@/utils";
 
-export const sidebarConfig = [
+type NavChild = { title: string; url: string };
+type NavItem = {
+  title: string;
+  icon: React.ElementType;
+  url?: string;
+  children?: NavChild[];
+};
+type NavGroup = { label: string; items: NavItem[] };
+
+export const sidebarConfig: NavGroup[] = [
   {
     label: "Application",
     items: [
@@ -51,100 +57,118 @@ export const sidebarConfig = [
         title: "Products",
         icon: Package,
         children: [
-          { title: "Product List", url: "/admin/products" },
-          { title: "Add Product", url: "/admin/products/create" },
+          { title: "Product List",  url: "/admin/products" },
+          { title: "Add Product",   url: "/admin/products/create" },
+          { title: "Catalogue",     url: "/admin/products/catalouge" },
         ],
       },
       {
-        title: "Party",
-        icon: User,
+        title: "Parties",
+        icon: Building2,
         children: [
           { title: "Party List", url: "/admin/parties" },
-          { title: "Add Party", url: "/admin/parties/add" },
         ],
       },
     ],
   },
-  // {
-  //   label: "Sales",
-  //   items: [
-  //     {
-  //       title: "Sales Invoice",
-  //       url: "/admin/sales/invoice",
-  //       icon: ShoppingCart,
-  //     },
-  //     { title: "Sales Estimate", url: "/admin/sales/estimate", icon: Layers },
-  //     { title: "Customers", url: "/admin/customers", icon: Users },
-  //   ],
-  // },
-  // {
-  //   label: "Purchase",
-  //   items: [
-  //     {
-  //       title: "Purchase Invoice",
-  //       url: "/admin/purchase/invoice",
-  //       icon: Truck,
-  //     },
-  //     { title: "Vendors", url: "/admin/vendors", icon: Users },
-  //   ],
-  // },
-  // {
-  //   label: "Reports",
-  //   items: [
-  //     { title: "Sales Report", url: "/admin/reports/sales", icon: BarChart3 },
-  //     { title: "Stock Report", url: "/admin/reports/stock", icon: BarChart3 },
-  //   ],
-  // },
   {
     label: "System",
     items: [
-      { title: "Users", url: "/admin/users", icon: Users },
       { title: "Settings", url: "/admin/settings", icon: Settings },
     ],
   },
 ];
 
-import { ChevronRight, ChevronUp, TvIcon, User2 } from "lucide-react";
-import { title } from "process";
-
 const AdminSidebar = () => {
+  const pathname = usePathname();
+  const { user } = useAuth();
+
+  // Top-level items: exact match or any sub-path
+  const isActive = (url: string) =>
+    pathname === url || pathname.startsWith(url + "/");
+
+  // Child items: most specific sibling wins — prevents /admin/products from
+  // matching when the active path is /admin/products/create
+  const isChildActive = (url: string, siblings: NavChild[]) => {
+    if (pathname === url) return true;
+    if (!pathname.startsWith(url + "/")) return false;
+    return !siblings.some(
+      (s) => s.url !== url && (pathname === s.url || pathname.startsWith(s.url + "/"))
+    );
+  };
+
+  const isGroupActive = (children: NavChild[]) =>
+    children.some((c) => isChildActive(c.url, children));
+
+  const userInitials = user?.email
+    ? user.email.slice(0, 2).toUpperCase()
+    : "AD";
+
   return (
-    <Sidebar className="bg-white border-r border-black/5">
+    <Sidebar className="border-r border-black/5">
       {/* HEADER */}
-      <SidebarHeader className="h-16 px-4 border-b border-black/5">
-        <div className="flex items-center gap-2 font-semibold tracking-wide">
-          <TvIcon size={18} className="text-amber-500" />
-          HINI Admin
-        </div>
+      <SidebarHeader className="h-14 px-4 border-b border-black/5">
+        <Link href="/admin/dashboard" className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500">
+            <LayoutGrid className="h-4 w-4 text-black" />
+          </div>
+          <span className="font-bold tracking-tight text-gray-900">HINI Admin</span>
+        </Link>
       </SidebarHeader>
 
       {/* CONTENT */}
       <SidebarContent>
-        <ScrollArea className="px-2">
+        <ScrollArea className="px-2 py-2">
           {sidebarConfig.map((group) => (
-            <SidebarGroup key={group.label}>
-              <SidebarGroupLabel className="px-3 text-xs uppercase tracking-widest text-muted-foreground">
+            <SidebarGroup key={group.label} className="mb-1">
+              <SidebarGroupLabel className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {group.label}
               </SidebarGroupLabel>
 
               <SidebarMenu>
                 {group.items.map((item) =>
                   item.children ? (
-                    <Collapsible key={item.title} className="group/collapsible">
+                    <Collapsible
+                      key={item.title}
+                      className="group/collapsible"
+                      defaultOpen={isGroupActive(item.children)}
+                    >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuButton>
-                            <item.icon className=" h-4 w-4" />
-                            {item.title}
-                            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                          <SidebarMenuButton
+                            className={cn(
+                              "w-full rounded-lg transition-colors",
+                              isGroupActive(item.children)
+                                ? "bg-amber-50 text-amber-700 font-medium"
+                                : "hover:bg-neutral-100"
+                            )}
+                          >
+                            <item.icon
+                              className={cn(
+                                "h-4 w-4",
+                                isGroupActive(item.children)
+                                  ? "text-amber-600"
+                                  : "text-muted-foreground"
+                              )}
+                            />
+                            <span>{item.title}</span>
+                            <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]/collapsible:rotate-90" />
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
 
                         <CollapsibleContent>
-                          <SidebarMenuSub>
+                          <SidebarMenuSub className="ml-4 border-l border-black/5 pl-3">
                             {item.children.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton
+                                  asChild
+                                  className={cn(
+                                    "rounded-lg text-sm transition-colors",
+                                    isChildActive(child.url, item.children!)
+                                      ? "bg-amber-500 text-black font-semibold hover:bg-amber-500"
+                                      : "text-muted-foreground hover:bg-neutral-100 hover:text-gray-900"
+                                  )}
+                                >
                                   <Link href={child.url}>{child.title}</Link>
                                 </SidebarMenuButton>
                               </SidebarMenuSubItem>
@@ -155,17 +179,27 @@ const AdminSidebar = () => {
                     </Collapsible>
                   ) : (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <Link
-                          href={item.url}
-                          className="flex items-center gap-2"
-                        >
-                          <item.icon className="h-4 w-4" />
+                      <SidebarMenuButton
+                        asChild
+                        className={cn(
+                          "rounded-lg transition-colors",
+                          isActive(item.url!)
+                            ? "bg-amber-500 text-black font-semibold hover:bg-amber-500"
+                            : "hover:bg-neutral-100"
+                        )}
+                      >
+                        <Link href={item.url!} className="flex items-center gap-2">
+                          <item.icon
+                            className={cn(
+                              "h-4 w-4",
+                              isActive(item.url!) ? "text-black" : "text-muted-foreground"
+                            )}
+                          />
                           {item.title}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  ),
+                  )
                 )}
               </SidebarMenu>
             </SidebarGroup>
@@ -173,29 +207,24 @@ const AdminSidebar = () => {
         </ScrollArea>
       </SidebarContent>
 
-      {/* FOOTER */}
-      <SidebarFooter className="border-t border-black/5 p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 className="mr-2 h-4 w-4" />
-                  Admin User
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent side="top" className="w-full">
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600">
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* FOOTER — user info only, no duplicate links */}
+      <SidebarFooter className="border-t border-black/5 p-3">
+        <Link
+          href="/admin/settings"
+          className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-neutral-100 transition-colors"
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-black">
+            {userInitials}
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs font-semibold text-gray-900 truncate">
+              {user?.email ?? "Admin"}
+            </span>
+            <span className="text-[10px] text-muted-foreground truncate">
+              {titleCase(user?.role?.name ?? "Admin")}
+            </span>
+          </div>
+        </Link>
       </SidebarFooter>
     </Sidebar>
   );

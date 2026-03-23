@@ -1,16 +1,14 @@
-import { BellIcon } from "lucide-react";
+import { Bell } from "lucide-react";
 import React from "react";
 
 const BiNotification = () => {
   return (
-    <div className="relative inline-flex items-center justify-center">
-      <BellIcon className="h-6 w-6 text-gray-600" />
-
-      {/* Badge */}
-      <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
-        9
-      </span>
-    </div>
+    <button
+      aria-label="Notifications"
+      className="relative flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-gray-900 transition-colors"
+    >
+      <Bell className="h-4 w-4" />
+    </button>
   );
 };
 

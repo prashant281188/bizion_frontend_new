@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 
 interface Props {
   value: string;
@@ -11,11 +12,21 @@ export default function FilterSearch({
   onChange,
   placeholder = "Search...",
 }: Props) {
+  const [local, setLocal] = useState(value);
+
+  // Sync URL → local only when the URL value is cleared externally (e.g. filter reset)
+  useEffect(() => {
+    if (value === "") setLocal("");
+  }, [value]);
+
   return (
     <Input
       placeholder={placeholder}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+      value={local}
+      onChange={(e) => {
+        setLocal(e.target.value);
+        onChange(e.target.value);
+      }}
     />
   );
 }

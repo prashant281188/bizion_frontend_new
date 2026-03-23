@@ -1,539 +1,418 @@
-import Datatable from "@/components/admin/datatable/Datatable";
-import { Button } from "@/components/ui/button";
-import PageHeader from "@/components/navigation/public/PageHeader";
-import React from "react";
-import { productListColumns } from "../../../../components/product/ProductListColums";
+"use client";
+
+import React, { Suspense } from "react";
 import Link from "next/link";
-import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
-const dataDemo = [
-  // ---------- PROFILE (SH models) ----------
-  {
-    id: "p001",
-    model: "SH-2001",
-    brand: "Flybird",
-    size: "3048",
-    size_type: "mm",
-    finish: "Ceramic Gold",
-    mrp: "2380",
-    category: "Profile",
-  },
-  {
-    id: "p002",
-    model: "SH-2006",
-    brand: "Alstone",
-    size: "2440",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "2190",
-    category: "Profile",
-  },
-  {
-    id: "p003",
-    model: "SH-2007",
-    brand: "Eurobond",
-    size: "3050",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "2870",
-    category: "Profile",
-  },
-  {
-    id: "p004",
-    model: "SH-2026",
-    brand: "Flybird",
-    size: "1220x2440",
-    size_type: "mm",
-    finish: "Champagne Bronze",
-    mrp: "3150",
-    category: "Profile",
-  },
-  {
-    id: "p005",
-    model: "SH-2001",
-    brand: "Aludecor",
-    size: "3048",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "2250",
-    category: "Profile",
-  },
-  {
-    id: "p006",
-    model: "SH-2006",
-    brand: "Flybird",
-    size: "2440",
-    size_type: "mm",
-    finish: "Glossy White",
-    mrp: "1980",
-    category: "Profile",
-  },
-  {
-    id: "p007",
-    model: "SH-2007",
-    brand: "Alstone",
-    size: "3050",
-    size_type: "mm",
-    finish: "Ceramic Gold",
-    mrp: "2690",
-    category: "Profile",
-  },
-  {
-    id: "p008",
-    model: "SH-2026",
-    brand: "Eurobond",
-    size: "3048",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "2310",
-    category: "Profile",
-  },
-  {
-    id: "p009",
-    model: "SH-2001",
-    brand: "Flybird",
-    size: "2440",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "2950",
-    category: "Profile",
-  },
-  {
-    id: "p010",
-    model: "SH-2006",
-    brand: "Aludecor",
-    size: "3050",
-    size_type: "mm",
-    finish: "Champagne Bronze",
-    mrp: "3180",
-    category: "Profile",
-  },
+import Image from "next/image";
+import {
+  Plus,
+  Search,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  Pencil,
+  Package,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useProducts } from "@/hooks/use-products";
+import { usePublicCategories } from "@/hooks/use-categories";
+import { useBrands } from "@/hooks/use-brands";
+import { useURLFilters } from "@/hooks/useURLFilters";
+import { useDebounce } from "@/hooks/useDebounce";
+import { titleCase } from "@/utils";
+import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-  {
-    id: "p011",
-    model: "SH-2007",
-    brand: "Flybird",
-    size: "3048",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "2210",
-    category: "Profile",
-  },
-  {
-    id: "p012",
-    model: "SH-2026",
-    brand: "Alstone",
-    size: "2440",
-    size_type: "mm",
-    finish: "Glossy White",
-    mrp: "2050",
-    category: "Profile",
-  },
-  {
-    id: "p013",
-    model: "SH-2001",
-    brand: "Eurobond",
-    size: "3050",
-    size_type: "mm",
-    finish: "Ceramic Gold",
-    mrp: "2820",
-    category: "Profile",
-  },
-  {
-    id: "p014",
-    model: "SH-2006",
-    brand: "Flybird",
-    size: "3048",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "2270",
-    category: "Profile",
-  },
-  {
-    id: "p015",
-    model: "SH-2007",
-    brand: "Aludecor",
-    size: "2440",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "2910",
-    category: "Profile",
-  },
+/* ── Skeleton ────────────────────────────────────────────── */
+const TableSkeleton = () => (
+  <div className="rounded-xl border border-black/5 overflow-hidden">
+    <div className="grid grid-cols-[48px_1fr_140px_140px_100px_80px_80px] bg-neutral-50 border-b border-black/5 px-4 py-2.5 gap-4">
+      {["", "Model", "Brand", "Category", "Metal", "Tags", ""].map((h, i) => (
+        <div key={i} className={cn("h-3 rounded-full bg-neutral-200", h === "" ? "w-6" : "w-3/4")} />
+      ))}
+    </div>
+    {Array.from({ length: 8 }).map((_, i) => (
+      <div
+        key={i}
+        className="grid grid-cols-[48px_1fr_140px_140px_100px_80px_80px] items-center px-4 py-3 gap-4 border-b border-black/5 last:border-0 animate-pulse"
+        style={{ animationDelay: `${i * 40}ms` }}
+      >
+        <div className="h-9 w-9 rounded-lg bg-neutral-100" />
+        <div className="space-y-1.5">
+          <div className="h-3 w-2/3 rounded-full bg-neutral-100" />
+          <div className="h-2.5 w-1/3 rounded-full bg-neutral-100" />
+        </div>
+        <div className="h-3 w-3/4 rounded-full bg-neutral-100" />
+        <div className="h-3 w-3/4 rounded-full bg-neutral-100" />
+        <div className="h-3 w-1/2 rounded-full bg-neutral-100" />
+        <div className="h-5 w-12 rounded-full bg-neutral-100" />
+        <div className="h-7 w-16 rounded-lg bg-neutral-100" />
+      </div>
+    ))}
+  </div>
+);
 
-  {
-    id: "p016",
-    model: "SH-2026",
-    brand: "Flybird",
-    size: "3050",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "2190",
-    category: "Profile",
-  },
-  {
-    id: "p017",
-    model: "SH-2001",
-    brand: "Alstone",
-    size: "3048",
-    size_type: "mm",
-    finish: "Champagne Bronze",
-    mrp: "3120",
-    category: "Profile",
-  },
-  {
-    id: "p018",
-    model: "SH-2006",
-    brand: "Eurobond",
-    size: "2440",
-    size_type: "mm",
-    finish: "Glossy White",
-    mrp: "1970",
-    category: "Profile",
-  },
-  {
-    id: "p019",
-    model: "SH-2007",
-    brand: "Flybird",
-    size: "3050",
-    size_type: "mm",
-    finish: "Ceramic Gold",
-    mrp: "2740",
-    category: "Profile",
-  },
-  {
-    id: "p020",
-    model: "SH-2026",
-    brand: "Aludecor",
-    size: "3048",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "2330",
-    category: "Profile",
-  },
-
-  // ---------- DOOR HANDLE (9481) ----------
-  {
-    id: "d021",
-    model: "9481",
-    brand: "Flybird",
-    size: "8inch",
-    size_type: "inch",
-    finish: "Silver Grey",
-    mrp: "1450",
-    category: "Door Handle",
-  },
-  {
-    id: "d022",
-    model: "9481",
-    brand: "Alstone",
-    size: "10inch",
-    size_type: "inch",
-    finish: "Matte Black",
-    mrp: "1680",
-    category: "Door Handle",
-  },
-  {
-    id: "d023",
-    model: "9481",
-    brand: "Eurobond",
-    size: "12inch",
-    size_type: "inch",
-    finish: "Rose Gold",
-    mrp: "1890",
-    category: "Door Handle",
-  },
-  {
-    id: "d024",
-    model: "9481",
-    brand: "Flybird",
-    size: "8inch",
-    size_type: "inch",
-    finish: "Champagne Bronze",
-    mrp: "1720",
-    category: "Door Handle",
-  },
-  {
-    id: "d025",
-    model: "9481",
-    brand: "Aludecor",
-    size: "10inch",
-    size_type: "inch",
-    finish: "Glossy White",
-    mrp: "1550",
-    category: "Door Handle",
-  },
-  {
-    id: "d026",
-    model: "9481",
-    brand: "Eurobond",
-    size: "8inch",
-    size_type: "inch",
-    finish: "Silver Grey",
-    mrp: "1490",
-    category: "Door Handle",
-  },
-  {
-    id: "d027",
-    model: "9481",
-    brand: "Flybird",
-    size: "12inch",
-    size_type: "inch",
-    finish: "Matte Black",
-    mrp: "1820",
-    category: "Door Handle",
-  },
-  {
-    id: "d028",
-    model: "9481",
-    brand: "Alstone",
-    size: "10inch",
-    size_type: "inch",
-    finish: "Rose Gold",
-    mrp: "1760",
-    category: "Door Handle",
-  },
-  {
-    id: "d029",
-    model: "9481",
-    brand: "Eurobond",
-    size: "12inch",
-    size_type: "inch",
-    finish: "Champagne Bronze",
-    mrp: "1910",
-    category: "Door Handle",
-  },
-  {
-    id: "d030",
-    model: "9481",
-    brand: "Flybird",
-    size: "8inch",
-    size_type: "inch",
-    finish: "Glossy White",
-    mrp: "1580",
-    category: "Door Handle",
-  },
-
-  // ---------- CABINET HANDLE (Boot / I20 / Jems / Arrow) ----------
-  {
-    id: "c031",
-    model: "Boot",
-    brand: "Flybird",
-    size: "160",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "420",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c032",
-    model: "I20",
-    brand: "Alstone",
-    size: "192",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "520",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c033",
-    model: "Jems",
-    brand: "Eurobond",
-    size: "224",
-    size_type: "mm",
-    finish: "Champagne Bronze",
-    mrp: "610",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c034",
-    model: "Arrow",
-    brand: "Flybird",
-    size: "256",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "580",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c035",
-    model: "Boot",
-    brand: "Aludecor",
-    size: "160",
-    size_type: "mm",
-    finish: "Glossy White",
-    mrp: "460",
-    category: "Cabinet Handle",
-  },
-
-  {
-    id: "c036",
-    model: "I20",
-    brand: "Flybird",
-    size: "192",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "490",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c037",
-    model: "Jems",
-    brand: "Alstone",
-    size: "224",
-    size_type: "mm",
-    finish: "Ceramic Gold",
-    mrp: "640",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c038",
-    model: "Arrow",
-    brand: "Eurobond",
-    size: "256",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "610",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c039",
-    model: "Boot",
-    brand: "Flybird",
-    size: "128",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "390",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c040",
-    model: "I20",
-    brand: "Aludecor",
-    size: "192",
-    size_type: "mm",
-    finish: "Glossy White",
-    mrp: "510",
-    category: "Cabinet Handle",
-  },
-
-  {
-    id: "c041",
-    model: "Jems",
-    brand: "Flybird",
-    size: "224",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "600",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c042",
-    model: "Arrow",
-    brand: "Alstone",
-    size: "256",
-    size_type: "mm",
-    finish: "Ceramic Gold",
-    mrp: "650",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c043",
-    model: "Boot",
-    brand: "Eurobond",
-    size: "160",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "470",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c044",
-    model: "I20",
-    brand: "Flybird",
-    size: "192",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "500",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c045",
-    model: "Jems",
-    brand: "Aludecor",
-    size: "224",
-    size_type: "mm",
-    finish: "Champagne Bronze",
-    mrp: "630",
-    category: "Cabinet Handle",
-  },
-
-  {
-    id: "c046",
-    model: "Arrow",
-    brand: "Flybird",
-    size: "256",
-    size_type: "mm",
-    finish: "Glossy White",
-    mrp: "590",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c047",
-    model: "Boot",
-    brand: "Alstone",
-    size: "160",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "430",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c048",
-    model: "I20",
-    brand: "Eurobond",
-    size: "192",
-    size_type: "mm",
-    finish: "Rose Gold",
-    mrp: "540",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c049",
-    model: "Jems",
-    brand: "Flybird",
-    size: "224",
-    size_type: "mm",
-    finish: "Silver Grey",
-    mrp: "610",
-    category: "Cabinet Handle",
-  },
-  {
-    id: "c050",
-    model: "Arrow",
-    brand: "Aludecor",
-    size: "256",
-    size_type: "mm",
-    finish: "Matte Black",
-    mrp: "600",
-    category: "Cabinet Handle",
-  },
-];
-
-const page = () => {
+/* ── Sort header ─────────────────────────────────────────── */
+const SortHeader = ({
+  label,
+  field,
+  current,
+  onSort,
+}: {
+  label: string;
+  field: string;
+  current: string;
+  onSort: (f: string) => void;
+}) => {
+  const asc = current === `${field}_asc`;
+  const desc = current === `${field}_desc`;
   return (
-    <div className="max-w-9xl mx-auto gap-4 grid">
-      <BiBreadcrumb />
-      <PageHeader
-        title="Products"
-        description="Realtime Products Sanpshot"
-        action={
-          <Button asChild variant={"outline"}>
-            <Link href={"/admin/products/create"}>Add Product</Link>
-          </Button>
-        }
-      />
-      <Datatable columns={productListColumns} data={dataDemo} />
+    <button
+      onClick={() => onSort(field)}
+      className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-gray-900 transition-colors"
+    >
+      {label}
+      {asc ? (
+        <ArrowUp className="h-3 w-3 text-amber-500" />
+      ) : desc ? (
+        <ArrowDown className="h-3 w-3 text-amber-500" />
+      ) : (
+        <ArrowUpDown className="h-3 w-3 opacity-40" />
+      )}
+    </button>
+  );
+};
+
+/* ── Main content ────────────────────────────────────────── */
+const ProductListContent = () => {
+  const { filters, setFilter } = useURLFilters();
+  const debouncedSearch = useDebounce(filters.search, 400);
+
+  const { data, isLoading, isFetching } = useProducts({
+    page: filters.page,
+    limit: filters.limit,
+    search: debouncedSearch,
+    brandId: filters.brandId,
+    categoryId: filters.categoryId,
+    sort: filters.sort,
+  });
+
+  const { data: categories } = usePublicCategories();
+  const { data: brands } = useBrands();
+
+  const products = data?.data ?? [];
+  const meta = data?.meta;
+  const totalPages = meta?.totalPages ?? 1;
+
+  const handleSort = (field: string) => {
+    const next =
+      filters.sort === `${field}_asc`
+        ? `${field}_desc`
+        : `${field}_asc`;
+    setFilter("sort", next);
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Products</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {meta ? `${meta.total} product${meta.total !== 1 ? "s" : ""} total` : "Loading…"}
+          </p>
+        </div>
+        <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg">
+          <Link href="/admin/products/create">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add Product
+          </Link>
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px] max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            value={filters.search}
+            onChange={(e) => setFilter("search", e.target.value)}
+            placeholder="Search model, brand…"
+            className="pl-8 h-8 text-sm bg-white rounded-lg border-black/10"
+          />
+        </div>
+
+        {/* Category */}
+        <Select
+          value={filters.categoryId || "__all__"}
+          onValueChange={(v) => setFilter("categoryId", v === "__all__" ? "" : v)}
+        >
+          <SelectTrigger className="h-8 text-sm w-[150px] rounded-lg border-black/10">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Categories</SelectItem>
+            {categories?.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{titleCase(c.categoryName)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Brand */}
+        <Select
+          value={filters.brandId || "__all__"}
+          onValueChange={(v) => setFilter("brandId", v === "__all__" ? "" : v)}
+        >
+          <SelectTrigger className="h-8 text-sm w-[140px] rounded-lg border-black/10">
+            <SelectValue placeholder="All Brands" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">All Brands</SelectItem>
+            {brands?.map((b) => (
+              <SelectItem key={b.id} value={b.id}>{titleCase(b.brandName)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Rows per page */}
+        <Select
+          value={String(filters.limit)}
+          onValueChange={(v) => setFilter("limit", Number(v))}
+        >
+          <SelectTrigger className="h-8 text-sm w-[100px] rounded-lg border-black/10 ml-auto">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[10, 20, 50].map((n) => (
+              <SelectItem key={n} value={String(n)}>Show {n}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Active filter pills */}
+      {(filters.search || filters.categoryId || filters.brandId) && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">Active:</span>
+          {filters.search && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+              "{filters.search}"
+              <button onClick={() => setFilter("search", "")} className="ml-0.5 hover:text-amber-900">×</button>
+            </span>
+          )}
+          {filters.categoryId && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+              {categories?.find((c) => c.id === filters.categoryId)?.categoryName ?? "Category"}
+              <button onClick={() => setFilter("categoryId", "")} className="ml-0.5 hover:text-amber-900">×</button>
+            </span>
+          )}
+          {filters.brandId && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+              {brands?.find((b) => b.id === filters.brandId)?.brandName ?? "Brand"}
+              <button onClick={() => setFilter("brandId", "")} className="ml-0.5 hover:text-amber-900">×</button>
+            </span>
+          )}
+          <button
+            onClick={() => { setFilter("search", ""); setFilter("categoryId", ""); setFilter("brandId", ""); }}
+            className="text-xs text-muted-foreground hover:text-red-500 transition-colors"
+          >
+            Clear all
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className={cn("transition-opacity duration-200", isFetching && !isLoading ? "opacity-60" : "opacity-100")}>
+        {isLoading ? (
+          <TableSkeleton />
+        ) : products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-black/5 bg-white text-center">
+            <Package className="h-10 w-10 text-neutral-300 mb-3" />
+            <p className="text-sm font-semibold text-gray-900">No products found</p>
+            <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4 rounded-lg text-xs"
+              onClick={() => { setFilter("search", ""); setFilter("categoryId", ""); setFilter("brandId", ""); }}
+            >
+              Clear filters
+            </Button>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-black/5 overflow-hidden bg-white">
+            {/* Table header */}
+            <div className="grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 bg-neutral-50 border-b border-black/5">
+              <div />
+              <SortHeader label="Model" field="model" current={filters.sort} onSort={handleSort} />
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Brand</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Metal</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tags</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-right">Actions</span>
+            </div>
+
+            {/* Rows */}
+            <div className="divide-y divide-black/5">
+              {products.map((product, i) => (
+                <div
+                  key={product.id}
+                  className="grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors group"
+                  style={{ animation: "fade-up 0.3s ease both", animationDelay: `${i * 30}ms` }}
+                >
+                  {/* Image */}
+                  <div className="relative h-9 w-9 rounded-lg overflow-hidden bg-neutral-100 ring-1 ring-black/5 shrink-0">
+                    <Image
+                      src={product.image?.url ?? "/products/dummy_photo.png"}
+                      alt={product.model}
+                      fill
+                      className="object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/products/dummy_photo.png"; }}
+                    />
+                  </div>
+
+                  {/* Model */}
+                  <div className="min-w-0">
+                    <Link
+                      href={`/admin/products/${product.id}`}
+                      className="text-sm font-semibold text-gray-900 truncate block group-hover:text-amber-600 transition-colors"
+                    >
+                      {product.model.toUpperCase()}
+                    </Link>
+                    {product.shortDescription && (
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">
+                        {product.shortDescription}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Brand */}
+                  <span className="text-sm text-gray-700 truncate">
+                    {titleCase(product.brand?.brandName ?? "—")}
+                  </span>
+
+                  {/* Category */}
+                  <span className="text-sm text-gray-700 truncate">
+                    {titleCase(product.category?.categoryName ?? "—")}
+                  </span>
+
+                  {/* Metal */}
+                  <span className="text-sm text-muted-foreground truncate">
+                    {product.metal ?? "—"}
+                  </span>
+
+                  {/* Tags */}
+                  <div className="flex gap-1 flex-wrap">
+                    {product.isFeatured && (
+                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                        Featured
+                      </span>
+                    )}
+                    {product.isNew && (
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                        New
+                      </span>
+                    )}
+                    {!product.isFeatured && !product.isNew && (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-1">
+                    <Link
+                      href={`/products/${product.id}`}
+                      target="_blank"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-gray-900 transition-colors"
+                      title="View public page"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </Link>
+                    <Link
+                      href={`/admin/products/${product.id}`}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                      title="Edit product"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Pagination */}
+      {meta && totalPages > 1 && (
+        <div className="flex items-center justify-between pt-1">
+          <p className="text-xs text-muted-foreground">
+            Showing {(filters.page - 1) * filters.limit + 1}–{Math.min(filters.page * filters.limit, meta.total)} of {meta.total}
+          </p>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setFilter("page", filters.page - 1)}
+              disabled={filters.page === 1}
+              className="flex h-7 w-7 items-center justify-center rounded-lg border border-black/10 text-muted-foreground hover:border-amber-500 hover:text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - filters.page) <= 1)
+              .reduce<(number | "…")[]>((acc, p) => {
+                if (acc.length && (p as number) - (acc[acc.length - 1] as number) > 1) acc.push("…");
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, i) =>
+                p === "…" ? (
+                  <span key={`e${i}`} className="flex h-7 w-7 items-center justify-center text-xs text-muted-foreground">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => setFilter("page", p as number)}
+                    className={cn(
+                      "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors",
+                      p === filters.page
+                        ? "bg-amber-500 text-black"
+                        : "border border-black/10 text-muted-foreground hover:border-amber-500 hover:text-amber-600"
+                    )}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+
+            <button
+              onClick={() => setFilter("page", filters.page + 1)}
+              disabled={filters.page >= totalPages}
+              className="flex h-7 w-7 items-center justify-center rounded-lg border border-black/10 text-muted-foreground hover:border-amber-500 hover:text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default page;
+const AdminProductsPage = () => (
+  <Suspense>
+    <ProductListContent />
+  </Suspense>
+);
+
+export default AdminProductsPage;

@@ -14,14 +14,19 @@ const SortToggle = ({
   onSortChange: (value: string) => void;
   sort: string;
 }) => {
+  const handleChange = (value: string) => {
+    onSortChange(value === "__none__" ? "" : value);
+  };
+
   return (
-    <Select value={sort} onValueChange={(value) => onSortChange(value)}>
-      <SelectTrigger className="w-auto">
+    <Select value={sort || "__none__"} onValueChange={handleChange}>
+      <SelectTrigger className="w-auto rounded-full border-black/10">
         <SelectValue placeholder="Sort By" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="model_asc">Model A to Z</SelectItem>
-        <SelectItem value="model_dsc">Model Z to A</SelectItem>
+        <SelectItem value="__none__">Default</SelectItem>
+        <SelectItem value="model_asc">Model A → Z</SelectItem>
+        <SelectItem value="model_dsc">Model Z → A</SelectItem>
       </SelectContent>
     </Select>
   );

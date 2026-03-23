@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"BiSettings\\\\|protected\\\\|BiDataTable\\\\|BiCategory\\\\|BiCarousel\" /d/project/bizion_frontend --include=*.tsx --include=*.ts --exclude-dir=node_modules --exclude-dir=.next)",
+      "Bash(grep -n \"TODO\\\\|FIXME\\\\|XXX\\\\|HACK\" /d/project/bizion_frontend/app -r --include=*.tsx --include=*.ts)",
+      "Bash(grep -r \"ItemsPerPage\\\\|PagrHeader\\\\|from.*Section\\\\|from.*container\" /d/project/bizion_frontend/app --include=*.tsx --include=*.ts)",
+      "mcp__ide__getDiagnostics"
+    ]
+  }
+}

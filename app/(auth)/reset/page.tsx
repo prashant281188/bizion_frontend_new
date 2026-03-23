@@ -1,9 +1,44 @@
 "use client";
+
+import { resetPassword } from "@/lib/api/auth";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "sonner";
+
 const ResetPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const mutation = useMutation({
+    mutationFn: resetPassword,
+    onSuccess: () => {
+      toast.success("Password reset successfully");
+      router.replace("/login");
+    },
+    onError: (err: string) => {
+      toast.error(err || "Failed to reset password");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const confirm = (form.elements.namedItem("confirm") as HTMLInputElement).value;
+
+    if (password !== confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    const token = searchParams.get("token") ?? "";
+    mutation.mutate({ token, newPassword: password });
+  };
+
   return (
     <section className="min-h-screen w-full bg-neutral-50 flex items-center justify-center px-6">
       <div className="w-full max-w-md rounded-2xl bg-white p-10 ring-1 ring-black/5 shadow-sm">
@@ -19,7 +54,7 @@ const ResetPage = () => {
         </div>
 
         {/* Form */}
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {/* New Password */}
           <div>
             <label className="mb-1 block text-sm font-medium">
@@ -27,7 +62,9 @@ const ResetPage = () => {
             </label>
             <div className="relative">
               <input
+                name="password"
                 type={showPassword ? "text" : "password"}
+                required
                 placeholder="••••••••"
                 className="w-full rounded-md border border-black/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
@@ -48,7 +85,9 @@ const ResetPage = () => {
             </label>
             <div className="relative">
               <input
+                name="confirm"
                 type={showConfirmPassword ? "text" : "password"}
+                required
                 placeholder="••••••••"
                 className="w-full rounded-md border border-black/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
@@ -76,9 +115,10 @@ const ResetPage = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-600"
+            disabled={mutation.isPending}
+            className="w-full rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Reset Password
+            {mutation.isPending ? "Resetting…" : "Reset Password"}
           </button>
         </form>
 

@@ -1,24 +1,27 @@
+"use client";
+
 import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, Settings, User, Keyboard } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/lib/api/auth";
+import { useAuth } from "@/providers/auth-provider";
+import { titleCase } from "@/utils";
+
 const BiUserIcon = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  const mutation = useMutation({
+  const { mutate: handleLogout } = useMutation({
     mutationFn: logout,
     onSuccess: async () => {
       await queryClient.clear();
@@ -26,67 +29,39 @@ const BiUserIcon = () => {
     },
   });
 
-  const handleLogout = () => {
-    mutation.mutate();
-  };
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "AD";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          aria-label="Open account menu"
-          className="
-            flex items-center rounded-full
-            focus-visible:outline-none
-            focus-visible:ring-2 focus-visible:ring-ring
-          "
+          aria-label="Account menu"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
         >
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>PG</AvatarFallback>
-          </Avatar>
+          {initials}
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" sideOffset={8} className="w-56">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-52">
         <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <span className="text-sm font-medium">Prashant Garg</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-semibold text-gray-900 truncate">
+              {user?.email ?? "Admin"}
+            </span>
             <span className="text-xs text-muted-foreground">
-              admin@company.com
+              {titleCase(user?.role?.name ?? "Admin")}
             </span>
           </div>
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem>
-            <Keyboard className="mr-2 h-4 w-4" />
-            <span>Keyboard shortcuts</span>
-            <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-
-        <DropdownMenuSeparator />
-
         <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
-          onClick={handleLogout}
+          className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+          onClick={() => handleLogout()}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

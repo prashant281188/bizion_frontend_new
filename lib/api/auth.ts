@@ -29,12 +29,14 @@ export async function logout() {
 export async function forgot(data: {
     email: string
 }) {
-    try {
+    const res = await api.post("/auth/forgot-password", data)
+    return res.data
+}
 
-        const res = await api.post("/auth/forgot-password", data)
-        return res.data
-    }
-    catch {
-        return null
-    }
+export async function resetPassword(data: {
+    token: string;
+    newPassword: string;
+}) {
+    const res = await api.post("/auth/reset-password", data)
+    return res.data
 }

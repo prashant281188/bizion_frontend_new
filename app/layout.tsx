@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import QueryProvider from "@/providers/query-provider";
 import Container from "@/components/layout/container";
+import { TopLoadingBar } from "@/components/ui/top-loading-bar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,8 +41,9 @@ export default function RootLayout({
     `}
       >
         <QueryProvider>
+          <TopLoadingBar />
           <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
-               {children}
+            {children}
             <Toaster />
           </div>
         </QueryProvider>

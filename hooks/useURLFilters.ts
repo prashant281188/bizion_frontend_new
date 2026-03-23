@@ -1,13 +1,14 @@
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export function useURLFilters() {
   const params = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
 
   const filters = {
     search: params.get("search") ?? "",
-    category: params.get("category") ?? "",
-    brand: params.get("brand") ?? "",
+    categoryId: params.get("categoryId") ?? "",
+    brandId: params.get("brandId") ?? "",
     page: Number(params.get("page") ?? 1),
     limit: Number(params.get("limit") ?? 12),
     sort: params.get("sort") ?? "",
@@ -16,12 +17,12 @@ export function useURLFilters() {
   const setFilter = (key: string, value: string | number) => {
     const newParams = new URLSearchParams(params.toString());
 
-    if (!value) newParams.delete(key);
+    if (value === "" || value === 0) newParams.delete(key);
     else newParams.set(key, String(value));
 
     if (key !== "page") newParams.set("page", "1");
 
-    router.push(`?${newParams.toString()}`);
+    router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
   return { filters, setFilter };
