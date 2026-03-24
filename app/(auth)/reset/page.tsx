@@ -4,10 +4,10 @@ import { resetPassword } from "@/lib/api/auth";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { toast } from "sonner";
 
-const ResetPage = () => {
+const ResetForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
@@ -133,5 +133,11 @@ const ResetPage = () => {
     </section>
   );
 };
+
+const ResetPage = () => (
+  <Suspense>
+    <ResetForm />
+  </Suspense>
+);
 
 export default ResetPage;

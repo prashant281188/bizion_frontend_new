@@ -1,22 +1,14 @@
 "use client";
-import { Button } from "@/components/ui/button";
 
-import PageHeader from "@/components/navigation/public/PageHeader";
-
-import React from "react";
+import React, { Suspense } from "react";
 import PartyDataTable from "./components/PartyDataTable";
-import BiBreadcrumb from "@/components/navigation/admin/BiBreadcrumb";
 
-const page = () => {
-  return (
-    <div className="max-w-9xl mx-auto gap-4 grid">
-      <BiBreadcrumb />
-  
-
-      {/* content */}
+const PartiesPage = () => (
+  <div className="page-wrapper">
+    <Suspense>
       <PartyDataTable />
-    </div>
-  );
-};
+    </Suspense>
+  </div>
+);
 
-export default page;
+export default PartiesPage;

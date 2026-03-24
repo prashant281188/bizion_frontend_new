@@ -11,17 +11,28 @@ const ForgotPage = () => {
 
   const mutation = useMutation({
     mutationFn: forgot,
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
+      sessionStorage.setItem("reset_email", variables.email);
       router.push("/verify");
     },
     onError: () => {
-      toast.error("Not Valid Email");
+      toast.error("No account found with that email address.");
     },
   });
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const email = e.target.email.value;
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const email = formData.get("email") as string;
+
+    if (!email) {
+      toast.error("Email is required");
+      return;
+    }
+
     mutation.mutate({ email });
   };
   return (
@@ -31,10 +42,10 @@ const ForgotPage = () => {
         <div className="mb-8 text-center">
           <span className="mx-auto mb-4 block h-1 w-14 rounded-full bg-amber-500" />
           <h1 className="text-2xl font-semibold text-gray-900">
-            Forgot Password?
+            Reset Your Password
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enter your registered email and we’ll send you a reset link.
+            Enter your registered email address and we&apos;ll send you a verification code.
           </p>
         </div>
 
@@ -48,8 +59,7 @@ const ForgotPage = () => {
               name="email"
               type="email"
               placeholder="you@company.com"
-              className="w-full rounded-md border border-black/10 px-4 py-3 text-sm
-                         focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="input-base"
             />
           </div>
 

@@ -4,7 +4,24 @@
       "Bash(grep -r \"BiSettings\\\\|protected\\\\|BiDataTable\\\\|BiCategory\\\\|BiCarousel\" /d/project/bizion_frontend --include=*.tsx --include=*.ts --exclude-dir=node_modules --exclude-dir=.next)",
       "Bash(grep -n \"TODO\\\\|FIXME\\\\|XXX\\\\|HACK\" /d/project/bizion_frontend/app -r --include=*.tsx --include=*.ts)",
       "Bash(grep -r \"ItemsPerPage\\\\|PagrHeader\\\\|from.*Section\\\\|from.*container\" /d/project/bizion_frontend/app --include=*.tsx --include=*.ts)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(grep:*)",
+      "Bash(bc)",
+      "Bash(find D:/project/bizion_frontend/app -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(find D:/project/bizion_frontend -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\) -path */components/* -o -path */hooks/* -o -path */lib/* -o -path */providers/*)",
+      "Bash(find D:/project/bizion_frontend/components D:/project/bizion_frontend/hooks D:/project/bizion_frontend/lib D:/project/bizion_frontend/providers -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i 's/<Card>/<Card className=\"\"border-0 shadow-none rounded-none\"\">/g' \"$f\")",
+      "Bash(echo \"$f done\")",
+      "Bash(done)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)",
+      "Bash(npm list:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

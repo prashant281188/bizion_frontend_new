@@ -41,7 +41,7 @@ const Filter = ({
   const selectedLabel = options?.find((opt) => opt.value === value)?.label;
 
   return (
-    <div>
+    <div >
       <Select onValueChange={handleChange} value={value ?? ""}>
         <SelectTrigger className={cn(className)}>
           <SelectValue placeholder={label}>{titleCase(selectedLabel ?? "")}</SelectValue>

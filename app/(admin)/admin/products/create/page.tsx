@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 
 /* ── Schema ─────────────────────────────────────────────── */
 const variantSchema = z.object({
-  options: z.record(z.string()).default({}),
+  options: z.record(z.string(), z.string()).default({}),
   sku: z.string().min(1, "SKU required"),
   packing: z.string().optional(),
   mrp: z.string().min(1, "MRP required"),
@@ -59,7 +59,12 @@ const schema = z.object({
   isFeatured: z.boolean().default(false),
   isNew: z.boolean().default(false),
   options: z
-    .array(z.object({ name: z.string().min(1, "Name required"), values: z.array(z.string()) }))
+    .array(
+      z.object({
+        name: z.string().min(1, "Name required"),
+        values: z.array(z.string()),
+      }),
+    )
     .default([]),
   variants: z.array(variantSchema).default([]),
 });
@@ -71,13 +76,26 @@ function cartesian(arrays: string[][]): string[][] {
   if (arrays.length === 0) return [[]];
   return arrays.reduce<string[][]>(
     (acc, arr) => acc.flatMap((prev) => arr.map((val) => [...prev, val])),
-    [[]]
+    [[]],
   );
 }
 
-function buildVariants(options: { name: string; values: string[] }[]): FormValues["variants"] {
+function buildVariants(
+  options: { name: string; values: string[] }[],
+): FormValues["variants"] {
   const validOptions = options.filter((o) => o.name && o.values.length > 0);
-  if (validOptions.length === 0) return [{ options: {}, sku: "", packing: "", mrp: "", saleRate: "", purchaseRate: "", imageUrl: "" }];
+  if (validOptions.length === 0)
+    return [
+      {
+        options: {},
+        sku: "",
+        packing: "",
+        mrp: "",
+        saleRate: "",
+        purchaseRate: "",
+        imageUrl: "",
+      },
+    ];
   const combos = cartesian(validOptions.map((o) => o.values));
   return combos.map((combo) => ({
     options: Object.fromEntries(validOptions.map((o, i) => [o.name, combo[i]])),
@@ -91,18 +109,40 @@ function buildVariants(options: { name: string; values: string[] }[]): FormValue
 }
 
 /* ── Section Card ────────────────────────────────────────── */
-const Section = ({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) => (
+const Section = ({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) => (
   <div className="rounded-xl border border-black/5 bg-white overflow-hidden">
     <div className="px-5 py-4 border-b border-black/5 bg-neutral-50/50">
       <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
-      {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+      {description && (
+        <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+      )}
     </div>
     <div className="p-5">{children}</div>
   </div>
 );
 
 /* ── Field wrapper ───────────────────────────────────────── */
-const Field = ({ label, error, required, className, children }: { label: string; error?: string; required?: boolean; className?: string; children: React.ReactNode }) => (
+const Field = ({
+  label,
+  error,
+  required,
+  className,
+  children,
+}: {
+  label: string;
+  error?: string;
+  required?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) => (
   <div className={cn("space-y-1.5", className)}>
     <label className="text-xs font-medium text-gray-700">
       {label} {required && <span className="text-red-500">*</span>}
@@ -138,9 +178,19 @@ const TagInput = ({
       onClick={() => inputRef.current?.focus()}
     >
       {values.map((v) => (
-        <span key={v} className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+        <span
+          key={v}
+          className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200"
+        >
           {v}
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChange(values.filter((x) => x !== v)); }} className="hover:text-red-500 transition-colors">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange(values.filter((x) => x !== v));
+            }}
+            className="hover:text-red-500 transition-colors"
+          >
             <X className="h-2.5 w-2.5" />
           </button>
         </span>
@@ -150,8 +200,12 @@ const TagInput = ({
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); }
-          if (e.key === "Backspace" && !input && values.length > 0) onChange(values.slice(0, -1));
+          if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            add();
+          }
+          if (e.key === "Backspace" && !input && values.length > 0)
+            onChange(values.slice(0, -1));
         }}
         placeholder={values.length === 0 ? placeholder : ""}
         className="flex-1 min-w-[80px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
@@ -169,7 +223,9 @@ const CreateProductPage = () => {
 
   // Pending image files (in memory, not yet uploaded)
   const [productFile, setProductFile] = useState<File | null>(null);
-  const [variantFiles, setVariantFiles] = useState<Record<string, File | null>>({});
+  const [variantFiles, setVariantFiles] = useState<Record<string, File | null>>(
+    {},
+  );
   const [isUploading, setIsUploading] = useState(false);
 
   const {
@@ -179,6 +235,7 @@ const CreateProductPage = () => {
     watch,
     formState: { errors },
   } = useForm<FormValues>({
+    //@ts-expect-error : there is error in resolver
     resolver: zodResolver(schema),
     defaultValues: {
       model: "",
@@ -192,15 +249,36 @@ const CreateProductPage = () => {
       isFeatured: false,
       isNew: false,
       options: [],
-      variants: [{ options: {}, sku: "", packing: "", mrp: "", saleRate: "", purchaseRate: "", imageUrl: "" }],
+      variants: [
+        {
+          options: {},
+          sku: "",
+          packing: "",
+          mrp: "",
+          saleRate: "",
+          purchaseRate: "",
+          imageUrl: "",
+        },
+      ],
     },
   });
 
-  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({ control, name: "options" });
-  const { fields: variantFields, replace: replaceVariants, remove: removeVariant, append: appendVariant } = useFieldArray({ control, name: "variants" });
+  const {
+    fields: optionFields,
+    append: appendOption,
+    remove: removeOption,
+  } = useFieldArray({ control, name: "options" });
+  const {
+    fields: variantFields,
+    replace: replaceVariants,
+    remove: removeVariant,
+    append: appendVariant,
+  } = useFieldArray({ control, name: "variants" });
 
   const watchedOptions = useWatch({ control, name: "options" });
-  const validOptions = watchedOptions.filter((o) => o.name && o.values.length > 0);
+  const validOptions = watchedOptions.filter(
+    (o) => o.name && o.values.length > 0,
+  );
 
   const handleGenerateVariants = () => {
     replaceVariants(buildVariants(watchedOptions));
@@ -210,7 +288,11 @@ const CreateProductPage = () => {
   const handleRemoveVariant = (vi: number) => {
     const fieldId = variantFields[vi].id;
     removeVariant(vi);
-    setVariantFiles((prev) => { const next = { ...prev }; delete next[fieldId]; return next; });
+    setVariantFiles((prev) => {
+      const next = { ...prev };
+      delete next[fieldId];
+      return next;
+    });
   };
 
   const { mutate, isPending } = useMutation({
@@ -218,7 +300,7 @@ const CreateProductPage = () => {
     onSuccess: () => {
       toast.success("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["product"] });
-      router.push("/admin/products");
+      router.push("/products");
     },
     onError: (err: unknown) => {
       toast.error(typeof err === "string" ? err : "Failed to create product");
@@ -231,7 +313,7 @@ const CreateProductPage = () => {
       // Upload product image if a file is pending
       const productImageUrl = productFile
         ? await uploadImage(productFile)
-        : (data.imageUrl || undefined);
+        : data.imageUrl || undefined;
 
       // Upload all variant images in parallel
       const variantImageUrls = await Promise.all(
@@ -239,7 +321,7 @@ const CreateProductPage = () => {
           const file = variantFiles[field.id];
           if (file) return await uploadImage(file);
           return data.variants[vi]?.imageUrl || undefined;
-        })
+        }),
       );
 
       setIsUploading(false);
@@ -270,6 +352,7 @@ const CreateProductPage = () => {
   const isBusy = isUploading || isPending;
 
   return (
+    //@ts-expect-error:error in onSubmit
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-10">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -282,7 +365,9 @@ const CreateProductPage = () => {
           </Link>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Add Product</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Fill in the details below</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Fill in the details below
+            </p>
           </div>
         </div>
         <Button
@@ -291,11 +376,20 @@ const CreateProductPage = () => {
           className="bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg"
         >
           {isUploading ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading images…</>
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Uploading images…
+            </>
           ) : isPending ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Saving…
+            </>
           ) : (
-            <><CheckCircle2 className="h-4 w-4 mr-2" />Save Product</>
+            <>
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Save Product
+            </>
           )}
         </Button>
       </div>
@@ -303,11 +397,18 @@ const CreateProductPage = () => {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
         {/* LEFT COLUMN */}
         <div className="space-y-5">
-
           {/* Basic Info */}
-          <Section title="Basic Information" description="Core product identifiers">
+          <Section
+            title="Basic Information"
+            description="Core product identifiers"
+          >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label="Model" required error={errors.model?.message} className="sm:col-span-2">
+              <Field
+                label="Model"
+                required
+                error={errors.model?.message}
+                className="sm:col-span-2"
+              >
                 <Input
                   {...register("model")}
                   placeholder="e.g. SH-2001"
@@ -321,12 +422,19 @@ const CreateProductPage = () => {
                   name="brandId"
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className={cn("rounded-lg", errors.brandId && "border-red-400")}>
+                      <SelectTrigger
+                        className={cn(
+                          "rounded-lg",
+                          errors.brandId && "border-red-400",
+                        )}
+                      >
                         <SelectValue placeholder="Select brand" />
                       </SelectTrigger>
                       <SelectContent>
                         {brands?.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>{titleCase(b.brandName)}</SelectItem>
+                          <SelectItem key={b.id} value={b.id}>
+                            {titleCase(b.brandName)}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -334,18 +442,29 @@ const CreateProductPage = () => {
                 />
               </Field>
 
-              <Field label="Category" required error={errors.categoryId?.message}>
+              <Field
+                label="Category"
+                required
+                error={errors.categoryId?.message}
+              >
                 <Controller
                   control={control}
                   name="categoryId"
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className={cn("rounded-lg", errors.categoryId && "border-red-400")}>
+                      <SelectTrigger
+                        className={cn(
+                          "rounded-lg",
+                          errors.categoryId && "border-red-400",
+                        )}
+                      >
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
                         {categories?.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{titleCase(c.categoryName)}</SelectItem>
+                          <SelectItem key={c.id} value={c.id}>
+                            {titleCase(c.categoryName)}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -354,17 +473,28 @@ const CreateProductPage = () => {
               </Field>
 
               <Field label="Metal" error={errors.metal?.message}>
-                <Input {...register("metal")} placeholder="e.g. Aluminum, Stainless Steel" className="rounded-lg" />
+                <Input
+                  {...register("metal")}
+                  placeholder="e.g. Aluminum, Stainless Steel"
+                  className="rounded-lg"
+                />
               </Field>
 
               <Field label="Size Type" error={errors.sizeType?.message}>
-                <Input {...register("sizeType")} placeholder="e.g. mm, inch, pcs" className="rounded-lg" />
+                <Input
+                  {...register("sizeType")}
+                  placeholder="e.g. mm, inch, pcs"
+                  className="rounded-lg"
+                />
               </Field>
             </div>
           </Section>
 
           {/* Description */}
-          <Section title="Description" description="Product details shown to customers">
+          <Section
+            title="Description"
+            description="Product details shown to customers"
+          >
             <div className="space-y-4">
               <Field label="Short Description">
                 <Textarea
@@ -394,7 +524,8 @@ const CreateProductPage = () => {
               {optionFields.length === 0 && (
                 <div className="flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-3 text-xs text-blue-700 ring-1 ring-blue-100">
                   <Info className="h-3.5 w-3.5 shrink-0" />
-                  No options added. Add options like "Size" or "Finish" to auto-generate variant rows below.
+                  No options added. Add options like &quot;Size&quot; or
+                  &quot;Finish&quot; to auto-generate variant rows below.
                 </div>
               )}
 
@@ -406,7 +537,10 @@ const CreateProductPage = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
-                      <Field label="Option Name" error={errors.options?.[oi]?.name?.message}>
+                      <Field
+                        label="Option Name"
+                        error={errors.options?.[oi]?.name?.message}
+                      >
                         <Input
                           {...register(`options.${oi}.name`)}
                           placeholder="e.g. Size, Finish, Color"
@@ -435,7 +569,9 @@ const CreateProductPage = () => {
                         />
                       )}
                     />
-                    <p className="text-[10px] text-muted-foreground mt-1">Press Enter or comma to add each value</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      Press Enter or comma to add each value
+                    </p>
                   </Field>
                 </div>
               ))}
@@ -461,25 +597,44 @@ const CreateProductPage = () => {
             <div className="space-y-3">
               {variantFields.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center rounded-lg border border-dashed border-black/10 bg-neutral-50">
-                  <p className="text-sm text-muted-foreground">No variants yet.</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Generate from options or add manually.</p>
+                  <p className="text-sm text-muted-foreground">
+                    No variants yet.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Generate from options or add manually.
+                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto rounded-lg border border-black/5">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-black/5 bg-neutral-50">
-                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Img</th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          Img
+                        </th>
                         {validOptions.map((opt) => (
-                          <th key={opt.name} className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-amber-600 whitespace-nowrap">
+                          <th
+                            key={opt.name}
+                            className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-amber-600 whitespace-nowrap"
+                          >
                             {opt.name}
                           </th>
                         ))}
-                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">SKU <span className="text-red-400">*</span></th>
-                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">Packing</th>
-                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">MRP <span className="text-red-400">*</span></th>
-                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">Sale Rate</th>
-                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">Purchase Rate</th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          SKU <span className="text-red-400">*</span>
+                        </th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                          Packing
+                        </th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          MRP <span className="text-red-400">*</span>
+                        </th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                          Sale Rate
+                        </th>
+                        <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                          Purchase Rate
+                        </th>
                         <th className="px-3 py-2 w-8" />
                       </tr>
                     </thead>
@@ -488,7 +643,10 @@ const CreateProductPage = () => {
                         <tr
                           key={field.id}
                           className="hover:bg-neutral-50/80 transition-colors"
-                          style={{ animation: "fade-up 0.25s ease both", animationDelay: `${vi * 25}ms` }}
+                          style={{
+                            animation: "fade-up 0.25s ease both",
+                            animationDelay: `${vi * 25}ms`,
+                          }}
                         >
                           {/* Variant image */}
                           <td className="px-3 py-2">
@@ -500,9 +658,19 @@ const CreateProductPage = () => {
                                   size="sm"
                                   value={field.value ?? ""}
                                   onChange={field.onChange}
-                                  onFileSelect={(file) => setVariantFiles((prev) => ({ ...prev, [variantFields[vi].id]: file }))}
-                                  pendingFile={variantFiles[variantFields[vi].id]}
-                                  uploading={isUploading && !!variantFiles[variantFields[vi].id]}
+                                  onFileSelect={(file) =>
+                                    setVariantFiles((prev) => ({
+                                      ...prev,
+                                      [variantFields[vi].id]: file,
+                                    }))
+                                  }
+                                  pendingFile={
+                                    variantFiles[variantFields[vi].id]
+                                  }
+                                  uploading={
+                                    isUploading &&
+                                    !!variantFiles[variantFields[vi].id]
+                                  }
                                 />
                               )}
                             />
@@ -512,15 +680,22 @@ const CreateProductPage = () => {
                             <td key={opt.name} className="px-3 py-2">
                               <Controller
                                 control={control}
-                                name={`variants.${vi}.options.${opt.name}` as `variants.${number}.options`}
+                                name={
+                                  `variants.${vi}.options.${opt.name}` as `variants.${number}.options`
+                                }
                                 render={({ field: f }) => (
-                                  <Select value={(f.value as unknown as string) ?? ""} onValueChange={f.onChange}>
+                                  <Select
+                                    value={(f.value as unknown as string) ?? ""}
+                                    onValueChange={f.onChange}
+                                  >
                                     <SelectTrigger className="h-8 w-28 rounded-md text-xs">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {opt.values.map((v) => (
-                                        <SelectItem key={v} value={v}>{v}</SelectItem>
+                                        <SelectItem key={v} value={v}>
+                                          {v}
+                                        </SelectItem>
                                       ))}
                                     </SelectContent>
                                   </Select>
@@ -533,7 +708,10 @@ const CreateProductPage = () => {
                             <Input
                               {...register(`variants.${vi}.sku`)}
                               placeholder="SKU-001"
-                              className={cn("h-8 rounded-md text-xs w-28", errors.variants?.[vi]?.sku && "border-red-400")}
+                              className={cn(
+                                "h-8 rounded-md text-xs w-28",
+                                errors.variants?.[vi]?.sku && "border-red-400",
+                              )}
                             />
                           </td>
                           {/* Packing */}
@@ -550,7 +728,10 @@ const CreateProductPage = () => {
                             <Input
                               {...register(`variants.${vi}.mrp`)}
                               placeholder="0.00"
-                              className={cn("h-8 rounded-md text-xs w-24", errors.variants?.[vi]?.mrp && "border-red-400")}
+                              className={cn(
+                                "h-8 rounded-md text-xs w-24",
+                                errors.variants?.[vi]?.mrp && "border-red-400",
+                              )}
                             />
                           </td>
                           {/* Sale Rate */}
@@ -583,7 +764,6 @@ const CreateProductPage = () => {
                       ))}
                     </tbody>
                   </table>
-
                 </div>
               )}
 
@@ -604,7 +784,17 @@ const CreateProductPage = () => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendVariant({ options: {}, sku: "", packing: "", mrp: "", saleRate: "", purchaseRate: "", imageUrl: "" })}
+                  onClick={() =>
+                    appendVariant({
+                      options: {},
+                      sku: "",
+                      packing: "",
+                      mrp: "",
+                      saleRate: "",
+                      purchaseRate: "",
+                      imageUrl: "",
+                    })
+                  }
                   className="rounded-lg border-dashed"
                 >
                   <Plus className="h-3.5 w-3.5 mr-1.5" />
@@ -617,7 +807,6 @@ const CreateProductPage = () => {
 
         {/* RIGHT COLUMN */}
         <div className="space-y-5">
-
           {/* Image */}
           <Section title="Product Image">
             <Controller
@@ -652,7 +841,9 @@ const CreateProductPage = () => {
                 />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Featured</p>
-                  <p className="text-xs text-muted-foreground">Show on homepage & featured sections</p>
+                  <p className="text-xs text-muted-foreground">
+                    Show on homepage & featured sections
+                  </p>
                 </div>
               </label>
 
@@ -669,8 +860,12 @@ const CreateProductPage = () => {
                   )}
                 />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">New Arrival</p>
-                  <p className="text-xs text-muted-foreground">Badge displayed on product card</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    New Arrival
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Badge displayed on product card
+                  </p>
                 </div>
               </label>
             </div>
@@ -680,14 +875,30 @@ const CreateProductPage = () => {
           <Section title="Summary">
             <dl className="space-y-2 text-xs">
               {[
-                ["Options",  `${watchedOptions.filter((o) => o.name).length} defined`],
-                ["Variants", `${variantFields.length} row${variantFields.length !== 1 ? "s" : ""}`],
-                ["Brand",    brands?.find((b) => b.id === watch("brandId"))?.brandName ?? "—"],
-                ["Category", categories?.find((c) => c.id === watch("categoryId"))?.categoryName ?? "—"],
+                [
+                  "Options",
+                  `${watchedOptions.filter((o) => o.name).length} defined`,
+                ],
+                [
+                  "Variants",
+                  `${variantFields.length} row${variantFields.length !== 1 ? "s" : ""}`,
+                ],
+                [
+                  "Brand",
+                  brands?.find((b) => b.id === watch("brandId"))?.brandName ??
+                    "—",
+                ],
+                [
+                  "Category",
+                  categories?.find((c) => c.id === watch("categoryId"))
+                    ?.categoryName ?? "—",
+                ],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between">
                   <dt className="text-muted-foreground">{label}</dt>
-                  <dd className="font-medium text-gray-900 capitalize">{value}</dd>
+                  <dd className="font-medium text-gray-900 capitalize">
+                    {value}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -700,9 +911,15 @@ const CreateProductPage = () => {
             className="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg"
           >
             {isPending ? (
-              <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving…
+              </>
             ) : (
-              <><CheckCircle2 className="h-4 w-4 mr-2" />Save Product</>
+              <>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Save Product
+              </>
             )}
           </Button>
         </div>

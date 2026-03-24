@@ -46,19 +46,20 @@ const ProductsContent = () => {
   return (
     <>
       {/* Hero */}
-      <section className="relative w-full bg-neutral-50 py-20">
-        <div className="container mx-auto px-6 text-center">
+      <section className="relative w-full bg-neutral-50 py-10 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
           <span className="mx-auto mb-4 block h-1 w-14 rounded-full bg-amber-500" />
-          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">Our Collections</h1>
-          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-            Explore premium architectural hardware crafted for modern spaces
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">Our Products</h1>
+          <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-2">
+            Browse the full HINI range — door handles, cabinet hardware, aluminium profiles, and more.
+            Filter by category or brand to find exactly what you need.
           </p>
         </div>
       </section>
 
       {/* Filter Bar */}
-      <div className="sticky top-16 z-20 w-full border-b border-black/5 bg-white/90 backdrop-blur-md">
-        <div className="container mx-auto px-6 py-3">
+      <div className="sticky top-16 z-20  border-b border-black/5 bg-white/90 backdrop-blur-md">
+        <div className="container mx-auto px-4 sm:px-6 py-3">
           <div className="flex flex-wrap items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground flex-shrink-0" />
 
@@ -96,34 +97,22 @@ const ProductsContent = () => {
             <div className="mt-2 flex flex-wrap items-center gap-2 pb-1">
               <span className="text-xs text-muted-foreground">Active:</span>
               {filters.search && (
-                <button
-                  onClick={() => setFilter("search", "")}
-                  className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100 transition"
-                >
+                <button onClick={() => setFilter("search", "")} className="filter-pill">
                   Search: {filters.search} ×
                 </button>
               )}
               {filters.categoryId && (
-                <button
-                  onClick={() => setFilter("categoryId", "")}
-                  className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100 transition"
-                >
+                <button onClick={() => setFilter("categoryId", "")} className="filter-pill">
                   {categoryOptions.find((c) => c.value === filters.categoryId)?.label ?? "Category"} ×
                 </button>
               )}
               {filters.brandId && (
-                <button
-                  onClick={() => setFilter("brandId", "")}
-                  className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100 transition"
-                >
+                <button onClick={() => setFilter("brandId", "")} className="filter-pill">
                   {brandOptions.find((b) => b.value === filters.brandId)?.label ?? "Brand"} ×
                 </button>
               )}
               {filters.sort && (
-                <button
-                  onClick={() => setFilter("sort", "")}
-                  className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100 transition"
-                >
+                <button onClick={() => setFilter("sort", "")} className="filter-pill">
                   {filters.sort === "model_asc" ? "A → Z" : "Z → A"} ×
                 </button>
               )}
@@ -145,7 +134,7 @@ const ProductsContent = () => {
 
       {/* Results count */}
       {!isLoading && meta && (
-        <div className="container mx-auto px-6 pt-5 pb-1">
+        <div className="container mx-auto px-4 sm:px-6 pt-5 pb-1">
           <p className="text-xs text-muted-foreground">
             Showing {products.length} of {meta.total} products
           </p>
@@ -153,14 +142,14 @@ const ProductsContent = () => {
       )}
 
       {/* Products Grid */}
-      <section className="container mx-auto px-6 py-6">
+      <section className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className={isFetching ? "opacity-60 transition-opacity duration-200" : "opacity-100 transition-opacity duration-200"}>
           {isLoading ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-6">
               {Array.from({ length: 12 }).map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden animate-pulse"
+                  className="card-base overflow-hidden animate-pulse"
                   style={{ animationDelay: `${i * 40}ms` }}
                 >
                   <div className="aspect-square bg-neutral-100" />
@@ -176,17 +165,15 @@ const ProductsContent = () => {
             <div
               className={
                 view === "grid"
-                  ? "grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-6"
+                  ? "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-6"
                   : "flex flex-col gap-3"
               }
             >
               {products.map((product, i) => (
                 <div
                   key={product.id}
-                  style={{
-                    animation: "fade-up 0.4s ease both",
-                    animationDelay: `${Math.min(i * 45, 400)}ms`,
-                  }}
+                  className="animate-fade-up"
+                  style={{ animationDelay: `${Math.min(i * 45, 400)}ms` }}
                 >
                   <ProductCard {...product} />
                 </div>
@@ -197,7 +184,7 @@ const ProductsContent = () => {
               <div className="mb-4 h-1 w-14 rounded-full bg-amber-500 mx-auto" />
               <h3 className="text-lg font-semibold text-gray-900">No Products Found</h3>
               <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-                Try adjusting your filters or search term to find what you're looking for.
+                Try adjusting your filters or search term to find what you&apos;re looking for.
               </p>
               <button
                 onClick={() => { setFilter("search", ""); setFilter("categoryId", ""); setFilter("brandId", ""); }}

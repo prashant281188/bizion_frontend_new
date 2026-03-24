@@ -7,19 +7,19 @@ const BrandSection = () => {
   const { data, isLoading } = useBrands();
 
   return (
-    <section className="relative w-full bg-white py-24">
-      <div className="container mx-auto px-6">
-        <div className="mb-14 text-center">
-          <span className="mx-auto mb-4 block h-1 w-14 rounded-full bg-amber-500" />
-          <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
-            Trusted Brands We Offer
+    <section className="relative w-full bg-white py-12 sm:py-20 md:py-24">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="mb-8 sm:mb-12 text-center">
+          <span className="mx-auto mb-3 block h-1 w-12 rounded-full bg-amber-500" />
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">
+            Brands We Carry
           </h2>
-          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-            Partnering with industry-leading hardware manufacturers of Rajkot
+          <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-4">
+            Sourced directly from leading hardware manufacturers — quality you can specify with confidence
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4">
           {isLoading
             ? Array.from({ length: 5 }).map((_, i) => (
                 <div
@@ -33,11 +33,8 @@ const BrandSection = () => {
             : data?.map((brand, i) => (
                 <div
                   key={brand.id}
-                  className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-white px-6 py-5 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:ring-amber-500/30"
-                  style={{
-                    animation: "fade-up 0.4s ease both",
-                    animationDelay: `${Math.min(i * 70, 350)}ms`,
-                  }}
+                  className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-white px-6 py-5 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:ring-amber-500/30 animate-fade-up"
+                  style={{ animationDelay: `${Math.min(i * 70, 350)}ms` }}
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200 text-sm font-bold text-amber-600 group-hover:bg-amber-500 group-hover:text-black group-hover:ring-amber-500 transition-all">
                     {brand.brandName.charAt(0).toUpperCase()}

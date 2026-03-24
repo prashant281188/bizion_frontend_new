@@ -205,21 +205,21 @@ const ProductListContent = () => {
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground">Active:</span>
           {filters.search && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
-              "{filters.search}"
-              <button onClick={() => setFilter("search", "")} className="ml-0.5 hover:text-amber-900">×</button>
+            <span className="filter-pill">
+              &quot;{filters.search}&quot;
+              <button onClick={() => setFilter("search", "")} className="filter-pill-remove">×</button>
             </span>
           )}
           {filters.categoryId && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+            <span className="filter-pill">
               {categories?.find((c) => c.id === filters.categoryId)?.categoryName ?? "Category"}
-              <button onClick={() => setFilter("categoryId", "")} className="ml-0.5 hover:text-amber-900">×</button>
+              <button onClick={() => setFilter("categoryId", "")} className="filter-pill-remove">×</button>
             </span>
           )}
           {filters.brandId && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+            <span className="filter-pill">
               {brands?.find((b) => b.id === filters.brandId)?.brandName ?? "Brand"}
-              <button onClick={() => setFilter("brandId", "")} className="ml-0.5 hover:text-amber-900">×</button>
+              <button onClick={() => setFilter("brandId", "")} className="filter-pill-remove">×</button>
             </span>
           )}
           <button
@@ -236,10 +236,10 @@ const ProductListContent = () => {
         {isLoading ? (
           <TableSkeleton />
         ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-black/5 bg-white text-center">
-            <Package className="h-10 w-10 text-neutral-300 mb-3" />
-            <p className="text-sm font-semibold text-gray-900">No products found</p>
-            <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters</p>
+          <div className="empty-state">
+            <Package className="empty-state-icon" />
+            <p className="empty-state-title">No products found</p>
+            <p className="empty-state-subtitle">Try adjusting your filters</p>
             <Button
               variant="outline"
               size="sm"
@@ -250,16 +250,16 @@ const ProductListContent = () => {
             </Button>
           </div>
         ) : (
-          <div className="rounded-xl border border-black/5 overflow-hidden bg-white">
+          <div className="data-table">
             {/* Table header */}
             <div className="grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 bg-neutral-50 border-b border-black/5">
               <div />
               <SortHeader label="Model" field="model" current={filters.sort} onSort={handleSort} />
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Brand</span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Metal</span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tags</span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-right">Actions</span>
+              <span className="data-table-th">Brand</span>
+              <span className="data-table-th">Category</span>
+              <span className="data-table-th">Metal</span>
+              <span className="data-table-th">Tags</span>
+              <span className="data-table-th text-right">Actions</span>
             </div>
 
             {/* Rows */}
@@ -267,8 +267,8 @@ const ProductListContent = () => {
               {products.map((product, i) => (
                 <div
                   key={product.id}
-                  className="grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors group"
-                  style={{ animation: "fade-up 0.3s ease both", animationDelay: `${i * 30}ms` }}
+                  className="animate-fade-up grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors group"
+                  style={{ animationDelay: `${i * 30}ms` }}
                 >
                   {/* Image */}
                   <div className="relative h-9 w-9 rounded-lg overflow-hidden bg-neutral-100 ring-1 ring-black/5 shrink-0">
@@ -314,14 +314,10 @@ const ProductListContent = () => {
                   {/* Tags */}
                   <div className="flex gap-1 flex-wrap">
                     {product.isFeatured && (
-                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
-                        Featured
-                      </span>
+                      <span className="pill-amber">Featured</span>
                     )}
                     {product.isNew && (
-                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                        New
-                      </span>
+                      <span className="pill-emerald">New</span>
                     )}
                     {!product.isFeatured && !product.isNew && (
                       <span className="text-xs text-muted-foreground">—</span>
@@ -333,14 +329,14 @@ const ProductListContent = () => {
                     <Link
                       href={`/products/${product.id}`}
                       target="_blank"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-neutral-100 hover:text-gray-900 transition-colors"
+                      className="icon-btn-view"
                       title="View public page"
                     >
                       <Eye className="h-3.5 w-3.5" />
                     </Link>
                     <Link
                       href={`/admin/products/${product.id}`}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                      className="icon-btn-edit"
                       title="Edit product"
                     >
                       <Pencil className="h-3.5 w-3.5" />

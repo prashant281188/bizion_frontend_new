@@ -21,7 +21,6 @@ import {
   ChevronRight,
   LayoutGrid,
   Building2,
-  BookOpen,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -57,25 +56,22 @@ export const sidebarConfig: NavGroup[] = [
         title: "Products",
         icon: Package,
         children: [
-          { title: "Product List",  url: "/admin/products" },
-          { title: "Add Product",   url: "/admin/products/create" },
-          { title: "Catalogue",     url: "/admin/products/catalouge" },
+          { title: "Product List", url: "/admin/products" },
+          { title: "Add Product", url: "/admin/products/create" },
+          { title: "Bulk Edit / Create", url: "/admin/products/bulk" },
+          { title: "Catalogue", url: "/admin/products/catalouge" },
         ],
       },
       {
         title: "Parties",
         icon: Building2,
-        children: [
-          { title: "Party List", url: "/admin/parties" },
-        ],
+        children: [{ title: "Party List", url: "/admin/parties" }],
       },
     ],
   },
   {
     label: "System",
-    items: [
-      { title: "Settings", url: "/admin/settings", icon: Settings },
-    ],
+    items: [{ title: "Settings", url: "/admin/settings", icon: Settings }],
   },
 ];
 
@@ -93,7 +89,9 @@ const AdminSidebar = () => {
     if (pathname === url) return true;
     if (!pathname.startsWith(url + "/")) return false;
     return !siblings.some(
-      (s) => s.url !== url && (pathname === s.url || pathname.startsWith(s.url + "/"))
+      (s) =>
+        s.url !== url &&
+        (pathname === s.url || pathname.startsWith(s.url + "/")),
     );
   };
 
@@ -112,7 +110,9 @@ const AdminSidebar = () => {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500">
             <LayoutGrid className="h-4 w-4 text-black" />
           </div>
-          <span className="font-bold tracking-tight text-gray-900">HINI Admin</span>
+          <span className="font-bold tracking-tight text-gray-900">
+            HINI Admin
+          </span>
         </Link>
       </SidebarHeader>
 
@@ -140,7 +140,7 @@ const AdminSidebar = () => {
                               "w-full rounded-lg transition-colors",
                               isGroupActive(item.children)
                                 ? "bg-amber-50 text-amber-700 font-medium"
-                                : "hover:bg-neutral-100"
+                                : "hover:bg-neutral-100",
                             )}
                           >
                             <item.icon
@@ -148,7 +148,7 @@ const AdminSidebar = () => {
                                 "h-4 w-4",
                                 isGroupActive(item.children)
                                   ? "text-amber-600"
-                                  : "text-muted-foreground"
+                                  : "text-muted-foreground",
                               )}
                             />
                             <span>{item.title}</span>
@@ -166,7 +166,7 @@ const AdminSidebar = () => {
                                     "rounded-lg text-sm transition-colors",
                                     isChildActive(child.url, item.children!)
                                       ? "bg-amber-500 text-black font-semibold hover:bg-amber-500"
-                                      : "text-muted-foreground hover:bg-neutral-100 hover:text-gray-900"
+                                      : "text-muted-foreground hover:bg-neutral-100 hover:text-gray-900",
                                   )}
                                 >
                                   <Link href={child.url}>{child.title}</Link>
@@ -185,21 +185,26 @@ const AdminSidebar = () => {
                           "rounded-lg transition-colors",
                           isActive(item.url!)
                             ? "bg-amber-500 text-black font-semibold hover:bg-amber-500"
-                            : "hover:bg-neutral-100"
+                            : "hover:bg-neutral-100",
                         )}
                       >
-                        <Link href={item.url!} className="flex items-center gap-2">
+                        <Link
+                          href={item.url!}
+                          className="flex items-center gap-2"
+                        >
                           <item.icon
                             className={cn(
                               "h-4 w-4",
-                              isActive(item.url!) ? "text-black" : "text-muted-foreground"
+                              isActive(item.url!)
+                                ? "text-black"
+                                : "text-muted-foreground",
                             )}
                           />
                           {item.title}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  )
+                  ),
                 )}
               </SidebarMenu>
             </SidebarGroup>

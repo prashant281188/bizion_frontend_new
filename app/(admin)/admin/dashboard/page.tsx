@@ -38,25 +38,29 @@ const StatCard = ({
   const content = (
     <div className="flex items-center justify-between rounded-2xl bg-white px-5 py-5 ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-md transition-all group">
       <div>
-        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
+        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          {label}
+        </p>
         {isLoading ? (
           <div className="mt-2 h-8 w-16 rounded-lg bg-neutral-100 animate-pulse" />
         ) : (
           <p className="mt-1 text-3xl font-bold text-gray-900">{value}</p>
         )}
       </div>
-      <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}>
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}
+      >
         <Icon className="h-5 w-5" />
       </div>
     </div>
   );
 
   return href ? (
-    <Link href={href} className="block" style={{ animation: "fade-up 0.4s ease both" }}>
+    <Link href={href} className="animate-fade-up block">
       {content}
     </Link>
   ) : (
-    <div style={{ animation: "fade-up 0.4s ease both" }}>{content}</div>
+    <div className="animate-fade-up">{content}</div>
   );
 };
 
@@ -76,8 +80,8 @@ const QuickAction = ({
 }) => (
   <Link
     href={href}
-    className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-md transition-all group"
-    style={{ animation: "fade-up 0.4s ease both", animationDelay: `${delay}ms` }}
+    className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-md transition-all group animate-fade-up"
+    style={{ animationDelay: `${delay}ms` }}
   >
     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 ring-1 ring-amber-200 text-amber-600 group-hover:bg-amber-500 group-hover:text-black group-hover:ring-amber-500 transition-all">
       <Icon className="h-4 w-4" />
@@ -93,7 +97,8 @@ const QuickAction = ({
 /* ── Page ───────────────────────────────────────────────── */
 const AdminDashboardPage = () => {
   const { data: brands, isLoading: brandsLoading } = useBrands();
-  const { data: categories, isLoading: categoriesLoading } = usePublicCategories();
+  const { data: categories, isLoading: categoriesLoading } =
+    usePublicCategories();
   const { data: productsData, isLoading: productsLoading } = useProducts({
     page: 1,
     limit: 6,
@@ -111,9 +116,8 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="space-y-8">
-
       {/* Header */}
-      <div style={{ animation: "fade-up 0.4s ease both" }}>
+      <div className="animate-fade-up">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
@@ -131,7 +135,9 @@ const AdminDashboardPage = () => {
 
       {/* Stats */}
       <div>
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Overview</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Overview
+        </p>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard
             label="Total Products"
@@ -169,16 +175,16 @@ const AdminDashboardPage = () => {
 
       {/* Main grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
         {/* Recent Products */}
-        <div
-          className="lg:col-span-2 rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden"
-          style={{ animation: "fade-up 0.4s ease both", animationDelay: "100ms" }}
-        >
+        <div className="lg:col-span-2 animate-fade-up delay-100 rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-black/5">
             <div>
-              <h2 className="text-sm font-semibold text-gray-900">Recent Products</h2>
-              <p className="text-xs text-muted-foreground">Latest additions to the catalogue</p>
+              <h2 className="text-sm font-semibold text-gray-900">
+                Recent Products
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Latest additions to the catalogue
+              </p>
             </div>
             <Link
               href="/admin/products"
@@ -189,69 +195,69 @@ const AdminDashboardPage = () => {
           </div>
 
           <div className="divide-y divide-black/5">
-            {productsLoading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-4 px-5 py-3 animate-pulse">
-                    <div className="h-10 w-10 rounded-xl bg-neutral-100 shrink-0" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3 w-1/3 rounded-full bg-neutral-100" />
-                      <div className="h-3 w-1/4 rounded-full bg-neutral-100" />
-                    </div>
-                    <div className="h-3 w-16 rounded-full bg-neutral-100" />
+            {productsLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 px-5 py-3 animate-pulse"
+                >
+                  <div className="h-10 w-10 rounded-xl bg-neutral-100 shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-1/3 rounded-full bg-neutral-100" />
+                    <div className="h-3 w-1/4 rounded-full bg-neutral-100" />
                   </div>
-                ))
-              : recentProducts.length > 0
-              ? recentProducts.map((product, i) => (
-                  <Link
-                    key={product.id}
-                    href={`/admin/products/${product.id}`}
-                    className="flex items-center gap-4 px-5 py-3 hover:bg-neutral-50 transition-colors group"
-                    style={{
-                      animation: "fade-up 0.35s ease both",
-                      animationDelay: `${i * 40}ms`,
-                    }}
-                  >
-                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-black/5">
-                      <Image
-                        src={product.image?.url ?? "/products/dummy_photo.png"}
-                        alt={product.model}
-                        fill
-                        className="object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/products/dummy_photo.png";
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate group-hover:text-amber-600 transition-colors">
-                        {product.model.toUpperCase()}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {titleCase(product.brand?.brandName ?? "")} · {titleCase(product.category?.categoryName ?? "")}
-                      </p>
-                    </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </Link>
-                ))
-              : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Package className="h-8 w-8 text-neutral-300 mb-2" />
-                  <p className="text-sm text-muted-foreground">No products yet</p>
+                  <div className="h-3 w-16 rounded-full bg-neutral-100" />
                 </div>
-              )}
+              ))
+            ) : recentProducts.length > 0 ? (
+              recentProducts.map((product, i) => (
+                <Link
+                  key={product.id}
+                  href={`/admin/products/${product.id}`}
+                  className="animate-fade-up flex items-center gap-4 px-5 py-3 hover:bg-neutral-50 transition-colors group"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-black/5">
+                    <Image
+                      src={product.image?.url ?? "/products/dummy_photo.png"}
+                      alt={product.model}
+                      fill
+                      className="object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "/products/dummy_photo.png";
+                      }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-amber-600 transition-colors">
+                      {product.model.toUpperCase()}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {titleCase(product.brand?.brandName ?? "")} ·{" "}
+                      {titleCase(product.category?.categoryName ?? "")}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Package className="h-8 w-8 text-neutral-300 mb-2" />
+                <p className="text-sm text-muted-foreground">No products yet</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Right column */}
         <div className="space-y-6">
-
           {/* Quick Actions */}
-          <div
-            className="rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden"
-            style={{ animation: "fade-up 0.4s ease both", animationDelay: "150ms" }}
-          >
+          <div className="animate-fade-up delay-150 rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden">
             <div className="px-5 py-4 border-b border-black/5">
-              <h2 className="text-sm font-semibold text-gray-900">Quick Actions</h2>
+              <h2 className="text-sm font-semibold text-gray-900">
+                Quick Actions
+              </h2>
               <p className="text-xs text-muted-foreground">Common tasks</p>
             </div>
             <div className="p-3 space-y-2">
@@ -287,18 +293,20 @@ const AdminDashboardPage = () => {
           </div>
 
           {/* Top Brands */}
-          <div
-            className="rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden"
-            style={{ animation: "fade-up 0.4s ease both", animationDelay: "200ms" }}
-          >
+          <div className="animate-fade-up delay-200 rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden">
             <div className="px-5 py-4 border-b border-black/5">
               <h2 className="text-sm font-semibold text-gray-900">Brands</h2>
-              <p className="text-xs text-muted-foreground">{brands?.length ?? "—"} registered</p>
+              <p className="text-xs text-muted-foreground">
+                {brands?.length ?? "—"} registered
+              </p>
             </div>
             <div className="p-4 flex flex-wrap gap-2">
               {brandsLoading
                 ? Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="h-7 w-20 rounded-full bg-neutral-100 animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-7 w-20 rounded-full bg-neutral-100 animate-pulse"
+                    />
                   ))
                 : brands?.slice(0, 10).map((brand) => (
                     <span
@@ -318,27 +326,32 @@ const AdminDashboardPage = () => {
 
       {/* Categories */}
       {(categoriesLoading || (categories && categories.length > 0)) && (
-        <div style={{ animation: "fade-up 0.4s ease both", animationDelay: "250ms" }}>
+        <div className="animate-fade-up delay-250">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</p>
-            <Link href="/admin/settings" className="text-xs text-amber-600 hover:text-amber-500 transition">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Categories
+            </p>
+            <Link
+              href="/admin/settings"
+              className="text-xs text-amber-600 hover:text-amber-500 transition"
+            >
               Manage
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {categoriesLoading
               ? Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-16 rounded-2xl bg-white ring-1 ring-black/5 animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-16 rounded-2xl bg-white ring-1 ring-black/5 animate-pulse"
+                  />
                 ))
               : categories?.slice(0, 12).map((cat, i) => (
                   <Link
                     key={cat.id}
                     href={`/admin/products?categoryId=${cat.id}`}
-                    className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white px-3 py-4 text-center ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-sm transition-all group"
-                    style={{
-                      animation: "fade-up 0.35s ease both",
-                      animationDelay: `${i * 40}ms`,
-                    }}
+                    className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white px-3 py-4 text-center ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-sm transition-all group animate-fade-up"
+                    style={{ animationDelay: `${i * 40}ms` }}
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200 text-xs font-bold text-amber-600 group-hover:bg-amber-500 group-hover:text-black group-hover:ring-amber-500 transition-all">
                       {cat.categoryName.charAt(0).toUpperCase()}

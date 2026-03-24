@@ -2,7 +2,7 @@
 
 import { useProduct } from "@/hooks/useProduct";
 import { titleCase } from "@/utils";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles, Star, Package, Tag, Layers, Hash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -10,60 +10,32 @@ import React, { useState } from "react";
 
 /* ── Skeleton ───────────────────────────────────────────── */
 const ProductDetailSkeleton = () => (
-  <>
-    <section className="w-full bg-white py-10">
-      <div className="container mx-auto px-6 max-w-5xl">
-        <div className="h-9 w-24 rounded-full bg-neutral-100 animate-pulse" />
-
-        <div className="pt-6 grid gap-8 md:grid-cols-[260px_1fr]">
-          <div className="aspect-square rounded-2xl bg-neutral-100 animate-pulse" />
-
-          <div className="space-y-4">
-            <div className="h-7 w-28 rounded-full bg-neutral-100 animate-pulse" />
-            <div className="h-10 w-3/4 rounded-xl bg-neutral-100 animate-pulse" />
-            <div className="space-y-2 pt-1">
-              <div className="h-3.5 w-full rounded-full bg-neutral-100 animate-pulse" />
-              <div className="h-3.5 w-5/6 rounded-full bg-neutral-100 animate-pulse" />
-              <div className="h-3.5 w-2/3 rounded-full bg-neutral-100 animate-pulse" />
-            </div>
-            <div className="pt-2">
-              <div className="h-3.5 w-32 rounded-full bg-neutral-100 animate-pulse mb-3" />
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-8 w-16 rounded-full bg-neutral-100 animate-pulse" />
-                ))}
-              </div>
-            </div>
-            <div className="pt-2">
-              <div className="h-3.5 w-36 rounded-full bg-neutral-100 animate-pulse mb-3" />
-              <div className="grid grid-cols-2 gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-8 rounded-full bg-neutral-100 animate-pulse" />
-                ))}
-              </div>
-            </div>
+  <div className="w-full bg-white">
+    <div className="container mx-auto px-4 sm:px-6 max-w-5xl py-6 sm:py-10">
+      <div className="h-9 w-24 rounded-full bg-neutral-100 animate-pulse" />
+      <div className="mt-8 grid gap-8 md:grid-cols-[380px_1fr]">
+        <div className="aspect-square rounded-3xl bg-neutral-100 animate-pulse" />
+        <div className="space-y-4 pt-2">
+          <div className="flex gap-2">
+            <div className="h-6 w-20 rounded-full bg-neutral-100 animate-pulse" />
+            <div className="h-6 w-16 rounded-full bg-neutral-100 animate-pulse" />
+          </div>
+          <div className="h-10 w-3/4 rounded-xl bg-neutral-100 animate-pulse" />
+          <div className="h-5 w-1/3 rounded-full bg-neutral-100 animate-pulse" />
+          <div className="space-y-2 pt-2">
+            {[1, 0.8, 0.6].map((w, i) => (
+              <div key={i} className={`h-3.5 rounded-full bg-neutral-100 animate-pulse`} style={{ width: `${w * 100}%` }} />
+            ))}
+          </div>
+          <div className="pt-4 grid grid-cols-2 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-14 rounded-2xl bg-neutral-100 animate-pulse" />
+            ))}
           </div>
         </div>
       </div>
-    </section>
-
-    <section className="w-full bg-neutral-50 py-20">
-      <div className="container mx-auto px-6 max-w-5xl">
-        <div className="h-7 w-52 rounded-xl bg-neutral-100 animate-pulse mb-6" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex justify-between rounded-xl bg-white p-4 ring-1 ring-black/5 animate-pulse"
-            >
-              <div className="h-3.5 w-24 rounded-full bg-neutral-100" />
-              <div className="h-3.5 w-20 rounded-full bg-neutral-100" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  </>
+    </div>
+  </div>
 );
 
 /* ── Page ───────────────────────────────────────────────── */
@@ -76,10 +48,12 @@ const ProductDetailPage = () => {
 
   if (!data) {
     return (
-      <section className="flex flex-col items-center justify-center py-32 text-center">
+      <section className="flex flex-col items-center justify-center py-32 text-center px-4">
         <div className="mb-4 h-1 w-14 rounded-full bg-amber-500 mx-auto" />
         <h2 className="text-xl font-semibold text-gray-900">Product Not Found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">This product may have been removed or does not exist.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This product may have been removed or does not exist.
+        </p>
         <Link
           href="/products"
           className="mt-6 inline-flex items-center gap-2 rounded-full border border-black/10 px-5 py-2 text-sm transition hover:border-amber-500 hover:text-amber-600"
@@ -91,79 +65,105 @@ const ProductDetailPage = () => {
     );
   }
 
-  const imageSrc = imgError ? "/products/dummy_photo.png" : (data.image?.url ?? "/products/dummy_photo.png");
+  const imageSrc = imgError
+    ? "/products/dummy_photo.png"
+    : (data.image?.url ?? "/products/dummy_photo.png");
 
   const specs = [
-    ["Category", data.category?.categoryName],
-    ["Brand", data.brand?.brandName],
-    ["Metal", data.metal],
-    ["Size Type", data.sizeType],
-    ["Unit", data.unit ? `${data.unit.unitName} (${data.unit.unitSymbol})` : null],
-    ["HSN Code", data.hsn?.hsnCode],
-  ].filter(([, val]) => !!val) as [string, string][];
+    { icon: Layers, label: "Category", value: data.category?.categoryName ? titleCase(data.category.categoryName) : null },
+    { icon: Tag, label: "Brand", value: data.brand?.brandName ? titleCase(data.brand.brandName) : null },
+    { icon: Package, label: "Metal", value: data.metal ?? null },
+    { icon: Package, label: "Size Type", value: data.sizeType ?? null },
+    { icon: Package, label: "Unit", value: data.unit ? `${data.unit.unitName} (${data.unit.unitSymbol})` : null },
+    { icon: Hash, label: "HSN Code", value: data.hsn?.hsnCode ?? null },
+  ].filter((s) => !!s.value) as { icon: React.ElementType; label: string; value: string }[];
 
   return (
     <>
-      {/* Main */}
-      <section
-        className="w-full bg-white py-10"
-        style={{ animation: "fade-up 0.5s ease both" }}
-      >
-        <div className="container mx-auto px-6 max-w-5xl">
-          {/* Back button */}
+      {/* ── Hero Section ─────────────────────────────────── */}
+      <section className="w-full bg-white py-6 sm:py-10" style={{ animation: "fade-up 0.5s ease both" }}>
+        <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
+
+          {/* Back */}
           <Link
             href="/products"
             className="inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-amber-500 hover:text-amber-600"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            Back to Products
           </Link>
 
-          <div className="pt-8 grid gap-8 md:grid-cols-[260px_1fr]">
-            {/* Image */}
+          {/* Main grid */}
+          <div className="mt-6 sm:mt-8 grid gap-8 md:gap-12 md:grid-cols-[380px_1fr]">
+
+            {/* ── Image Panel ── */}
             <div style={{ animation: "fade-up 0.5s ease both", animationDelay: "80ms" }}>
-              <div className="aspect-square overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-black/5">
+              <div className="relative aspect-square overflow-hidden rounded-3xl bg-neutral-50 ring-1 ring-black/5 shadow-sm">
                 <Image
                   src={imageSrc}
                   alt={data.model ?? "Product"}
-                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                  height={600}
-                  width={600}
+                  className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                  height={700}
+                  width={700}
                   onError={() => setImgError(true)}
                 />
+                {/* Badges on image */}
+                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                  {data.isNew && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-black shadow">
+                      <Sparkles className="h-3 w-3" /> NEW
+                    </span>
+                  )}
+                  {data.isFeatured && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-black/80 px-2.5 py-1 text-xs font-bold text-amber-400 shadow backdrop-blur-sm">
+                      <Star className="h-3 w-3 fill-amber-400" /> FEATURED
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Info */}
-            <div style={{ animation: "fade-up 0.5s ease both", animationDelay: "160ms" }}>
-              {/* Brand badge */}
-              <span className="inline-flex items-center rounded-full border border-amber-500 px-4 py-1 text-sm text-amber-600">
-                {titleCase(data.brand?.brandName ?? "")}
-              </span>
+            {/* ── Info Panel ── */}
+            <div className="flex flex-col" style={{ animation: "fade-up 0.5s ease both", animationDelay: "160ms" }}>
 
-              {/* Model name */}
-              <h1 className="pt-4 text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
+              {/* Brand + Category row */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">
+                  {titleCase(data.brand?.brandName ?? "")}
+                </span>
+                <span className="inline-flex items-center rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-gray-600">
+                  {titleCase(data.category?.categoryName ?? "")}
+                </span>
+              </div>
+
+              {/* Model */}
+              <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
                 {data.model?.toUpperCase()}
               </h1>
 
-              {/* Category */}
-              <p className="mt-1 text-sm text-muted-foreground">
-                {titleCase(data.category?.categoryName ?? "")}
-              </p>
+              {/* Accent bar */}
+              <div className="mt-3 h-0.5 w-12 rounded-full bg-amber-500" />
 
-              {/* Short description */}
+              {/* Description */}
               {data.shortDescription && (
-                <p className="mt-3 text-muted-foreground leading-relaxed text-sm">
+                <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed">
                   {data.shortDescription}
+                </p>
+              )}
+
+              {data.description && data.description !== data.shortDescription && (
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  {data.description}
                 </p>
               )}
 
               {/* Metal */}
               {data.metal && (
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Metal:{" "}
-                  <span className="font-medium text-gray-800">{data.metal}</span>
-                </p>
+                <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 ring-1 ring-black/5 self-start">
+                  <span className="text-xs text-muted-foreground">Material</span>
+                  <span className="h-3 w-px bg-black/10" />
+                  <span className="text-sm font-semibold text-gray-800">{data.metal}</span>
+                </div>
               )}
 
               {/* Options */}
@@ -172,22 +172,18 @@ const ProductDetailPage = () => {
                   {data.options.map((option, oi) => (
                     <div
                       key={option.name}
-                      style={{
-                        animation: "fade-up 0.4s ease both",
-                        animationDelay: `${240 + oi * 80}ms`,
-                      }}
+                      style={{ animation: "fade-up 0.4s ease both", animationDelay: `${240 + oi * 80}ms` }}
                     >
-                      <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-600 mb-2">
-                        {option.name} Available
-                      </h2>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-amber-600">
+                        {option.name}
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {option.values.map((val) => (
                           <span
                             key={val}
-                            className="px-3 py-1 text-sm rounded-full border border-black/10 text-gray-700 hover:bg-amber-500 hover:text-black hover:border-amber-500 transition-colors cursor-default"
+                            className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-sm text-gray-700 hover:border-amber-500 hover:bg-amber-50 hover:text-amber-700 transition-colors cursor-default"
                           >
-                            {val}
-                            {option.name === "Size" && data.sizeType ? ` ${data.sizeType}` : ""}
+                            {val}{option.name === "Size" && data.sizeType ? ` ${data.sizeType}` : ""}
                           </span>
                         ))}
                       </div>
@@ -195,25 +191,47 @@ const ProductDetailPage = () => {
                   ))}
                 </div>
               )}
+
+              {/* Quick specs inline */}
+              {specs.length > 0 && (
+                <div className="mt-6 grid grid-cols-2 gap-2 pt-4 border-t border-black/5">
+                  {specs.map(({ label, value }) => (
+                    <div key={label} className="flex flex-col gap-0.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+                      <span className="text-sm font-medium text-gray-800">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Enquire CTA */}
+              <div className="mt-6 sm:mt-auto pt-6">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-400 hover:shadow-lg hover:shadow-amber-200"
+                >
+                  Enquire About This Product
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Variants */}
+      {/* ── Variants ─────────────────────────────────────── */}
       {data.variants && data.variants.length > 0 && (
         <section
-          className="w-full bg-neutral-50 py-16"
+          className="w-full bg-neutral-50 py-10 sm:py-16"
           style={{ animation: "fade-up 0.5s ease both", animationDelay: "200ms" }}
         >
-          <div className="container mx-auto px-6 max-w-5xl">
-            <div className="mb-8 flex items-end justify-between">
+          <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
+            <div className="mb-6 sm:mb-8 flex items-center justify-between">
               <div>
                 <span className="block h-1 w-10 rounded-full bg-amber-500 mb-3" />
-                <h2 className="text-2xl font-semibold text-gray-900">Available Variants</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Available Variants</h2>
               </div>
-              <span className="text-sm text-muted-foreground">
-                {data.variants.length} variant{data.variants.length !== 1 ? "s" : ""}
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-black/5">
+                {data.variants.length} {data.variants.length !== 1 ? "variants" : "variant"}
               </span>
             </div>
 
@@ -221,14 +239,11 @@ const ProductDetailPage = () => {
               {data.variants.map((variant, i) => (
                 <div
                   key={variant.id}
-                  className="group relative flex flex-col gap-3 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/40 hover:shadow-md transition-all"
-                  style={{
-                    animation: "fade-up 0.35s ease both",
-                    animationDelay: `${Math.min(i * 50, 400)}ms`,
-                  }}
+                  className="group flex flex-col gap-3 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/40 hover:shadow-md transition-all duration-200"
+                  style={{ animation: "fade-up 0.35s ease both", animationDelay: `${Math.min(i * 50, 400)}ms` }}
                 >
                   {/* SKU */}
-                  <span className="font-mono text-[11px] text-muted-foreground bg-neutral-50 rounded-md px-2 py-0.5 self-start ring-1 ring-black/5">
+                  <span className="self-start font-mono text-[10px] text-muted-foreground bg-neutral-50 rounded-md px-2 py-0.5 ring-1 ring-black/5">
                     {variant.sku}
                   </span>
 
@@ -240,7 +255,9 @@ const ProductDetailPage = () => {
                           key={key}
                           className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200"
                         >
-                          <span className="text-amber-400">{key}:</span> {val}
+                          <span className="text-amber-400 text-[10px]">{key}</span>
+                          <span className="text-amber-300">·</span>
+                          {val || "NA"}
                         </span>
                       ))}
                     </div>
@@ -250,49 +267,19 @@ const ProductDetailPage = () => {
                   {data.unit && (
                     <p className="text-xs text-muted-foreground">
                       Packing:{" "}
-                      <span className="font-medium text-gray-700">
+                      <span className="font-semibold text-gray-700">
                         {variant.packing != null ? `${variant.packing} ${data.unit.unitSymbol}` : "—"}
                       </span>
                     </p>
                   )}
 
                   {/* MRP */}
-                  <div className="mt-auto pt-2 border-t border-black/5 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">MRP</span>
-                    <span className="text-base font-semibold text-gray-900">
+                  <div className="mt-auto pt-3 border-t border-black/5 flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">MRP</span>
+                    <span className="text-lg font-bold text-gray-900">
                       ₹{parseFloat(variant.mrp).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Specs */}
-      {specs.length > 0 && (
-        <section
-          className="w-full bg-neutral-50 py-16"
-          style={{ animation: "fade-up 0.5s ease both", animationDelay: "280ms" }}
-        >
-          <div className="container mx-auto px-6 max-w-5xl">
-            <div className="mb-6">
-              <span className="block h-1 w-10 rounded-full bg-amber-500 mb-3" />
-              <h2 className="text-2xl font-semibold text-gray-900">Product Specifications</h2>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {specs.map(([label, value], i) => (
-                <div
-                  key={label}
-                  className="flex items-center justify-between rounded-xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/30 transition-all"
-                  style={{
-                    animation: "fade-up 0.35s ease both",
-                    animationDelay: `${300 + i * 50}ms`,
-                  }}
-                >
-                  <span className="text-sm text-muted-foreground">{label}</span>
-                  <span className="text-sm font-medium text-gray-900">{value}</span>
                 </div>
               ))}
             </div>

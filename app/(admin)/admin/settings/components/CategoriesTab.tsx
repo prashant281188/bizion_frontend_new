@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,83 +23,78 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  adminGetUsers,
-  adminCreateUser,
-  adminUpdateUser,
-  adminDeleteUser,
-  type AdminUser,
+  adminGetCategories,
+  adminCreateCategory,
+  adminUpdateCategory,
+  adminDeleteCategory,
+  type Category,
 } from "@/lib/api/admin";
 
 const PAGE_SIZE = 10;
-const ROLES = ["admin", "manager", "staff", "viewer"];
 
-type FormState = { name: string; email: string; password: string; role: string };
-const empty: FormState = { name: "", email: "", password: "", role: "staff" };
+type FormState = { categoryName: string; description: string; parentId: string };
+const empty: FormState = { categoryName: "", description: "", parentId: "" };
 
-export default function UsersTab() {
+export default function CategoriesTab() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<AdminUser | null>(null);
+  const [editing, setEditing] = useState<Category | null>(null);
   const [form, setForm] = useState<FormState>(empty);
-  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ["admin-users"],
-    queryFn: adminGetUsers,
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: ["admin-categories"],
+    queryFn: adminGetCategories,
   });
 
   const save = useMutation({
     mutationFn: () =>
       editing
-        ? adminUpdateUser(editing.id, { name: form.name, role: form.role })
-        : adminCreateUser({ name: form.name, email: form.email, password: form.password, role: form.role }),
+        ? adminUpdateCategory(editing.id, {
+            categoryName: form.categoryName,
+            description: form.description || undefined,
+            parentId: form.parentId || undefined,
+          })
+        : adminCreateCategory({
+            categoryName: form.categoryName,
+            description: form.description || undefined,
+            parentId: form.parentId || undefined,
+          }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-categories"] });
+      qc.invalidateQueries({ queryKey: ["categories"] });
       setOpen(false);
       setPage(1);
-      toast.success("User saved");
+      toast.success("Category saved");
     },
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to save"),
   });
 
   const remove = useMutation({
-    mutationFn: (id: string) => adminDeleteUser(id),
+    mutationFn: (id: string) => adminDeleteCategory(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-categories"] });
+      qc.invalidateQueries({ queryKey: ["categories"] });
       setDeleteTarget(null);
       setPage(1);
-      toast.success("User deleted");
+      toast.success("Category deleted");
     },
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to delete"),
   });
 
-  const toggleActive = useMutation({
-    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      adminUpdateUser(id, { isActive }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-users"] }),
-    onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to update status"),
-  });
-
   function openAdd() { setEditing(null); setForm(empty); setOpen(true); }
-  function openEdit(u: AdminUser) {
-    setEditing(u);
-    setForm({ name: u.name, email: u.email, password: "", role: u.role });
+  function openEdit(c: Category) {
+    setEditing(c);
+    setForm({ categoryName: c.categoryName, description: c.description ?? "", parentId: c.parentId ?? "" });
     setOpen(true);
   }
 
-  const roleColor: Record<string, string> = {
-    admin:   "bg-red-50 text-red-600 ring-red-200",
-    manager: "bg-blue-50 text-blue-600 ring-blue-200",
-    staff:   "bg-emerald-50 text-emerald-600 ring-emerald-200",
-    viewer:  "bg-neutral-100 text-neutral-600 ring-neutral-200",
-  };
+  const rootCategories = categories.filter((c) => !c.parentId);
 
-  const filtered = users.filter(
-    (u) =>
-      // u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = categories.filter((c) =>
+    c.categoryName.toLowerCase().includes(search.toLowerCase())
   );
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -109,16 +104,16 @@ export default function UsersTab() {
     <>
       <Card className="border-0 shadow-none rounded-none">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <CardTitle className="text-base">User Management</CardTitle>
+          <CardTitle className="text-base">Categories</CardTitle>
           <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-black font-semibold" onClick={openAdd}>
-            <Plus className="h-4 w-4 mr-1.5" /> Add User
+            <Plus className="h-4 w-4 mr-1.5" /> Add Category
           </Button>
         </CardHeader>
         <CardContent>
           {/* Search */}
           <div className="mb-3">
             <Input
-              placeholder="Search by name or email…"
+              placeholder="Search categories…"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="h-8 text-xs"
@@ -133,44 +128,33 @@ export default function UsersTab() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center py-12 text-center">
-              <Users className="h-8 w-8 text-neutral-300 mb-2" />
+              <FolderOpen className="h-8 w-8 text-neutral-300 mb-2" />
               <p className="text-sm text-muted-foreground">
-                {search ? "No users match your search" : "No users yet"}
+                {search ? "No categories match your search" : "No categories yet"}
               </p>
             </div>
           ) : (
             <>
               <div className="rounded-lg border border-black/5 overflow-hidden">
-                <div className="grid grid-cols-[1fr_1fr_100px_80px_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-4">
+                <div className="grid grid-cols-[1fr_1fr_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-4">
                   <span className="data-table-th">Name</span>
-                  <span className="data-table-th">Email</span>
-                  <span className="data-table-th">Role</span>
-                  <span className="data-table-th">Status</span>
+                  <span className="data-table-th">Parent</span>
                   <span className="data-table-th text-right">Actions</span>
                 </div>
                 <div className="divide-y divide-black/5">
-                  {paged.map((u) => (
-                    <div key={u.id} className="grid grid-cols-[1fr_1fr_100px_80px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80">
-                      <span className="text-sm font-medium text-gray-900 truncate">{u.name}</span>
-                      <span className="text-sm text-muted-foreground truncate">{u.email}</span>
-                      <span className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${roleColor[u.role] ?? roleColor.viewer}`}>
-                        {u.role}
+                  {paged.map((c) => (
+                    <div key={c.id} className="grid grid-cols-[1fr_1fr_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80">
+                      <span className="text-sm font-medium text-gray-900">{c.categoryName}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {c.parentId
+                          ? (categories.find((p) => p.id === c.parentId)?.categoryName ?? "—")
+                          : <span className="text-xs text-amber-600 font-medium">Root</span>}
                       </span>
-                      <button
-                        onClick={() => toggleActive.mutate({ id: u.id, isActive: !u.isActive })}
-                        className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 transition-colors ${
-                          u.isActive
-                            ? "bg-emerald-50 text-emerald-600 ring-emerald-200"
-                            : "bg-neutral-100 text-neutral-500 ring-neutral-200"
-                        }`}
-                      >
-                        {u.isActive ? "Active" : "Inactive"}
-                      </button>
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEdit(u)} className="icon-btn-edit">
+                        <button onClick={() => openEdit(c)} className="icon-btn-edit">
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
-                        <button onClick={() => setDeleteTarget(u)} className="icon-btn-delete">
+                        <button onClick={() => setDeleteTarget(c)} className="icon-btn-delete">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -181,7 +165,7 @@ export default function UsersTab() {
 
               {/* Pagination */}
               <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{filtered.length} user{filtered.length !== 1 ? "s" : ""}</span>
+                <span>{filtered.length} categor{filtered.length !== 1 ? "ies" : "y"}</span>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-1">
                     <button
@@ -207,37 +191,31 @@ export default function UsersTab() {
         </CardContent>
       </Card>
 
+      {/* Add / Edit dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit User" : "Add User"}</DialogTitle>
+            <DialogTitle>{editing ? "Edit Category" : "Add Category"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid gap-1.5">
               <Label>Name</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Full name" />
+              <Input value={form.categoryName} onChange={(e) => setForm((f) => ({ ...f, categoryName: e.target.value }))} placeholder="e.g. Electronics" />
             </div>
-            {!editing && (
-              <>
-                <div className="grid gap-1.5">
-                  <Label>Email</Label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="user@example.com" />
-                </div>
-                <div className="grid gap-1.5">
-                  <Label>Password</Label>
-                  <Input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} placeholder="Min. 8 characters" />
-                </div>
-              </>
-            )}
             <div className="grid gap-1.5">
-              <Label>Role</Label>
-              <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v }))}>
+              <Label>Description <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Short description" />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Parent Category <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Select value={form.parentId || "__none__"} onValueChange={(v) => setForm((f) => ({ ...f, parentId: v === "__none__" ? "" : v }))}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="None (Root)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {ROLES.map((r) => (
-                    <SelectItem key={r} value={r} className="capitalize">{r}</SelectItem>
+                  <SelectItem value="__none__">None (Root)</SelectItem>
+                  {rootCategories.filter((c) => c.id !== editing?.id).map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.categoryName}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -245,23 +223,20 @@ export default function UsersTab() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button
-              onClick={() => save.mutate()}
-              disabled={!form.name || (!editing && (!form.email || !form.password)) || save.isPending}
-              className="bg-amber-500 hover:bg-amber-400 text-black"
-            >
+            <Button onClick={() => save.mutate()} disabled={!form.categoryName || save.isPending} className="bg-amber-500 hover:bg-amber-400 text-black">
               {save.isPending ? "Saving…" : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Delete confirm */}
       <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>Delete Category</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</p>
+          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.categoryName}</strong>? This cannot be undone.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
             <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>

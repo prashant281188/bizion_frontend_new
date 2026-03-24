@@ -66,7 +66,7 @@ const LoginPage = () => {
                 className="mt-2 text-muted-foreground"
                 style={{ animation: "fade-up 0.5s ease both", animationDelay: "220ms" }}
               >
-                Sign in to continue to HINI
+                Sign in to access the HINI admin portal
               </p>
             </div>
 
@@ -101,7 +101,7 @@ const LoginPage = () => {
                   type="email"
                   required
                   placeholder="you@company.com"
-                  className="w-full rounded-xl border border-black/10 px-4 py-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent hover:border-amber-300"
+                  className="input-base hover:border-amber-300"
                 />
               </div>
 
@@ -113,7 +113,7 @@ const LoginPage = () => {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className="w-full rounded-xl border border-black/10 px-4 py-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent hover:border-amber-300"
+                  className="input-base hover:border-amber-300"
                 />
               </div>
 
@@ -194,8 +194,7 @@ const LoginPage = () => {
             <div>
               <span className="mb-4 block h-1 w-10 rounded-full bg-amber-500" />
               <p className="max-w-md text-lg font-medium text-white leading-relaxed">
-                Premium architectural hardware crafted for modern interiors —
-                trusted by professionals across India.
+                The HINI admin portal — manage products, parties, and your business from one place.
               </p>
             </div>
           </div>

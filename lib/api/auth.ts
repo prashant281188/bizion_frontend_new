@@ -1,13 +1,16 @@
 import { ApiResponse, User } from "@/types/auth";
 import { api } from "./axios";
+import { AxiosError } from "axios";
 
 export async function getMe(): Promise<User | null> {
   try {
     const res = await api.get<ApiResponse<{ user: User }>>("/auth/me");
     return res.data.data?.user ?? null;
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      return null;
+  } catch (err: unknown) {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 401) {
+        return null;
+      }
     }
     throw err; // let React Query handle real errors
   }
@@ -38,5 +41,34 @@ export async function resetPassword(data: {
     newPassword: string;
 }) {
     const res = await api.post("/auth/reset-password", data)
+    return res.data
+}
+
+export async function verifyOtp(data: {
+    email: string;
+    otp: string;
+}) {
+    const res = await api.post<ApiResponse<{ token?: string }>>("/auth/verify-otp", data)
+    return res.data
+}
+
+export async function resendOtp(data: { email: string }) {
+    const res = await api.post("/auth/resend-otp", data)
+    return res.data
+}
+
+export async function changePassword(data: {
+    currentPassword: string;
+    newPassword: string;
+}) {
+    const res = await api.post("/auth/change-password", data)
+    return res.data
+}
+
+export async function updateProfile(data: {
+    name?: string;
+    email?: string;
+}) {
+    const res = await api.patch<ApiResponse<{ user: User }>>("/auth/profile", data)
     return res.data
 }

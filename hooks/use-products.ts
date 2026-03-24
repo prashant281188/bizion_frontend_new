@@ -9,3 +9,19 @@ export function useProducts({ page, limit, search, brandId, categoryId, sort }: 
         placeholderData: (previousData) => previousData,
     });
 }
+
+export function useFeaturedProducts(limit = 10) {
+    return useQuery({
+        queryKey: ["product", "featured", limit],
+        queryFn: () => getProductsWithFilter({ page: 1, limit, isFeatured: true }),
+        staleTime: 1000 * 60 * 10,
+    });
+}
+
+export function useNewProducts(limit = 10) {
+    return useQuery({
+        queryKey: ["product", "new", limit],
+        queryFn: () => getProductsWithFilter({ page: 1, limit, isNew: true }),
+        staleTime: 1000 * 60 * 10,
+    });
+}

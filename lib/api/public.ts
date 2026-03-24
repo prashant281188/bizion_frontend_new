@@ -16,12 +16,20 @@ type meta = {
 }
 
 /* ---------- Schema ---------- */
-export const publicCategoriesSchema = z.object({
+type CategoryType = {
+    id: string;
+    categoryName: string;
+    description?: string | null;
+    parentId?: string | null;
+    children?: CategoryType[];
+};
+
+export const publicCategoriesSchema: z.ZodType<CategoryType> = z.object({
     id: z.string(),
     categoryName: z.string(),
     description: z.string().optional().nullable(),
     parentId: z.string().nullable().optional(),
-    children: z.array(z.lazy((): z.ZodTypeAny => publicCategoriesSchema)).optional()
+    children: z.array(z.lazy(() => publicCategoriesSchema)).optional()
 });
 
 export const brandSchema = z.object({
@@ -89,7 +97,7 @@ export const publicProductDetailSchema = z.object({
         mrp: z.string(),
         saleRate: z.string().optional().nullable(),
         purchaseRate: z.string().optional().nullable(),
-        options: z.record(z.string()).optional()
+        options: z.record(z.string(), z.string()).optional()
     }).array().optional()
 })
 
@@ -201,6 +209,8 @@ export async function getProductsWithFilter(params: {
     brandId?: string;
     categoryId?: string;
     sort?: string;
+    isFeatured?: boolean;
+    isNew?: boolean;
 }) {
     const cleanParams = Object.fromEntries(
         Object.entries(params).filter(([, v]) => v !== "" && v !== undefined && v !== null)

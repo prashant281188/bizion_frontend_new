@@ -26,7 +26,7 @@ const SortToggle = ({
       <SelectContent>
         <SelectItem value="__none__">Default</SelectItem>
         <SelectItem value="model_asc">Model A → Z</SelectItem>
-        <SelectItem value="model_dsc">Model Z → A</SelectItem>
+        <SelectItem value="model_desc">Model Z → A</SelectItem>
       </SelectContent>
     </Select>
   );

@@ -49,15 +49,15 @@ const LogoutPage = () => {
           className="text-2xl font-semibold text-gray-900"
           style={{ animation: "fade-up 0.5s ease both", animationDelay: "250ms" }}
         >
-          You've Been Logged Out
+          Signed Out Successfully
         </h1>
 
         <p
           className="mt-3 text-sm text-muted-foreground"
           style={{ animation: "fade-up 0.5s ease both", animationDelay: "320ms" }}
         >
-          Your session has ended securely. For your safety, please close the
-          browser if you are on a shared device.
+          Your session has ended securely. If you are on a shared device,
+          close this browser tab to protect your account.
         </p>
 
         {/* Actions */}

@@ -1,345 +1,267 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-
-import { DownloadIcon, FileTextIcon, FileSpreadsheetIcon } from 'lucide-react'
-
-import Papa from 'papaparse'
-import * as XLSX from 'xlsx'
-
-import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/react-table'
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { Plus, Search, Pencil, Trash2, Building2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable
-} from '@tanstack/react-table'
-
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  adminGetParties,
+  adminCreateParty,
+  adminUpdateParty,
+  adminDeleteParty,
+  type Party,
+} from "@/lib/api/admin";
+import { useDebounce } from "@/hooks/useDebounce";
 
-import { cn } from '@/lib/utils'
+type FormState = {
+  name: string;
+  gstin: string;
+  contact: string;
+  address: string;
+  city: string;
+  type: string;
+};
 
-const data: Payment[] = [
-  {
-    id: '1',
-    name: 'Shang Chain',
-    amount: 699,
-    status: 'success',
-    email: 'shang07@yahoo.com'
-  },
-  {
-    id: '2',
-    name: 'Kevin Lincoln',
-    amount: 242,
-    status: 'success',
-    email: 'kevinli09@gmail.com'
-  },
-  {
-    id: '3',
-    name: 'Milton Rose',
-    amount: 655,
-    status: 'processing',
-    email: 'rose96@gmail.com'
-  },
-  {
-    id: '4',
-    name: 'Silas Ryan',
-    amount: 874,
-    status: 'success',
-    email: 'silas22@gmail.com'
-  },
-  {
-    id: '5',
-    name: 'Ben Tenison',
-    amount: 541,
-    status: 'failed',
-    email: 'bent@hotmail.com'
-  },
-  {
-    id: '6',
-    name: 'Alice Cooper',
-    amount: 321,
-    status: 'processing',
-    email: 'alice@email.com'
-  },
-  {
-    id: '7',
-    name: 'Bob Johnson',
-    amount: 789,
-    status: 'success',
-    email: 'bob.j@company.com'
-  },
-  {
-    id: '8',
-    name: 'Carol Williams',
-    amount: 456,
-    status: 'processing',
-    email: 'carol.w@domain.org'
-  }
-]
+const empty: FormState = { name: "", gstin: "", contact: "", address: "", city: "", type: "retailer" };
 
-export type Payment = {
-  id: string
-  name: string
-  amount: number
-  status: 'processing' | 'success' | 'failed'
-  email: string
-}
+const PARTY_TYPES = ["retailer", "supplier", "customer", "distributor"];
 
-export const columns: ColumnDef<Payment>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={value => row.toggleSelected(!!value)}
-        aria-label='Select row'
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
-    accessorKey: 'name',
-    header: 'Name',
-    cell: ({ row }) => <div className='font-medium'>{row.getValue('name')}</div>
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string
+const typeColor: Record<string, string> = {
+  retailer: "bg-blue-50 text-blue-600 ring-blue-200",
+  supplier: "bg-violet-50 text-violet-600 ring-violet-200",
+  customer: "bg-emerald-50 text-emerald-600 ring-emerald-200",
+  distributor: "bg-amber-50 text-amber-700 ring-amber-200",
+};
 
-      const styles = {
-        success:
-          'bg-green-600/10 text-green-600 focus-visible:ring-green-600/20 dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5',
-        failed:
-          'bg-destructive/10 [a&]:hover:bg-destructive/5 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive',
-        processing:
-          'bg-amber-600/10 text-amber-600 focus-visible:ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-400 dark:focus-visible:ring-amber-400/40 [a&]:hover:bg-amber-600/5 dark:[a&]:hover:bg-amber-400/5'
-      }[status]
+export default function PartyDataTable() {
+  const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Party | null>(null);
+  const [form, setForm] = useState<FormState>(empty);
+  const [deleteTarget, setDeleteTarget] = useState<Party | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
-      return <Badge className={(cn('border-none focus-visible:outline-none'), styles)}>{row.getValue('status')}</Badge>
-    }
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-    cell: ({ row }) => <div className='lowercase'>{row.getValue('email')}</div>
-  },
-  {
-    accessorKey: 'amount',
-    header: () => <div className='text-right'>Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'))
+  const debouncedSearch = useDebounce(search, 400);
 
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(amount)
+  const { data: parties = [], isLoading } = useQuery({
+    queryKey: ["admin-parties", debouncedSearch, typeFilter],
+    queryFn: () => adminGetParties({ search: debouncedSearch || undefined, type: typeFilter || undefined }),
+  });
 
-      return <div className='text-right font-medium'>{formatted}</div>
-    }
-  }
-]
+  const save = useMutation({
+    mutationFn: () =>
+      editing
+        ? adminUpdateParty(editing.id, form)
+        : adminCreateParty(form),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-parties"] }); setOpen(false); },
+  });
 
-const PartyDataTable = () => {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
-  const [globalFilter, setGlobalFilter] = useState('')
+  const remove = useMutation({
+    mutationFn: (id: string) => adminDeleteParty(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-parties"] }); setDeleteTarget(null); },
+  });
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: 'includesString',
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      globalFilter
-    }
-  })
-
-  const exportToCSV = () => {
-    const selectedRows = table.getSelectedRowModel().rows
-
-    const dataToExport =
-      selectedRows.length > 0
-        ? selectedRows.map(row => row.original)
-        : table.getFilteredRowModel().rows.map(row => row.original)
-
-    const csv = Papa.unparse(dataToExport, {
-      header: true
-    })
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-
-    link.setAttribute('href', url)
-    link.setAttribute('download', `payments-export-${new Date().toISOString().split('T')[0]}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  function openAdd() { setEditing(null); setForm(empty); setOpen(true); }
+  function openEdit(p: Party) {
+    setEditing(p);
+    setForm({ name: p.name, gstin: p.gstin ?? "", contact: p.contact ?? "", address: p.address ?? "", city: p.city ?? "", type: p.type });
+    setOpen(true);
   }
 
-  const exportToExcel = () => {
-    const selectedRows = table.getSelectedRowModel().rows
-
-    const dataToExport =
-      selectedRows.length > 0
-        ? selectedRows.map(row => row.original)
-        : table.getFilteredRowModel().rows.map(row => row.original)
-
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport)
-    const workbook = XLSX.utils.book_new()
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Payments')
-
-    const cols = [{ wch: 10 }, { wch: 20 }, { wch: 15 }, { wch: 25 }, { wch: 15 }]
-
-    worksheet['!cols'] = cols
-
-    XLSX.writeFile(workbook, `payments-export-${new Date().toISOString().split('T')[0]}.xlsx`)
-  }
-
-  const exportToJSON = () => {
-    const selectedRows = table.getSelectedRowModel().rows
-
-    const dataToExport =
-      selectedRows.length > 0
-        ? selectedRows.map(row => row.original)
-        : table.getFilteredRowModel().rows.map(row => row.original)
-
-    const json = JSON.stringify(dataToExport, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-
-    link.setAttribute('href', url)
-    link.setAttribute('download', `payments-export-${new Date().toISOString().split('T')[0]}.json`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+  const totalPages = Math.max(1, Math.ceil(parties.length / limit));
+  const paged = parties.slice((page - 1) * limit, page * limit);
 
   return (
-    <div className='w-full'>
-      <div className='flex justify-between gap-2 pb-4 max-sm:flex-col sm:items-center'>
-        <div className='flex items-center space-x-2'>
-          <Input
-            placeholder='Search all columns...'
-            value={globalFilter ?? ''}
-            onChange={event => setGlobalFilter(String(event.target.value))}
-            className='max-w-sm'
-          />
-        </div>
-        <div className='flex items-center space-x-2'>
-          <div className='text-muted-foreground text-sm'>
-            {table.getSelectedRowModel().rows.length > 0 && (
-              <span className='mr-2'>
-                {table.getSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected
-              </span>
-            )}
+    <>
+      <div className="space-y-5">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="page-title">Parties</h1>
+            <p className="page-subtitle">{isLoading ? "Loading…" : `${parties.length} parties total`}</p>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='outline' size='sm'>
-                <DownloadIcon className='mr-2' />
-                Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem onClick={exportToCSV}>
-                <FileTextIcon className='mr-2 size-4' />
-                Export as CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={exportToExcel}>
-                <FileSpreadsheetIcon className='mr-2 size-4' />
-                Export as Excel
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={exportToJSON}>
-                <FileTextIcon className='mr-2 size-4' />
-                Export as JSON
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button size="sm" className="btn-amber rounded-lg" onClick={openAdd}>
+            <Plus className="h-4 w-4 mr-1.5" /> Add Party
+          </Button>
         </div>
-      </div>
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <p className='text-muted-foreground mt-4 text-center text-sm'>
-        Data table with export functionality (CSV, Excel, JSON)
-      </p>
-    </div>
-  )
-}
 
-export default PartyDataTable
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[200px] max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search name, GSTIN…" className="pl-8 h-8 text-sm rounded-lg border-black/10" />
+          </div>
+          <Select value={typeFilter || "__all__"} onValueChange={(v) => { setTypeFilter(v === "__all__" ? "" : v); setPage(1); }}>
+            <SelectTrigger className="h-8 text-sm w-[140px] rounded-lg border-black/10">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Types</SelectItem>
+              {PARTY_TYPES.map((t) => (
+                <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Table */}
+        {isLoading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse" style={{ animationDelay: `${i * 40}ms` }} />
+            ))}
+          </div>
+        ) : paged.length === 0 ? (
+          <div className="empty-state">
+            <Building2 className="empty-state-icon" />
+            <p className="empty-state-title">No parties found</p>
+            <p className="empty-state-subtitle">{search || typeFilter ? "Try adjusting filters" : "Add your first party to get started"}</p>
+          </div>
+        ) : (
+          <div className="data-table">
+            <div className="grid grid-cols-[1fr_140px_140px_120px_80px] items-center px-4 py-2.5 gap-4 bg-neutral-50 border-b border-black/5">
+              <span className="data-table-th">Name</span>
+              <span className="data-table-th">GSTIN</span>
+              <span className="data-table-th">Contact</span>
+              <span className="data-table-th">Type</span>
+              <span className="data-table-th text-right">Actions</span>
+            </div>
+            <div className="data-table-body">
+              {paged.map((p, i) => (
+                <div
+                  key={p.id}
+                  className="animate-fade-up grid grid-cols-[1fr_140px_140px_120px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
+                  style={{ animationDelay: `${i * 30}ms` }}
+                >
+                  <div className="min-w-0">
+                    <Link href={`/admin/parties/${p.id}`} className="text-sm font-semibold text-gray-900 truncate block hover:text-amber-600 transition-colors">
+                      {p.name}
+                    </Link>
+                    {p.city && <p className="text-xs text-muted-foreground truncate">{p.city}</p>}
+                  </div>
+                  <span className="text-sm font-mono text-muted-foreground truncate">{p.gstin || "—"}</span>
+                  <span className="text-sm text-gray-700 truncate">{p.contact || "—"}</span>
+                  <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 capitalize ${typeColor[p.type] ?? typeColor.retailer}`}>
+                    {p.type}
+                  </span>
+                  <div className="flex items-center justify-end gap-1">
+                    <button onClick={() => openEdit(p)} className="icon-btn-edit"><Pencil className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => setDeleteTarget(p)} className="icon-btn-delete"><Trash2 className="h-3.5 w-3.5" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-xs text-muted-foreground">
+              Showing {(page - 1) * limit + 1}–{Math.min(page * limit, parties.length)} of {parties.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setPage((p) => p - 1)} disabled={page === 1} className="flex h-7 w-7 items-center justify-center rounded-lg border border-black/10 text-muted-foreground hover:border-amber-500 hover:text-amber-600 disabled:opacity-30 transition-colors">
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button key={p} onClick={() => setPage(p)} className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? "bg-amber-500 text-black" : "border border-black/10 text-muted-foreground hover:border-amber-500 hover:text-amber-600"}`}>
+                  {p}
+                </button>
+              ))}
+              <button onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages} className="flex h-7 w-7 items-center justify-center rounded-lg border border-black/10 text-muted-foreground hover:border-amber-500 hover:text-amber-600 disabled:opacity-30 transition-colors">
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Add / Edit dialog */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editing ? "Edit Party" : "Add Party"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid gap-1.5">
+              <Label>Name</Label>
+              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Party / Company name" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <Label>GSTIN <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input value={form.gstin} onChange={(e) => setForm((f) => ({ ...f, gstin: e.target.value }))} placeholder="09ABCDE..." />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Contact <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input value={form.contact} onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))} placeholder="+91 XXXXX XXXXX" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <Label>City <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="City" />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Type</Label>
+                <Select value={form.type} onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PARTY_TYPES.map((t) => (
+                      <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Address <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Input value={form.address} onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} placeholder="Street address" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => save.mutate()} disabled={!form.name || save.isPending} className="btn-amber">
+              {save.isPending ? "Saving…" : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirm */}
+      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete Party</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>
+              {remove.isPending ? "Deleting…" : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

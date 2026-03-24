@@ -1,5 +1,7 @@
 "use client";
 
+import { verifyOtp, resendOtp } from "@/lib/api/auth";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
@@ -9,9 +11,30 @@ const OTP_LENGTH = 6;
 
 const VerifyPage = () => {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
-  const [isLoading, setIsLoading] = useState(false);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
+
+  const getEmail = () =>
+    typeof window !== "undefined" ? sessionStorage.getItem("reset_email") ?? "" : "";
+
+  const verify = useMutation({
+    mutationFn: (code: string) => verifyOtp({ email: getEmail(), otp: code }),
+    onSuccess: (data) => {
+      if (data.data?.token) sessionStorage.setItem("reset_token", data.data.token);
+      router.replace("/reset");
+    },
+    onError: () => toast.error("Invalid or expired code. Please try again."),
+  });
+
+  const resend = useMutation({
+    mutationFn: () => resendOtp({ email: getEmail() }),
+    onSuccess: () => {
+      toast.success("Verification code resent to your email.");
+      setOtp(Array(OTP_LENGTH).fill(""));
+      inputs.current[0]?.focus();
+    },
+    onError: () => toast.error("Failed to resend code. Please try again."),
+  });
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -27,29 +50,14 @@ const VerifyPage = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const code = otp.join("");
     if (code.length < OTP_LENGTH) {
       toast.error("Please enter the full 6-digit code");
       return;
     }
-    setIsLoading(true);
-    try {
-      // TODO: call verify API with code
-      router.replace("/reset");
-    } catch {
-      toast.error("Invalid or expired code");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResend = () => {
-    setOtp(Array(OTP_LENGTH).fill(""));
-    inputs.current[0]?.focus();
-    toast.success("Verification code resent");
-    // TODO: call resend API
+    verify.mutate(code);
   };
 
   return (
@@ -58,9 +66,7 @@ const VerifyPage = () => {
         {/* Header */}
         <div className="mb-8 text-center">
           <span className="mx-auto mb-4 block h-1 w-14 rounded-full bg-amber-500" />
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Verify Your Account
-          </h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Verify Your Account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Enter the 6-digit verification code sent to your email.
           </p>
@@ -84,29 +90,29 @@ const VerifyPage = () => {
             ))}
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-600 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={verify.isPending}
+            className="w-full rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-400 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Verifying…" : "Verify"}
+            {verify.isPending ? "Verifying…" : "Verify"}
           </button>
         </form>
 
         {/* Resend */}
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Didn't receive the code?{" "}
-          <button onClick={handleResend} className="text-amber-500 hover:underline">
-            Resend
+          Didn&apos;t receive the code?{" "}
+          <button
+            onClick={() => resend.mutate()}
+            disabled={resend.isPending}
+            className="text-amber-500 hover:underline disabled:opacity-60"
+          >
+            {resend.isPending ? "Sending…" : "Resend"}
           </button>
         </p>
 
-        {/* Back */}
         <p className="mt-2 text-center text-xs text-muted-foreground">
-          <Link href="/login" className="hover:underline">
-            Back to Login
-          </Link>
+          <Link href="/login" className="hover:underline">Back to Login</Link>
         </p>
       </div>
     </section>

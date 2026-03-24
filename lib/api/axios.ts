@@ -29,14 +29,19 @@ export const api = axios.create({
   },
 });
 
+const AUTH_PATHS = ["/login", "/logout", "/forgot", "/reset", "/verify"];
+
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message?: string }>) => {
-    if (error.response?.status === 401 && typeof window !== "undefined") {
-      window.location.href = "/login"
+    const isAuthPage = typeof window !== "undefined" &&
+      AUTH_PATHS.some((p) => window.location.pathname.startsWith(p));
+
+    if (error.response?.status === 401 && typeof window !== "undefined" && !isAuthPage) {
+      window.location.href = "/login";
     }
     return Promise.reject(
       error.response?.data?.message || "Something went wrong"
-    )
+    );
   }
 )
