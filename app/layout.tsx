@@ -5,7 +5,6 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import QueryProvider from "@/providers/query-provider";
 import { TopLoadingBar } from "@/components/ui/top-loading-bar";
-import { AuthProvider } from "@/providers/auth-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
