@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import QueryProvider from "@/providers/query-provider";
 import { TopLoadingBar } from "@/components/ui/top-loading-bar";
+import { BackdropProvider } from "@/providers/backdrop-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,11 +41,13 @@ export default function RootLayout({
     `}
       >
         <QueryProvider>
+          <BackdropProvider>
             <TopLoadingBar />
             <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
               {children}
               <Toaster />
             </div>
+          </BackdropProvider>
         </QueryProvider>
       </body>
     </html>

@@ -15,7 +15,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <SidebarInset className="flex min-h-screen flex-col">
           <AdminNavbar className="sticky top-0 z-30 border-b bg-background" />
           <main className="flex-1 overflow-y-auto">
-            <div className="p-6">{children}</div>
+            <div className="p-4 md:p-6">{children}</div>
           </main>
         </SidebarInset>
       </SidebarProvider>

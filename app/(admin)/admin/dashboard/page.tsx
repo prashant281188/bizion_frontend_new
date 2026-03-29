@@ -8,91 +8,19 @@ import {
   Tag,
   Layers,
   Users,
-  ArrowRight,
   Plus,
   ListFilter,
   Building2,
   TrendingUp,
+  ArrowRight,
 } from "lucide-react";
 import { useBrands } from "@/hooks/use-brands";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useProducts } from "@/hooks/use-products";
 import { titleCase } from "@/utils";
+import { StatCard } from "@/components/admin/StatCard";
+import { QuickActionCard } from "@/components/admin/QuickActionCard";
 
-/* ── Stat Card ─────────────────────────────────────────── */
-const StatCard = ({
-  label,
-  value,
-  icon: Icon,
-  color,
-  isLoading,
-  href,
-}: {
-  label: string;
-  value: number | string;
-  icon: React.ElementType;
-  color: string;
-  isLoading?: boolean;
-  href?: string;
-}) => {
-  const content = (
-    <div className="flex items-center justify-between rounded-2xl bg-white px-5 py-5 ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-md transition-all group">
-      <div>
-        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-          {label}
-        </p>
-        {isLoading ? (
-          <div className="mt-2 h-8 w-16 rounded-lg bg-neutral-100 animate-pulse" />
-        ) : (
-          <p className="mt-1 text-3xl font-bold text-gray-900">{value}</p>
-        )}
-      </div>
-      <div
-        className={`flex h-12 w-12 items-center justify-center rounded-2xl ${color}`}
-      >
-        <Icon className="h-5 w-5" />
-      </div>
-    </div>
-  );
-
-  return href ? (
-    <Link href={href} className="animate-fade-up block">
-      {content}
-    </Link>
-  ) : (
-    <div className="animate-fade-up">{content}</div>
-  );
-};
-
-/* ── Quick Action ──────────────────────────────────────── */
-const QuickAction = ({
-  label,
-  description,
-  href,
-  icon: Icon,
-  delay,
-}: {
-  label: string;
-  description: string;
-  href: string;
-  icon: React.ElementType;
-  delay: number;
-}) => (
-  <Link
-    href={href}
-    className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-md transition-all group animate-fade-up"
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 ring-1 ring-amber-200 text-amber-600 group-hover:bg-amber-500 group-hover:text-black group-hover:ring-amber-500 transition-all">
-      <Icon className="h-4 w-4" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-gray-900">{label}</p>
-      <p className="text-xs text-muted-foreground truncate">{description}</p>
-    </div>
-    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" />
-  </Link>
-);
 
 /* ── Page ───────────────────────────────────────────────── */
 const AdminDashboardPage = () => {
@@ -261,28 +189,28 @@ const AdminDashboardPage = () => {
               <p className="text-xs text-muted-foreground">Common tasks</p>
             </div>
             <div className="p-3 space-y-2">
-              <QuickAction
+              <QuickActionCard
                 label="Add Product"
                 description="Create a new product listing"
                 href="/admin/products/create"
                 icon={Plus}
                 delay={200}
               />
-              <QuickAction
+              <QuickActionCard
                 label="Manage Products"
                 description="Edit or remove products"
                 href="/admin/products"
                 icon={ListFilter}
                 delay={240}
               />
-              <QuickAction
+              <QuickActionCard
                 label="View Parties"
                 description="Customers & suppliers"
                 href="/admin/parties"
                 icon={Building2}
                 delay={280}
               />
-              <QuickAction
+              <QuickActionCard
                 label="Settings"
                 description="Brands, categories & system"
                 href="/admin/settings"

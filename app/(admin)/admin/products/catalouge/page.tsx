@@ -9,7 +9,6 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { CatalogProduct } from "@/lib/api/public";
 import { cn } from "@/lib/utils";
 import { titleCase } from "@/utils";
-import { API_URL } from "@/lib/api/axios";
 import {
   Select,
   SelectContent,
@@ -19,37 +18,25 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  Pencil,
-  Eye,
-  Package,
-  BookOpen,
-} from "lucide-react";
+import { Search, Pencil, Eye, Package, BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 /* ─── Helpers ────────────────────────────────────────────────── */
 
 function parseOptions(
-  optionValues: CatalogProduct["variants"][number]["optionValues"]
+  optionValues: CatalogProduct["variants"][number]["optionValues"],
 ): Record<string, string> {
   return Object.fromEntries(
     [...optionValues]
       .sort(
-        (a, b) =>
-          (a.optionValue.position ?? 0) - (b.optionValue.position ?? 0)
+        (a, b) => (a.optionValue.position ?? 0) - (b.optionValue.position ?? 0),
       )
       .map((ov) => [
         ov.optionValue.option.optionName,
         ov.optionValue.optionValue,
-      ])
+      ]),
   );
-}
-
-function resolveImageUrl(path: string): string {
-  if (path.startsWith("http")) return path;
-  return `${API_URL}/${path}`;
 }
 
 /* ─── Variant table ──────────────────────────────────────────── */
@@ -64,8 +51,8 @@ const VariantTable = ({
   const optionNames = [
     ...new Set(
       variants.flatMap((v) =>
-        v.optionValues.map((ov) => ov.optionValue.option.optionName)
-      )
+        v.optionValues.map((ov) => ov.optionValue.option.optionName),
+      ),
     ),
   ];
 
@@ -160,9 +147,7 @@ const VariantTable = ({
 
 const ProductRow = ({ product }: { product: CatalogProduct }) => {
   const [imgSrc, setImgSrc] = useState(
-    product.image?.path
-      ? resolveImageUrl(product.image.path)
-      : "/products/dummy_photo.png"
+    product.image?.path ? product.image.path : "/products/dummy_photo.png",
   );
 
   return (
@@ -193,7 +178,7 @@ const ProductRow = ({ product }: { product: CatalogProduct }) => {
                   "rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
                   product.status === "active"
                     ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                    : "bg-neutral-100 text-neutral-500 ring-black/10"
+                    : "bg-neutral-100 text-neutral-500 ring-black/10",
                 )}
               >
                 {titleCase(product.status)}
@@ -304,7 +289,8 @@ const CatalogueContent = () => {
 
   // Client-side search
   const products = useMemo(() => {
-    if (!debouncedSearch) return allProducts.filter((p) => p.brand && p.category);
+    if (!debouncedSearch)
+      return allProducts.filter((p) => p.brand && p.category);
     const q = debouncedSearch.toLowerCase();
     return allProducts.filter(
       (p) =>
@@ -314,7 +300,7 @@ const CatalogueContent = () => {
           p.brand?.brandName.toLowerCase().includes(q) ||
           p.category?.categoryName.toLowerCase().includes(q) ||
           p.metal?.toLowerCase().includes(q) ||
-          p.shortDescription?.toLowerCase().includes(q))
+          p.shortDescription?.toLowerCase().includes(q)),
     );
   }, [allProducts, debouncedSearch]);
 
@@ -357,7 +343,11 @@ const CatalogueContent = () => {
     setFilter("categoryId", "");
   };
 
-  const hasFilters = !!(filters.search || filters.brandId || filters.categoryId);
+  const hasFilters = !!(
+    filters.search ||
+    filters.brandId ||
+    filters.categoryId
+  );
 
   return (
     <div className="space-y-5">
@@ -412,9 +402,7 @@ const CatalogueContent = () => {
         {/* Brand */}
         <Select
           value={filters.brandId || "__all__"}
-          onValueChange={(v) =>
-            setFilter("brandId", v === "__all__" ? "" : v)
-          }
+          onValueChange={(v) => setFilter("brandId", v === "__all__" ? "" : v)}
         >
           <SelectTrigger className="h-8 text-sm w-[150px] rounded-lg border-black/10">
             <SelectValue placeholder="All Brands" />

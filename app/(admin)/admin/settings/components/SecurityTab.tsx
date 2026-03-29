@@ -8,15 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { changePassword } from "@/lib/api/auth";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 type Form = { current: string; next: string; confirm: string };
 const empty: Form = { current: "", next: "", confirm: "" };
 
 export default function SecurityTab() {
   const [form, setForm] = useState<Form>(empty);
+  const { show, hide } = useBackdrop();
 
   const save = useMutation({
     mutationFn: () => changePassword({ currentPassword: form.current, newPassword: form.next }),
+    onMutate: () => show("Changing password…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       toast.success("Password changed successfully.");
       setForm(empty);

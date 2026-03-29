@@ -32,6 +32,7 @@ import {
 import { useBrands } from "@/hooks/use-brands";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { createProduct, uploadImage } from "@/lib/api/admin";
+import { useBackdrop } from "@/providers/backdrop-provider";
 import ImageUpload from "@/components/admin/ImageUpload";
 import { titleCase } from "@/utils";
 import { cn } from "@/lib/utils";
@@ -218,6 +219,7 @@ const TagInput = ({
 const CreateProductPage = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { show, hide } = useBackdrop();
   const { data: brands } = useBrands();
   const { data: categories } = usePublicCategories();
 
@@ -297,6 +299,8 @@ const CreateProductPage = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createProduct,
+    onMutate: () => show("Creating product…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       toast.success("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["product"] });

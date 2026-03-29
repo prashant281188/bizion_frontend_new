@@ -4,8 +4,8 @@ import { AxiosError } from "axios";
 
 export async function getMe(): Promise<User | null> {
   try {
-    const res = await api.get<ApiResponse<{ user: User }>>("/auth/me");
-    return res.data.data?.user ?? null;
+    const res = await api.get<ApiResponse<User>>("/auth/me");
+    return res.data.data ?? null;
   } catch (err: unknown) {
     if (err instanceof AxiosError) {
       if (err.response?.status === 401) {

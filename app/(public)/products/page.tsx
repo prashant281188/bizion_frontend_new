@@ -13,7 +13,9 @@ import { usePublicCategories } from "@/hooks/use-categories";
 import { useBrands } from "@/hooks/use-brands";
 import { useURLFilters } from "@/hooks/useURLFilters";
 import FilterSearch from "@/components/filters/FilterSearch";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Package } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const ProductsContent = () => {
   const { filters, setFilter } = useURLFilters();
@@ -21,8 +23,8 @@ const ProductsContent = () => {
   const debouncedSearch = useDebounce(filters.search, 500);
 
   const { data, isLoading, isFetching } = useProducts({
-    page: filters.page,
-    limit: filters.limit,
+    page: filters.page ?? 1,
+    limit: filters.limit ?? 12,
     search: debouncedSearch,
     brandId: filters.brandId,
     categoryId: filters.categoryId,
@@ -33,27 +35,37 @@ const ProductsContent = () => {
   const brands = useBrands();
 
   const categoryOptions =
-    categories.data?.map((cat) => ({ label: cat.categoryName, value: cat.id })) ?? [];
+    categories.data?.map((cat) => ({
+      label: cat.categoryName,
+      value: cat.id,
+    })) ?? [];
 
   const brandOptions =
-    brands.data?.map((brand) => ({ label: brand.brandName, value: brand.id })) ?? [];
+    brands.data?.map((brand) => ({
+      label: brand.brandName,
+      value: brand.id,
+    })) ?? [];
 
   const products = data?.data ?? [];
   const meta = data?.meta;
 
-  const activeFiltersCount = [filters.search, filters.brandId, filters.categoryId, filters.sort].filter(Boolean).length;
+  const activeFiltersCount = [
+    filters.search,
+    filters.brandId,
+    filters.categoryId,
+    filters.sort,
+  ].filter(Boolean).length;
 
   return (
     <>
       {/* Hero */}
       <section className="relative w-full bg-neutral-50 py-10 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 text-center">
-          <span className="mx-auto mb-4 block h-1 w-14 rounded-full bg-amber-500" />
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">Our Products</h1>
-          <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-2">
-            Browse the full HINI range — door handles, cabinet hardware, aluminium profiles, and more.
-            Filter by category or brand to find exactly what you need.
-          </p>
+        <div className="container mx-auto px-4 sm:px-6">
+          <SectionHeader
+            title="Our Products"
+            subtitle="Browse the full HINI range — door handles, cabinet hardware, aluminium profiles, and more. Filter by category or brand to find exactly what you need."
+            centered
+          />
         </div>
       </section>
 
@@ -65,8 +77,8 @@ const ProductsContent = () => {
 
             <div className="flex-1 min-w-[160px] max-w-xs">
               <FilterSearch
-                onChange={(search) => setFilter("search", search)}
-                value={filters.search}
+                onChange={(search) => setFilter({search: search})}
+                value={filters.search ?? ""}
                 placeholder="Search products…"
               />
             </div>
@@ -75,20 +87,26 @@ const ProductsContent = () => {
               label="Category"
               options={categoryOptions}
               value={filters.categoryId}
-              onChange={(opt) => setFilter("categoryId", opt.value)}
+              onChange={(opt) => setFilter({categoryId: opt.value})}
             />
 
             <Filter
               label="Brand"
               options={brandOptions}
               value={filters.brandId}
-              onChange={(opt) => setFilter("brandId", opt.value)}
+              onChange={(opt) => setFilter({brandId: opt.value})}
             />
 
             <div className="ml-auto flex items-center gap-2">
-              <SortToggle sort={filters.sort} onSortChange={(v) => setFilter("sort", v)} />
+              <SortToggle
+                sort={filters?.sort ?? ""}
+                onSortChange={(v) => setFilter({sort: v})}
+              />
               <ViewToggle value={view} onChange={setView} />
-              <ItemsPerPage itemsPerPage={filters.limit} onChange={(v) => setFilter("limit", v)} />
+              <ItemsPerPage
+                itemsPerPage={filters?.limit ?? 12}
+                onChange={(v) => setFilter({limit: v})}
+              />
             </div>
           </div>
 
@@ -97,32 +115,51 @@ const ProductsContent = () => {
             <div className="mt-2 flex flex-wrap items-center gap-2 pb-1">
               <span className="text-xs text-muted-foreground">Active:</span>
               {filters.search && (
-                <button onClick={() => setFilter("search", "")} className="filter-pill">
+                <button
+                  onClick={() => setFilter({search: ""})}
+                  className="filter-pill"
+                >
                   Search: {filters.search} ×
                 </button>
               )}
               {filters.categoryId && (
-                <button onClick={() => setFilter("categoryId", "")} className="filter-pill">
-                  {categoryOptions.find((c) => c.value === filters.categoryId)?.label ?? "Category"} ×
+                <button
+                  onClick={() => setFilter({categoryId: ""})}
+                  className="filter-pill"
+                >
+                  {categoryOptions.find((c) => c.value === filters.categoryId)
+                    ?.label ?? "Category"}{" "}
+                  ×
                 </button>
               )}
               {filters.brandId && (
-                <button onClick={() => setFilter("brandId", "")} className="filter-pill">
-                  {brandOptions.find((b) => b.value === filters.brandId)?.label ?? "Brand"} ×
+                <button
+                  onClick={() => setFilter({brandId:""})}
+                  className="filter-pill"
+                >
+                  {brandOptions.find((b) => b.value === filters.brandId)
+                    ?.label ?? "Brand"}{" "}
+                  ×
                 </button>
               )}
               {filters.sort && (
-                <button onClick={() => setFilter("sort", "")} className="filter-pill">
+                <button
+                  onClick={() => setFilter({sort: ""})}
+                  className="filter-pill"
+                >
                   {filters.sort === "model_asc" ? "A → Z" : "Z → A"} ×
                 </button>
               )}
               <button
-                onClick={() => {
-                  setFilter("search", "");
-                  setFilter("categoryId", "");
-                  setFilter("brandId", "");
-                  setFilter("sort", "");
-                }}
+                onClick={() =>
+                  setFilter({
+                    search: "",
+                    categoryId: "",
+                    brandId: "",
+                    sort: "",
+                    page: 1,
+                  })
+                }
                 className="text-xs text-muted-foreground hover:text-red-500 transition"
               >
                 Clear all
@@ -143,7 +180,13 @@ const ProductsContent = () => {
 
       {/* Products Grid */}
       <section className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <div className={isFetching ? "opacity-60 transition-opacity duration-200" : "opacity-100 transition-opacity duration-200"}>
+        <div
+          className={
+            isFetching
+              ? "opacity-60 transition-opacity duration-200"
+              : "opacity-100 transition-opacity duration-200"
+          }
+        >
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-6">
               {Array.from({ length: 12 }).map((_, i) => (
@@ -180,19 +223,20 @@ const ProductsContent = () => {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="mb-4 h-1 w-14 rounded-full bg-amber-500 mx-auto" />
-              <h3 className="text-lg font-semibold text-gray-900">No Products Found</h3>
-              <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-                Try adjusting your filters or search term to find what you&apos;re looking for.
-              </p>
-              <button
-                onClick={() => { setFilter("search", ""); setFilter("categoryId", ""); setFilter("brandId", ""); }}
-                className="mt-6 rounded-full border border-black/10 px-5 py-2 text-sm transition hover:border-amber-500 hover:text-amber-600"
-              >
-                Clear Filters
-              </button>
-            </div>
+            <EmptyState
+              icon={Package}
+              title="No Products Found"
+              description="Try adjusting your filters or search term to find what you're looking for."
+              className="py-24"
+              action={
+                <button
+                  onClick={() => setFilter({ search: "", categoryId: "" })}
+                  className="rounded-full border border-black/10 px-5 py-2 text-sm transition hover:border-amber-500 hover:text-amber-600"
+                >
+                  Clear Filters
+                </button>
+              }
+            />
           )}
         </div>
       </section>
@@ -200,9 +244,9 @@ const ProductsContent = () => {
       {/* Pagination */}
       {meta && meta.totalPages > 1 && (
         <Pagination
-          page={filters.page}
+          page={filters.page ?? 1}
           totalPages={meta.totalPages}
-          onPageChange={(p) => setFilter("page", p)}
+          onPageChange={(p) => setFilter({page: p})}
         />
       )}
     </>

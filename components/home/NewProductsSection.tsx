@@ -5,17 +5,8 @@ import Link from "next/link";
 import { useNewProducts } from "@/hooks/use-products";
 import ProductCard from "@/components/product/ProductCard";
 import { ArrowRight, Sparkles } from "lucide-react";
-
-const ProductCardSkeleton = () => (
-  <div className="min-w-[200px] w-[200px] rounded-2xl bg-white ring-1 ring-black/5 overflow-hidden animate-pulse">
-    <div className="aspect-square bg-neutral-100" />
-    <div className="p-4 space-y-2">
-      <div className="h-3 bg-neutral-100 rounded-full w-3/4" />
-      <div className="h-3 bg-neutral-100 rounded-full w-1/2" />
-      <div className="h-3 bg-neutral-100 rounded-full w-1/3" />
-    </div>
-  </div>
-);
+import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const NewProductsSection = () => {
   const { data, isLoading } = useNewProducts(10);
@@ -28,16 +19,17 @@ const NewProductsSection = () => {
       <div className="container mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="mb-8 flex items-end justify-between">
-          <div>
-            <span className="mb-3 block h-1 w-12 rounded-full bg-amber-500" />
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">New Arrivals</h2>
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
-                <Sparkles className="h-3 w-3" /> New
+          <SectionHeader
+            title={
+              <span className="flex items-center gap-2">
+                New Arrivals
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                  <Sparkles className="h-3 w-3" /> New
+                </span>
               </span>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">Latest additions to our hardware collection</p>
-          </div>
+            }
+            subtitle="Latest additions to our hardware collection"
+          />
           <Link
             href="/products?isNew=true"
             className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-500 transition-colors"

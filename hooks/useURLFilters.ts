@@ -4,8 +4,16 @@ export function useURLFilters() {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  type Filter = {
+    search: string,
+    categoryId: string,
+    brandId: string,
+    page: number,
+    limit: number,
+    sort: string,
+  }
 
-  const filters = {
+  const filters : Filter = {
     search: params.get("search") ?? "",
     categoryId: params.get("categoryId") ?? "",
     brandId: params.get("brandId") ?? "",
@@ -14,13 +22,24 @@ export function useURLFilters() {
     sort: params.get("sort") ?? "",
   };
 
-  const setFilter = (key: string, value: string | number) => {
+  const setFilter = (keyOrUpdates: keyof Filter | Partial<Filter>, value?: string | number | null) => {
+    const updates: Partial<Filter> = typeof keyOrUpdates === "string"
+      ? { [keyOrUpdates]: value }
+      : keyOrUpdates;
+
     const newParams = new URLSearchParams(params.toString());
 
-    if (value === "" || value === 0) newParams.delete(key);
-    else newParams.set(key, String(value));
+    Object.entries(updates).forEach(([key, val]) => {
+      if (val === "" || val === 0 || val === null || val === undefined) {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, String(val));
+      }
+    });
 
-    if (key !== "page") newParams.set("page", "1");
+    if (!("page" in updates)) {
+      newParams.set("page", "1");
+    }
 
     router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
   };

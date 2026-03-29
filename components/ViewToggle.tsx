@@ -12,7 +12,7 @@ type Props = {
 
 export function ViewToggle({ value, onChange }: Props) {
   return (
-    <div className="flex items-center rounded-full border border-black/10 overflow-hidden">
+    <div className="md:hidden flex items-center rounded-full border border-black/10 overflow-hidden">
       {(["grid", "list"] as ViewMode[]).map((mode) => (
         <button
           key={mode}

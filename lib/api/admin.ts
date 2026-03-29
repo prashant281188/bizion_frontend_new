@@ -10,6 +10,7 @@ export type Category = {
   categoryName: string;
   description?: string | null;
   parentId?: string | null;
+  categoryImage?: string | null;
 };
 
 export async function adminGetCategories(): Promise<Category[]> {
@@ -17,12 +18,41 @@ export async function adminGetCategories(): Promise<Category[]> {
   return res.data.data;
 }
 
-export async function adminCreateCategory(payload: { categoryName: string; description?: string; parentId?: string }) {
+export async function adminCreateCategory(
+  payload: { categoryName: string; description?: string; parentId?: string },
+  imageFile?: File,
+) {
+  if (imageFile) {
+    const fd = new FormData();
+    fd.append("image", imageFile);
+    fd.append("categoryName", payload.categoryName);
+    if (payload.description) fd.append("description", payload.description);
+    if (payload.parentId) fd.append("parentId", payload.parentId);
+    const res = await api.post<ApiResponse<Category>>("/categories", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
   const res = await api.post<ApiResponse<Category>>("/categories", payload);
   return res.data;
 }
 
-export async function adminUpdateCategory(id: string, payload: { categoryName?: string; description?: string; parentId?: string }) {
+export async function adminUpdateCategory(
+  id: string,
+  payload: { categoryName?: string; description?: string; parentId?: string },
+  imageFile?: File,
+) {
+  if (imageFile) {
+    const fd = new FormData();
+    fd.append("image", imageFile);
+    if (payload.categoryName) fd.append("categoryName", payload.categoryName);
+    if (payload.description) fd.append("description", payload.description);
+    if (payload.parentId) fd.append("parentId", payload.parentId);
+    const res = await api.patch<ApiResponse<Category>>(`/categories/${id}`, fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
   const res = await api.patch<ApiResponse<Category>>(`/categories/${id}`, payload);
   return res.data;
 }
@@ -44,12 +74,37 @@ export async function adminGetBrands(): Promise<AdminBrand[]> {
   return res.data.data;
 }
 
-export async function adminCreateBrand(payload: { brandName: string; brandLogo?: string }) {
+export async function adminCreateBrand(
+  payload: { brandName: string },
+  imageFile?: File,
+) {
+  if (imageFile) {
+    const fd = new FormData();
+    fd.append("image", imageFile);
+    fd.append("brandName", payload.brandName);
+    const res = await api.post<ApiResponse<AdminBrand>>("/brands", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
   const res = await api.post<ApiResponse<AdminBrand>>("/brands", payload);
   return res.data;
 }
 
-export async function adminUpdateBrand(id: string, payload: { brandName?: string; brandLogo?: string }) {
+export async function adminUpdateBrand(
+  id: string,
+  payload: { brandName?: string },
+  imageFile?: File,
+) {
+  if (imageFile) {
+    const fd = new FormData();
+    fd.append("image", imageFile);
+    if (payload.brandName) fd.append("brandName", payload.brandName);
+    const res = await api.patch<ApiResponse<AdminBrand>>(`/brands/${id}`, fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
   const res = await api.patch<ApiResponse<AdminBrand>>(`/brands/${id}`, payload);
   return res.data;
 }
@@ -230,6 +285,52 @@ export async function adminUpdateParty(id: string, payload: Partial<Omit<Party, 
 
 export async function adminDeleteParty(id: string) {
   const res = await api.delete<ApiResponse<null>>(`/parties/${id}`);
+  return res.data;
+}
+
+/* ── Carousel ────────────────────────────────────────────── */
+export type AdminCarousel = {
+  id: string;
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  isActive: boolean;
+};
+
+export async function adminGetCarousel(): Promise<AdminCarousel[]> {
+  const res = await api.get<ApiResponse<AdminCarousel[]>>("/carousel");
+  return res.data.data;
+}
+
+export async function adminCreateCarousel(formData: FormData) {
+  const res = await api.post<ApiResponse<AdminCarousel>>("/carousel", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+}
+
+export async function adminUpdateCarousel(
+  id: string,
+  payload: { title?: string; description?: string; isActive?: boolean },
+  imageFile?: File,
+) {
+  if (imageFile) {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    if (payload.title !== undefined) formData.append("title", payload.title);
+    if (payload.description !== undefined) formData.append("description", payload.description);
+    if (payload.isActive !== undefined) formData.append("isActive", String(payload.isActive));
+    const res = await api.patch<ApiResponse<AdminCarousel>>(`/carousel/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
+  const res = await api.patch<ApiResponse<AdminCarousel>>(`/carousel/${id}`, payload);
+  return res.data;
+}
+
+export async function adminDeleteCarousel(id: string) {
+  const res = await api.delete<ApiResponse<null>>(`/carousel/${id}`);
   return res.data;
 }
 

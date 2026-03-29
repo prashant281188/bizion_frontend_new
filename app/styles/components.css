@@ -92,6 +92,16 @@
     @apply h-10 rounded-lg bg-neutral-100 animate-pulse;
   }
 
+  /* Compact pagination button (settings tabs) */
+  .pagination-btn {
+    @apply flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* Image upload drop-zone label */
+  .img-upload-label {
+    @apply flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-black/20 px-4 py-2.5 text-sm text-muted-foreground hover:border-amber-400 hover:text-amber-600 transition-colors;
+  }
+
 
   /* ── Forms ───────────────────────────────────────────────────── */
 

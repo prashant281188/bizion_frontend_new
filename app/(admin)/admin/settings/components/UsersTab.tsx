@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ import {
   adminDeleteUser,
   type AdminUser,
 } from "@/lib/api/admin";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 const PAGE_SIZE = 10;
 const ROLES = ["admin", "manager", "staff", "viewer"];
@@ -38,6 +40,7 @@ const empty: FormState = { name: "", email: "", password: "", role: "staff" };
 
 export default function UsersTab() {
   const qc = useQueryClient();
+  const { show, hide } = useBackdrop();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<AdminUser | null>(null);
   const [form, setForm] = useState<FormState>(empty);
@@ -55,6 +58,8 @@ export default function UsersTab() {
       editing
         ? adminUpdateUser(editing.id, { name: form.name, role: form.role })
         : adminCreateUser({ name: form.name, email: form.email, password: form.password, role: form.role }),
+    onMutate: () => show(editing ? "Updating user…" : "Creating user…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       setOpen(false);
@@ -66,6 +71,8 @@ export default function UsersTab() {
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteUser(id),
+    onMutate: () => show("Deleting user…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       setDeleteTarget(null);
@@ -128,7 +135,7 @@ export default function UsersTab() {
           {isLoading ? (
             <div className="space-y-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-10 rounded-lg bg-neutral-100 animate-pulse" />
+                <div key={i} className="data-table-skeleton-row" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -187,7 +194,7 @@ export default function UsersTab() {
                     <button
                       disabled={safePage === 1}
                       onClick={() => setPage((p) => p - 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
@@ -195,7 +202,7 @@ export default function UsersTab() {
                     <button
                       disabled={safePage === totalPages}
                       onClick={() => setPage((p) => p + 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>
@@ -256,20 +263,14 @@ export default function UsersTab() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>
-              {remove.isPending ? "Deleting…" : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Delete User"
+        description={<>Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</>}
+        onConfirm={() => deleteTarget && remove.mutate(deleteTarget.id)}
+        isPending={remove.isPending}
+      />
     </>
   );
 }

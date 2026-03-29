@@ -14,41 +14,16 @@ function TopLoadingBarInner() {
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isFirstMount = useRef(true);
   const isStarted = useRef(false);
-  const completedEarly = useRef(false); // pathname changed before start() ran
+  const shouldCompleteImmediately = useRef(false);
 
   const clearTimers = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
   };
 
-  const start = () => {
-    if (completedEarly.current) {
-      // Navigation already finished before the bar could show — cancel silently
-      completedEarly.current = false;
-      return;
-    }
-    clearTimers();
-    isStarted.current = true;
-    setCompleting(false);
-    setVisible(true);
-    setWidth(0);
-
-    let w = 0;
-    intervalRef.current = setInterval(() => {
-      w = w + (90 - w) * 0.12;
-      setWidth(Math.min(w, 90));
-    }, 180);
-  };
-
-  const complete = () => {
-    if (!isStarted.current) {
-      // start() hasn't run yet (race condition on fast/cached routes)
-      // Mark it so start() knows to cancel itself when it fires
-      completedEarly.current = true;
-      return;
-    }
+  const doComplete = () => {
     isStarted.current = false;
-    completedEarly.current = false;
+    shouldCompleteImmediately.current = false;
     clearTimers();
     setCompleting(true);
     setWidth(100);
@@ -59,14 +34,56 @@ function TopLoadingBarInner() {
     }, 450);
   };
 
-  // Intercept pushState (Link clicks, router.push) and popstate (browser back/forward)
+  const start = () => {
+    clearTimers();
+    isStarted.current = true;
+    setCompleting(false);
+    setVisible(true);
+    setWidth(0);
+
+    // complete() already fired before we could start (fast/cached route) — finish immediately
+    if (shouldCompleteImmediately.current) {
+      doComplete();
+      return;
+    }
+
+    let w = 0;
+    intervalRef.current = setInterval(() => {
+      w = w + (90 - w) * 0.12;
+      setWidth(Math.min(w, 90));
+    }, 180);
+  };
+
+  const complete = () => {
+    if (!isStarted.current) {
+      // start() hasn't run yet — flag it so start() completes immediately when it fires
+      shouldCompleteImmediately.current = true;
+      return;
+    }
+    doComplete();
+  };
+
+  // Intercept pushState (Link clicks, router.push), replaceState (router.replace), and popstate (browser back/forward)
   useEffect(() => {
     const originalPushState = window.history.pushState.bind(window.history);
+    const originalReplaceState = window.history.replaceState.bind(window.history);
 
-    window.history.pushState = function (...args) {
-      const result = originalPushState(...args);
-      // Defer setState out of React's synchronous insertion phase (React 19)
-      queueMicrotask(start);
+    const getPath = (url?: string | URL | null) => {
+      if (!url) return window.location.pathname;
+      try { return new URL(String(url), window.location.href).pathname; } catch { return window.location.pathname; }
+    };
+
+    window.history.pushState = function (state, title, url) {
+      const prev = window.location.pathname;
+      const result = originalPushState(state, title, url);
+      if (getPath(url) !== prev) queueMicrotask(start);
+      return result;
+    };
+
+    window.history.replaceState = function (state, title, url) {
+      const prev = window.location.pathname;
+      const result = originalReplaceState(state, title, url);
+      if (getPath(url) !== prev) queueMicrotask(start);
       return result;
     };
 
@@ -75,6 +92,7 @@ function TopLoadingBarInner() {
 
     return () => {
       window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
       window.removeEventListener("popstate", onPopState);
       clearTimers();
     };
@@ -95,24 +113,32 @@ function TopLoadingBarInner() {
   if (!visible) return null;
 
   return (
-    <div
-      className="fixed top-0 left-0 z-[9999] h-[2.5px] bg-amber-500 pointer-events-none"
-      style={{
-        width: `${width}%`,
-        transition: completing
-          ? "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
-          : "width 0.18s ease-out",
-        boxShadow: "0 0 8px 1px rgba(245,158,11,0.6)",
-      }}
-    >
+    <>
+      {/* Interaction blocker — transparent overlay, blocks all clicks/scroll during navigation */}
+      {!completing && (
+        <div className="fixed inset-0 z-[9998] cursor-wait" />
+      )}
+
+      {/* Progress bar */}
       <div
-        className="absolute right-0 top-1/2 -translate-y-1/2 h-[5px] w-[80px] rounded-full"
+        className="fixed top-0 left-0 z-[9999] h-[2.5px] bg-amber-500 pointer-events-none"
         style={{
-          background: "linear-gradient(to left, rgba(255,255,255,0.9), transparent)",
-          filter: "blur(2px)",
+          width: `${width}%`,
+          transition: completing
+            ? "width 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
+            : "width 0.18s ease-out",
+          boxShadow: "0 0 8px 1px rgba(245,158,11,0.6)",
         }}
-      />
-    </div>
+      >
+        <div
+          className="absolute right-0 top-1/2 -translate-y-1/2 h-[5px] w-[80px] rounded-full"
+          style={{
+            background: "linear-gradient(to left, rgba(255,255,255,0.9), transparent)",
+            filter: "blur(2px)",
+          }}
+        />
+      </div>
+    </>
   );
 }
 

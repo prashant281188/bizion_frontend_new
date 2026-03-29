@@ -3,6 +3,7 @@
 import { usePublicCategories } from "@/hooks/use-categories";
 import React from "react";
 import BiCategory from "./category/BiCategory";
+import { getS3Url } from "@/utils";
 
 const CategorySection = () => {
   const { data, isLoading } = usePublicCategories();
@@ -14,10 +15,11 @@ const CategorySection = () => {
         <div className="mb-8 sm:mb-12 text-center">
           <span className="mx-auto mb-3 block h-1 w-12 rounded-full bg-amber-500" />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">
-            Shop by Category
+            Explore by Category
           </h2>
           <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-4">
-            From entrance doors to bathroom fittings — explore hardware collections built for every room and specification
+            From entrance doors to bathroom fittings — explore hardware
+            collections built for every room and specification
           </p>
         </div>
 
@@ -39,7 +41,7 @@ const CategorySection = () => {
                 >
                   <BiCategory
                     title={cat.categoryName}
-                    image="/products/dummy_photo.png"
+                    image={cat.categoryImage ? getS3Url(cat.categoryImage) : "/products/dummy_photo.png"}
                     subtitle={cat.description ?? undefined}
                     link={cat.id}
                   />

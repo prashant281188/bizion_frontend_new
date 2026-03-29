@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,15 +9,27 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/providers/auth-provider";
 import { updateProfile } from "@/lib/api/auth";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 export default function ProfileTab() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [name, setName] = useState("");
+  const { show, hide } = useBackdrop();
+  const [name, setName] = useState(user?.firstName ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
+
+  // Sync fields once user data loads
+  useEffect(() => {
+    if (user) {
+      setName(user.firstName ?? "");
+      setEmail(user.email);
+    }
+  }, [user]);
 
   const save = useMutation({
     mutationFn: () => updateProfile({ name: name || undefined, email: email || undefined }),
+    onMutate: () => show("Saving profile…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       toast.success("Profile updated.");
       qc.invalidateQueries({ queryKey: ["me"] });

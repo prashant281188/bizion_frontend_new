@@ -1,10 +1,9 @@
 "use client";
 
-import { Smile, Menu, X, UserCircle } from "lucide-react";
+import { Smile, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
-import { useAuth } from "@/providers/auth-provider";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -16,7 +15,6 @@ const navLinks = [
 const PublicNavbar = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -65,23 +63,7 @@ const PublicNavbar = () => {
               })}
             </div>
 
-            {/* Desktop CTA */}
-            {isAuthenticated ? (
-              <Link
-                href="/admin/dashboard"
-                className="hidden md:inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-amber-500 hover:text-amber-600"
-              >
-                <UserCircle className="h-5 w-5 text-amber-500" />
-                {user?.email}
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="hidden md:inline-flex items-center rounded-full bg-amber-500 px-5 py-2 text-sm font-semibold text-black transition hover:bg-amber-300 hover:shadow-md"
-              >
-                Login
-              </Link>
-            )}
+           
 
             {/* Mobile Hamburger */}
             <button
@@ -121,24 +103,7 @@ const PublicNavbar = () => {
                 );
               })}
 
-              {isAuthenticated ? (
-                <Link
-                  href="/admin/dashboard"
-                  onClick={() => setIsOpen(false)}
-                  className="mt-2 inline-flex items-center gap-2 rounded-full border border-black/10 px-5 py-2 text-sm font-medium text-gray-700"
-                >
-                  <UserCircle className="h-5 w-5 text-amber-500" />
-                  {user?.email}
-                </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="mt-2 inline-flex justify-center rounded-full bg-amber-500 px-5 py-2 text-sm font-semibold text-black transition hover:bg-amber-300"
-                >
-                  Login
-                </Link>
-              )}
+             
             </div>
           </div>
         )}

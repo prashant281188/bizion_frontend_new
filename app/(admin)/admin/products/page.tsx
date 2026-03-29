@@ -6,21 +6,20 @@ import Image from "next/image";
 import {
   Plus,
   Search,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
   Eye,
   Pencil,
   Package,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { SortHeader } from "@/components/admin/SortHeader";
 import { useProducts } from "@/hooks/use-products";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useBrands } from "@/hooks/use-brands";
 import { useURLFilters } from "@/hooks/useURLFilters";
 import { useDebounce } from "@/hooks/useDebounce";
 import { titleCase } from "@/utils";
+import { PageHeader } from "@/components/admin/PageHeader";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -61,45 +60,14 @@ const TableSkeleton = () => (
   </div>
 );
 
-/* ── Sort header ─────────────────────────────────────────── */
-const SortHeader = ({
-  label,
-  field,
-  current,
-  onSort,
-}: {
-  label: string;
-  field: string;
-  current: string;
-  onSort: (f: string) => void;
-}) => {
-  const asc = current === `${field}_asc`;
-  const desc = current === `${field}_desc`;
-  return (
-    <button
-      onClick={() => onSort(field)}
-      className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-gray-900 transition-colors"
-    >
-      {label}
-      {asc ? (
-        <ArrowUp className="h-3 w-3 text-amber-500" />
-      ) : desc ? (
-        <ArrowDown className="h-3 w-3 text-amber-500" />
-      ) : (
-        <ArrowUpDown className="h-3 w-3 opacity-40" />
-      )}
-    </button>
-  );
-};
-
 /* ── Main content ────────────────────────────────────────── */
 const ProductListContent = () => {
   const { filters, setFilter } = useURLFilters();
   const debouncedSearch = useDebounce(filters.search, 400);
 
   const { data, isLoading, isFetching } = useProducts({
-    page: filters.page,
-    limit: filters.limit,
+    page: filters?.page,
+    limit: filters?.limit,
     search: debouncedSearch,
     brandId: filters.brandId,
     categoryId: filters.categoryId,
@@ -123,21 +91,18 @@ const ProductListContent = () => {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Products</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {meta ? `${meta.total} product${meta.total !== 1 ? "s" : ""} total` : "Loading…"}
-          </p>
-        </div>
-        <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg">
-          <Link href="/admin/products/create">
-            <Plus className="h-4 w-4 mr-1.5" />
-            Add Product
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title="Products"
+        subtitle={meta ? `${meta.total} product${meta.total !== 1 ? "s" : ""} total` : "Loading…"}
+        action={
+          <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg">
+            <Link href="/admin/products/create">
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add Product
+            </Link>
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">

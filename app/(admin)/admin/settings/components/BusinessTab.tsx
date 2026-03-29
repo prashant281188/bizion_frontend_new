@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api/axios";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 type BusinessForm = {
   businessName: string;
@@ -34,12 +35,15 @@ const empty: BusinessForm = {
 
 export default function BusinessTab() {
   const [form, setForm] = useState<BusinessForm>(empty);
+  const { show, hide } = useBackdrop();
 
   const set = (key: keyof BusinessForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const save = useMutation({
     mutationFn: () => api.patch("/settings/business", form),
+    onMutate: () => show("Saving business info…"),
+    onSettled: () => hide(),
     onSuccess: () => toast.success("Business information updated."),
     onError: () => toast.error("Failed to save business information."),
   });

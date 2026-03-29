@@ -21,7 +21,17 @@
       "Bash(ls:*)",
       "Bash(npm install:*)",
       "Bash(npm list:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(find C:/project/bizion_frontend -type f \\\\\\(-name *image* -o -name *Image* \\\\\\) ! -path */node_modules/* -not -name *.png -not -name *.jpg -not -name *.webp)",
+      "Bash(find \"C:\\\\project\\\\bizion_frontend/app/\\(public\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(find \"C:\\\\project\\\\bizion_frontend/app/\\(admin\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(find /c/project/bizion_frontend/app -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(/tmp/components_audit.txt:*)",
+      "Read(//tmp/**)",
+      "Bash(find /c/project/bizion_frontend/hooks -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(find /c/project/bizion_frontend/lib -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(grep -n \"useMutation\\\\|mutate\\\\|async\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)",
+      "Bash(grep -n \"^  return\\\\|<div class.*p-\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/dashboard/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/parties/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/carousel/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/create/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/bulk/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)"
     ]
   }
 }

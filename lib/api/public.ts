@@ -21,6 +21,7 @@ type CategoryType = {
     categoryName: string;
     description?: string | null;
     parentId?: string | null;
+    categoryImage?:string | null;
     children?: CategoryType[];
 };
 
@@ -29,6 +30,7 @@ export const publicCategoriesSchema: z.ZodType<CategoryType> = z.object({
     categoryName: z.string(),
     description: z.string().optional().nullable(),
     parentId: z.string().nullable().optional(),
+    categoryImage: z.string().optional(),
     children: z.array(z.lazy(() => publicCategoriesSchema)).optional()
 });
 
@@ -168,7 +170,9 @@ export type CatalogProduct = z.infer<typeof catalogProductSchema>;
 /* ---------- API ---------- */
 export async function fetchCategories(): Promise<Category[]> {
     const res = await api.get<ApiResponse<Category[]>>("/public/categories");
-    return z.array(publicCategoriesSchema).parse(res.data.data);
+    console.log(res)
+    return res.data.data;
+    // return z.array(publicCategoriesSchema).parse(res.data.data);
 }
 
 export async function getBrands(): Promise<Brand[]> {

@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ import {
   type Party,
 } from "@/lib/api/admin";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 type FormState = {
   name: string;
@@ -52,6 +54,7 @@ const typeColor: Record<string, string> = {
 
 export default function PartyDataTable() {
   const qc = useQueryClient();
+  const { show, hide } = useBackdrop();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [open, setOpen] = useState(false);
@@ -73,11 +76,15 @@ export default function PartyDataTable() {
       editing
         ? adminUpdateParty(editing.id, form)
         : adminCreateParty(form),
+    onMutate: () => show(editing ? "Updating party…" : "Creating party…"),
+    onSettled: () => hide(),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-parties"] }); setOpen(false); },
   });
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteParty(id),
+    onMutate: () => show("Deleting party…"),
+    onSettled: () => hide(),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-parties"] }); setDeleteTarget(null); },
   });
 
@@ -249,19 +256,14 @@ export default function PartyDataTable() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirm */}
-      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Delete Party</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>
-              {remove.isPending ? "Deleting…" : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Delete Party"
+        description={<>Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</>}
+        onConfirm={() => deleteTarget && remove.mutate(deleteTarget.id)}
+        isPending={remove.isPending}
+      />
     </>
   );
 }

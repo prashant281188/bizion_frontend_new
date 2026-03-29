@@ -10,7 +10,6 @@ import FilterSearch from "@/components/filters/FilterSearch";
 import { CatalogProduct, Category } from "@/lib/api/public";
 import { cn } from "@/lib/utils";
 import { titleCase } from "@/utils";
-import { API_URL } from "@/lib/api/axios";
 import {
   ChevronDown,
   ChevronRight,
@@ -34,10 +33,6 @@ function parseOptions(
   );
 }
 
-function resolveImageUrl(path: string): string {
-  if (path.startsWith("http")) return path;
-  return `${API_URL}/${path}`;
-}
 
 /* ─── Variant table ──────────────────────────────────────────── */
 
@@ -138,7 +133,7 @@ const VariantTable = ({
 const ProductEntry = ({ product }: { product: CatalogProduct }) => {
   const [imgSrc, setImgSrc] = useState(
     product.image?.path
-      ? resolveImageUrl(product.image.path)
+      ? product.image.path
       : "/products/dummy_photo.png"
   );
 

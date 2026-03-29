@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "d127ve4h29yx4k.cloudfront.net",
-        pathname: "/products/**",
+        pathname: "/**",
       },
       {
         protocol: "https",

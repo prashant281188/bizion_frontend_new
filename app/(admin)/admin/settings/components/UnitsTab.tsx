@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import {
   adminGetUnits,
   adminCreateUnit,
@@ -22,6 +23,7 @@ import {
   adminDeleteUnit,
   type Unit,
 } from "@/lib/api/admin";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 const PAGE_SIZE = 10;
 
@@ -30,6 +32,7 @@ const empty: FormState = { unitName: "", unitSymbol: "" };
 
 export default function UnitsTab() {
   const qc = useQueryClient();
+  const { show, hide } = useBackdrop();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Unit | null>(null);
   const [form, setForm] = useState<FormState>(empty);
@@ -47,6 +50,8 @@ export default function UnitsTab() {
       editing
         ? adminUpdateUnit(editing.id, { unitName: form.unitName, unitSymbol: form.unitSymbol })
         : adminCreateUnit({ unitName: form.unitName, unitSymbol: form.unitSymbol }),
+    onMutate: () => show(editing ? "Updating unit…" : "Creating unit…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-units"] });
       setOpen(false);
@@ -58,6 +63,8 @@ export default function UnitsTab() {
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteUnit(id),
+    onMutate: () => show("Deleting unit…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-units"] });
       setDeleteTarget(null);
@@ -106,7 +113,7 @@ export default function UnitsTab() {
           {isLoading ? (
             <div className="space-y-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-10 rounded-lg bg-neutral-100 animate-pulse" />
+                <div key={i} className="data-table-skeleton-row" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -150,7 +157,7 @@ export default function UnitsTab() {
                     <button
                       disabled={safePage === 1}
                       onClick={() => setPage((p) => p - 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
@@ -158,7 +165,7 @@ export default function UnitsTab() {
                     <button
                       disabled={safePage === totalPages}
                       onClick={() => setPage((p) => p + 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>
@@ -194,20 +201,14 @@ export default function UnitsTab() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Unit</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.unitName}</strong>? This cannot be undone.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>
-              {remove.isPending ? "Deleting…" : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Delete Unit"
+        description={<>Are you sure you want to delete <strong>{deleteTarget?.unitName}</strong>? This cannot be undone.</>}
+        onConfirm={() => deleteTarget && remove.mutate(deleteTarget.id)}
+        isPending={remove.isPending}
+      />
     </>
   );
 }

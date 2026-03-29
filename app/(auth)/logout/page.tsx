@@ -5,19 +5,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const REDIRECT_DELAY = 4000;
 
 const LogoutPage = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [countdown, setCountdown] = useState(Math.round(REDIRECT_DELAY / 1000));
 
   useEffect(() => {
     logout().finally(() => {
+      queryClient.clear();
       const timer = setTimeout(() => router.replace("/login"), REDIRECT_DELAY);
       return () => clearTimeout(timer);
     });
-  }, [router]);
+  }, [router, queryClient]);
 
   useEffect(() => {
     if (countdown <= 0) return;

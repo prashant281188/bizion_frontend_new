@@ -5,12 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 const ForgotPage = () => {
   const router = useRouter();
+  const { show, hide } = useBackdrop();
 
   const mutation = useMutation({
     mutationFn: forgot,
+    onMutate: () => show("Sending reset code…"),
+    onSettled: () => hide(),
     onSuccess: async (_, variables) => {
       sessionStorage.setItem("reset_email", variables.email);
       router.push("/verify");
@@ -66,10 +70,10 @@ const ForgotPage = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-full bg-amber-500 px-6 py-3
-                       text-sm font-semibold text-black transition hover:bg-amber-600"
+            disabled={mutation.isPending}
+            className="w-full rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-amber-400 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Send Reset Link
+            {mutation.isPending ? "Sending…" : "Send Reset Code"}
           </button>
         </form>
 

@@ -1,7 +1,8 @@
 "use client";
 import { useBrands } from "@/hooks/use-brands";
 import React from "react";
-import { titleCase } from "@/utils";
+import Image from "next/image";
+import { titleCase, getS3Url } from "@/utils";
 
 const BrandSection = () => {
   const { data, isLoading } = useBrands();
@@ -36,8 +37,21 @@ const BrandSection = () => {
                   className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-white px-6 py-5 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:ring-amber-500/30 animate-fade-up"
                   style={{ animationDelay: `${Math.min(i * 70, 350)}ms` }}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200 text-sm font-bold text-amber-600 group-hover:bg-amber-500 group-hover:text-black group-hover:ring-amber-500 transition-all">
-                    {brand.brandName.charAt(0).toUpperCase()}
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-amber-50 ring-1 ring-amber-200 group-hover:ring-amber-500 transition-all">
+                    {brand.brandLogo ? (
+                      <Image
+                        src={getS3Url(brand.brandLogo)}
+                        alt={brand.brandName}
+                        width={40}
+                        height={40}
+                        className="object-cover h-full w-full"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                    ) : (
+                      <span className="text-sm font-bold text-amber-600 group-hover:text-black transition-all">
+                        {brand.brandName.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <span className="text-sm font-medium text-gray-800 text-center leading-tight">
                     {titleCase(brand.brandName)}

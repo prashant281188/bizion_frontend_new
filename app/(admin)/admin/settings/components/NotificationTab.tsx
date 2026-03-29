@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/api/axios";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 type Prefs = {
   emailNewOrder: boolean;
@@ -48,11 +49,14 @@ const Row = ({
 
 export default function NotificationTab() {
   const [prefs, setPrefs] = useState<Prefs>(defaults);
+  const { show, hide } = useBackdrop();
 
   const toggle = (key: keyof Prefs) => (v: boolean) => setPrefs((p) => ({ ...p, [key]: v }));
 
   const save = useMutation({
     mutationFn: () => api.patch("/settings/notifications", prefs),
+    onMutate: () => show("Saving preferences…"),
+    onSettled: () => hide(),
     onSuccess: () => toast.success("Notification preferences saved."),
     onError: () => toast.error("Failed to save preferences."),
   });

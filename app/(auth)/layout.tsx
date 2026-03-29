@@ -5,11 +5,7 @@ export const metadata:Metadata={
 }
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      {children}
-    </div>
-  );
+  return <>{children}</>;
 };
 
 export default AuthLayout;

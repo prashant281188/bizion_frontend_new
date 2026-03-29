@@ -34,6 +34,7 @@ import { useBrands } from "@/hooks/use-brands";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useProduct } from "@/hooks/useProduct";
 import { updateProduct, deleteProduct, uploadImage } from "@/lib/api/admin";
+import { useBackdrop } from "@/providers/backdrop-provider";
 import ImageUpload from "@/components/admin/ImageUpload";
 import { titleCase } from "@/utils";
 import { cn } from "@/lib/utils";
@@ -268,6 +269,7 @@ const EditProductPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { show, hide } = useBackdrop();
   const { data: brands } = useBrands();
   const { data: categories } = usePublicCategories();
   const { data: product, isLoading: productLoading } = useProduct(String(id));
@@ -372,6 +374,8 @@ const EditProductPage = () => {
   const { mutate: save, isPending: isSaving } = useMutation({
     mutationFn: (payload: Parameters<typeof updateProduct>[1]) =>
       updateProduct(String(id), payload),
+    onMutate: () => show("Saving product…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       toast.success("Product updated");
       queryClient.invalidateQueries({ queryKey: ["product", id] });
@@ -426,6 +430,8 @@ const EditProductPage = () => {
 
   const { mutate: doDelete, isPending: isDeleting } = useMutation({
     mutationFn: () => deleteProduct(String(id)),
+    onMutate: () => show("Deleting product…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       toast.success("Product deleted");
       queryClient.invalidateQueries({ queryKey: ["product"] });

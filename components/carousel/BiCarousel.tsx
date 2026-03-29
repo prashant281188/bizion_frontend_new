@@ -13,6 +13,7 @@ import {
 import { useCarouselData } from "@/hooks/useCarouselData";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
+import { getS3Url } from "@/utils";
 
 export function BiCarousel() {
   const { data, isLoading } = useCarouselData();
@@ -53,7 +54,7 @@ export function BiCarousel() {
             <CarouselItem key={index}>
               <div
                 className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] w-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${slide.image})` }}
+                style={{ backgroundImage: `url(${getS3Url(slide.image)})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/25" />
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent" />

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, FolderOpen, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import {
   Select,
   SelectContent,
@@ -29,6 +31,8 @@ import {
   adminDeleteCategory,
   type Category,
 } from "@/lib/api/admin";
+import { getS3Url } from "@/utils";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 const PAGE_SIZE = 10;
 
@@ -37,9 +41,12 @@ const empty: FormState = { categoryName: "", description: "", parentId: "" };
 
 export default function CategoriesTab() {
   const qc = useQueryClient();
+  const { show, hide } = useBackdrop();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [form, setForm] = useState<FormState>(empty);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -52,16 +59,25 @@ export default function CategoriesTab() {
   const save = useMutation({
     mutationFn: () =>
       editing
-        ? adminUpdateCategory(editing.id, {
-            categoryName: form.categoryName,
-            description: form.description || undefined,
-            parentId: form.parentId || undefined,
-          })
-        : adminCreateCategory({
-            categoryName: form.categoryName,
-            description: form.description || undefined,
-            parentId: form.parentId || undefined,
-          }),
+        ? adminUpdateCategory(
+            editing.id,
+            {
+              categoryName: form.categoryName,
+              description: form.description || undefined,
+              parentId: form.parentId || undefined,
+            },
+            imageFile ?? undefined,
+          )
+        : adminCreateCategory(
+            {
+              categoryName: form.categoryName,
+              description: form.description || undefined,
+              parentId: form.parentId || undefined,
+            },
+            imageFile ?? undefined,
+          ),
+    onMutate: () => show(editing ? "Updating category…" : "Creating category…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
@@ -74,6 +90,8 @@ export default function CategoriesTab() {
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteCategory(id),
+    onMutate: () => show("Deleting category…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
@@ -84,11 +102,27 @@ export default function CategoriesTab() {
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to delete"),
   });
 
-  function openAdd() { setEditing(null); setForm(empty); setOpen(true); }
+  function openAdd() {
+    setEditing(null);
+    setForm(empty);
+    setImageFile(null);
+    setImagePreview("");
+    setOpen(true);
+  }
+
   function openEdit(c: Category) {
     setEditing(c);
     setForm({ categoryName: c.categoryName, description: c.description ?? "", parentId: c.parentId ?? "" });
+    setImageFile(null);
+    setImagePreview(getS3Url(c.categoryImage));
     setOpen(true);
+  }
+
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   }
 
   const rootCategories = categories.filter((c) => !c.parentId);
@@ -123,7 +157,7 @@ export default function CategoriesTab() {
           {isLoading ? (
             <div className="space-y-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-10 rounded-lg bg-neutral-100 animate-pulse" />
+                <div key={i} className="data-table-skeleton-row" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -136,15 +170,31 @@ export default function CategoriesTab() {
           ) : (
             <>
               <div className="rounded-lg border border-black/5 overflow-hidden">
-                <div className="grid grid-cols-[1fr_1fr_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-4">
+                <div className="grid grid-cols-[36px_1fr_1fr_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-3">
+                  <span />
                   <span className="data-table-th">Name</span>
                   <span className="data-table-th">Parent</span>
                   <span className="data-table-th text-right">Actions</span>
                 </div>
                 <div className="divide-y divide-black/5">
                   {paged.map((c) => (
-                    <div key={c.id} className="grid grid-cols-[1fr_1fr_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80">
-                      <span className="text-sm font-medium text-gray-900">{c.categoryName}</span>
+                    <div key={c.id} className="grid grid-cols-[36px_1fr_1fr_80px] items-center px-4 py-2.5 gap-3 hover:bg-neutral-50/80">
+                      {/* Thumbnail */}
+                      <div className="h-9 w-9 rounded-md overflow-hidden bg-neutral-100 flex-shrink-0 flex items-center justify-center">
+                        {c.categoryImage ? (
+                          <Image
+                            src={getS3Url(c.categoryImage)}
+                            alt={c.categoryName}
+                            width={36}
+                            height={36}
+                            className="object-cover h-full w-full"
+                            onError={(e) => { (e.target as HTMLImageElement).src = "/products/dummy_photo.png"; }}
+                          />
+                        ) : (
+                          <ImageIcon className="h-4 w-4 text-neutral-300" />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 truncate">{c.categoryName}</span>
                       <span className="text-sm text-muted-foreground">
                         {c.parentId
                           ? (categories.find((p) => p.id === c.parentId)?.categoryName ?? "—")
@@ -171,7 +221,7 @@ export default function CategoriesTab() {
                     <button
                       disabled={safePage === 1}
                       onClick={() => setPage((p) => p - 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
@@ -179,7 +229,7 @@ export default function CategoriesTab() {
                     <button
                       disabled={safePage === totalPages}
                       onClick={() => setPage((p) => p + 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>
@@ -220,6 +270,21 @@ export default function CategoriesTab() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid gap-1.5">
+              <Label>Image <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <div className="space-y-2">
+                {imagePreview && (
+                  <div className="relative h-28 w-full overflow-hidden rounded-lg bg-neutral-100">
+                    <Image src={imagePreview} alt="Preview" fill className="object-cover" />
+                  </div>
+                )}
+                <label className="img-upload-label">
+                  <ImageIcon className="h-4 w-4" />
+                  {imagePreview ? "Change image" : "Upload image"}
+                  <input type="file" accept="image/*" className="sr-only" onChange={handleImageSelect} />
+                </label>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
@@ -230,21 +295,14 @@ export default function CategoriesTab() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirm */}
-      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Category</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.categoryName}</strong>? This cannot be undone.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>
-              {remove.isPending ? "Deleting…" : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Delete Category"
+        description={<>Are you sure you want to delete <strong>{deleteTarget?.categoryName}</strong>? This cannot be undone.</>}
+        onConfirm={() => deleteTarget && remove.mutate(deleteTarget.id)}
+        isPending={remove.isPending}
+      />
     </>
   );
 }

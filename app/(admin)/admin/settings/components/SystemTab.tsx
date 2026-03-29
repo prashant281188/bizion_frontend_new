@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/api/axios";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 type SystemConfig = {
   currency: string;
@@ -26,12 +27,15 @@ const defaults: SystemConfig = {
 
 export default function SystemTab() {
   const [config, setConfig] = useState<SystemConfig>(defaults);
+  const { show, hide } = useBackdrop();
 
   const set = (key: keyof SystemConfig) => (value: string) =>
     setConfig((c) => ({ ...c, [key]: value }));
 
   const save = useMutation({
     mutationFn: () => api.patch("/settings/system", config),
+    onMutate: () => show("Saving system settings…"),
+    onSettled: () => hide(),
     onSuccess: () => toast.success("System settings saved."),
     onError: () => toast.error("Failed to save system settings."),
   });

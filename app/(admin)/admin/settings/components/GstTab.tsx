@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import {
   adminGetGst,
   adminCreateGst,
@@ -22,6 +23,7 @@ import {
   adminDeleteGst,
   type GstRate,
 } from "@/lib/api/admin";
+import { useBackdrop } from "@/providers/backdrop-provider";
 
 const PAGE_SIZE = 10;
 
@@ -30,6 +32,7 @@ const empty: FormState = { name: "", rate: "", description: "" };
 
 export default function GstTab() {
   const qc = useQueryClient();
+  const { show, hide } = useBackdrop();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<GstRate | null>(null);
   const [form, setForm] = useState<FormState>(empty);
@@ -51,6 +54,8 @@ export default function GstTab() {
       };
       return editing ? adminUpdateGst(editing.id, payload) : adminCreateGst(payload);
     },
+    onMutate: () => show(editing ? "Updating GST rate…" : "Creating GST rate…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-gst"] });
       setOpen(false);
@@ -62,6 +67,8 @@ export default function GstTab() {
 
   const remove = useMutation({
     mutationFn: (id: string) => adminDeleteGst(id),
+    onMutate: () => show("Deleting GST rate…"),
+    onSettled: () => hide(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-gst"] });
       setDeleteTarget(null);
@@ -110,7 +117,7 @@ export default function GstTab() {
           {isLoading ? (
             <div className="space-y-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-10 rounded-lg bg-neutral-100 animate-pulse" />
+                <div key={i} className="data-table-skeleton-row" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -156,7 +163,7 @@ export default function GstTab() {
                     <button
                       disabled={safePage === 1}
                       onClick={() => setPage((p) => p - 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
@@ -164,7 +171,7 @@ export default function GstTab() {
                     <button
                       disabled={safePage === totalPages}
                       onClick={() => setPage((p) => p + 1)}
-                      className="flex h-6 w-6 items-center justify-center rounded border border-black/10 transition hover:border-amber-400 hover:text-amber-600 disabled:opacity-40"
+                      className="pagination-btn"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
                     </button>
@@ -204,20 +211,14 @@ export default function GstTab() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete GST Rate</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => deleteTarget && remove.mutate(deleteTarget.id)} disabled={remove.isPending}>
-              {remove.isPending ? "Deleting…" : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Delete GST Rate"
+        description={<>Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</>}
+        onConfirm={() => deleteTarget && remove.mutate(deleteTarget.id)}
+        isPending={remove.isPending}
+      />
     </>
   );
 }
