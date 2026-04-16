@@ -1,26 +1,13 @@
-"use client";
-
-import AdminNavbar from "@/components/navigation/admin/admin-navbar";
-import AdminSidebar from "@/components/navigation/admin/sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AuthProvider } from "@/providers/auth-provider";
-
+import { cookies } from "next/headers";
 import React from "react";
+import AdminShell from "./admin-shell";
 
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <AuthProvider>
-      <SidebarProvider>
-        <AdminSidebar />
-        <SidebarInset className="flex min-h-screen flex-col">
-          <AdminNavbar className="sticky top-0 z-30 border-b bg-background" />
-          <main className="flex-1 overflow-y-auto">
-            <div className="p-4 md:p-6">{children}</div>
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
-    </AuthProvider>
-  );
+const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
+  const cookieStore = await cookies();
+  const sidebarCookie = cookieStore.get("sidebar_state");
+  const defaultOpen = sidebarCookie ? sidebarCookie.value === "true" : true;
+
+  return <AdminShell defaultOpen={defaultOpen}>{children}</AdminShell>;
 };
 
 export default AdminLayout;

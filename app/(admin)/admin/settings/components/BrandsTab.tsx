@@ -166,12 +166,12 @@ export default function BrandsTab() {
                       </div>
                       <span className="text-sm font-medium text-gray-900 truncate">{b.brandName}</span>
                       <div className="flex items-center justify-end gap-1">
-                        <Button onClick={() => openEdit(b)} className="icon-btn-edit">
+                        <button onClick={() => openEdit(b)} className="icon-btn-edit">
                           <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button onClick={() => setDeleteTarget(b)} className="icon-btn-delete">
+                        </button>
+                        <button onClick={() => setDeleteTarget(b)} className="icon-btn-delete">
                           <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -183,21 +183,21 @@ export default function BrandsTab() {
                 <span>{filtered.length} brand{filtered.length !== 1 ? "s" : ""}</span>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-1">
-                    <Button
+                    <button
                       disabled={safePage === 1}
                       onClick={() => setPage((p) => p - 1)}
                       className="pagination-btn"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
-                    </Button>
+                    </button>
                     <span className="px-1.5">{safePage} / {totalPages}</span>
-                    <Button
+                    <button
                       disabled={safePage === totalPages}
                       onClick={() => setPage((p) => p + 1)}
                       className="pagination-btn"
                     >
                       <ChevronRight className="h-3.5 w-3.5" />
-                    </Button>
+                    </button>
                   </div>
                 )}
               </div>

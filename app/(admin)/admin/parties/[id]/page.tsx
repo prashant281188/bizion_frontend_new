@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Building2, Phone, MapPin, Hash } from "lucide-react";
 import { adminGetParty } from "@/lib/api/admin";
 import PartyBalanceCard from "../components/PartyBalanceCard";
+import PartyOrdersCard from "../components/PartyOrdersCard";
 
 const typeColor: Record<string, string> = {
   retailer: "bg-blue-50 text-blue-600 ring-blue-200",
@@ -69,8 +70,8 @@ export default function PartyDetailPage({ params }: { params: Promise<{ id: stri
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-black/5">
           {[
             { icon: Building2, label: "Company", value: party.name },
-            { icon: Hash, label: "GSTIN", value: party.gstin || "—" },
-            { icon: Phone, label: "Contact", value: party.contact || "—" },
+            { icon: Hash, label: "GSTIN", value: party.gstNo || "—" },
+            { icon: Phone, label: "Contact", value: party.phone || "—" },
             { icon: MapPin, label: "City", value: party.city || "—" },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-start gap-3 px-6 py-4">
@@ -95,6 +96,9 @@ export default function PartyDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Balance card */}
       <PartyBalanceCard partyId={id} />
+
+      {/* Order history */}
+      <PartyOrdersCard partyId={id} />
     </div>
   );
 }

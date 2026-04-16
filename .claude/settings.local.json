@@ -31,7 +31,15 @@
       "Bash(find /c/project/bizion_frontend/hooks -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
       "Bash(find /c/project/bizion_frontend/lib -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
       "Bash(grep -n \"useMutation\\\\|mutate\\\\|async\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)",
-      "Bash(grep -n \"^  return\\\\|<div class.*p-\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/dashboard/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/parties/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/carousel/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/create/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/bulk/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)"
+      "Bash(grep -n \"^  return\\\\|<div class.*p-\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/dashboard/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/parties/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/carousel/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/create/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/bulk/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)",
+      "Bash(cat:*)",
+      "Bash(find \"C:\\\\project\\\\bizion_frontend\\\\app\\\\\\(admin\\)\\\\admin\\\\orders\" -type f -name \"*.tsx\")",
+      "Bash(python3:*)",
+      "Bash(curl -s \"https://api.github.com/repos/prashant281188/bizion_backend/git/trees/main?recursive=1\")",
+      "Bash(node -e ':*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl:*)",
+      "Bash(node:*)"
     ]
   }
 }

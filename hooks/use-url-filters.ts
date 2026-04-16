@@ -18,7 +18,7 @@ export function useURLFilters() {
     categoryId: params.get("categoryId") ?? "",
     brandId: params.get("brandId") ?? "",
     page: Number(params.get("page") ?? 1),
-    limit: Number(params.get("limit") ?? 12),
+    limit: Number(params.get("limit") ?? 10),
     sort: params.get("sort") ?? "",
   };
 

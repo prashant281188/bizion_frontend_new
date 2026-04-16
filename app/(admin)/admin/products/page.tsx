@@ -13,11 +13,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { SortHeader } from "@/components/admin/SortHeader";
-import { useProducts } from "@/hooks/use-products";
+import { useAdminProducts } from "@/hooks/use-products";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useBrands } from "@/hooks/use-brands";
-import { useURLFilters } from "@/hooks/useURLFilters";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useURLFilters } from "@/hooks/use-url-filters";
+import { useSearch } from "@/hooks/use-debounce";
 import { titleCase } from "@/utils";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { cn } from "@/lib/utils";
@@ -63,22 +63,30 @@ const TableSkeleton = () => (
 /* ── Main content ────────────────────────────────────────── */
 const ProductListContent = () => {
   const { filters, setFilter } = useURLFilters();
-  const debouncedSearch = useDebounce(filters.search, 400);
+  const { value: searchInput, query: debouncedSearch, onChange: onSearchChange, reset: resetSearch } = useSearch(400);
 
-  const { data, isLoading, isFetching } = useProducts({
+  const [sortBy, sortOrder] = (() => {
+    const s = filters.sort ?? "";
+    const lastUnderscore = s.lastIndexOf("_");
+    if (lastUnderscore === -1) return ["model", "asc"] as const;
+    return [s.slice(0, lastUnderscore), s.slice(lastUnderscore + 1)] as const;
+  })();
+
+  const { data, isLoading, isFetching } = useAdminProducts({
     page: filters?.page,
     limit: filters?.limit,
-    search: debouncedSearch,
-    brandId: filters.brandId,
-    categoryId: filters.categoryId,
-    sort: filters.sort,
+    search: debouncedSearch || undefined,
+    brandId: filters.brandId || undefined,
+    categoryId: filters.categoryId || undefined,
+    sortBy: sortBy as "model" | "createdAt" | "updatedAt",
+    sortOrder: sortOrder as "asc" | "desc",
   });
 
   const { data: categories } = usePublicCategories();
   const { data: brands } = useBrands();
 
   const products = data?.data ?? [];
-  const meta = data?.meta;
+  const meta = data?.meta ?? null;
   const totalPages = meta?.totalPages ?? 1;
 
   const handleSort = (field: string) => {
@@ -110,8 +118,8 @@ const ProductListContent = () => {
         <div className="relative flex-1 min-w-[200px] max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
           <Input
-            value={filters.search}
-            onChange={(e) => setFilter("search", e.target.value)}
+            value={searchInput}
+            onChange={onSearchChange}
             placeholder="Search model, brand…"
             className="pl-8 h-8 text-sm bg-white rounded-lg border-black/10"
           />
@@ -155,7 +163,7 @@ const ProductListContent = () => {
           onValueChange={(v) => setFilter("limit", Number(v))}
         >
           <SelectTrigger className="h-8 text-sm w-[100px] rounded-lg border-black/10 ml-auto">
-            <SelectValue />
+            <SelectValue/>
           </SelectTrigger>
           <SelectContent>
             {[10, 20, 50].map((n) => (
@@ -166,13 +174,13 @@ const ProductListContent = () => {
       </div>
 
       {/* Active filter pills */}
-      {(filters.search || filters.categoryId || filters.brandId) && (
+      {(searchInput || filters.categoryId || filters.brandId) && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground">Active:</span>
-          {filters.search && (
+          {searchInput && (
             <span className="filter-pill">
-              &quot;{filters.search}&quot;
-              <button onClick={() => setFilter("search", "")} className="filter-pill-remove">×</button>
+              &quot;{searchInput}&quot;
+              <button onClick={resetSearch} className="filter-pill-remove">×</button>
             </span>
           )}
           {filters.categoryId && (
@@ -188,7 +196,7 @@ const ProductListContent = () => {
             </span>
           )}
           <button
-            onClick={() => { setFilter("search", ""); setFilter("categoryId", ""); setFilter("brandId", ""); }}
+            onClick={() => { resetSearch(); setFilter("categoryId", ""); setFilter("brandId", ""); }}
             className="text-xs text-muted-foreground hover:text-red-500 transition-colors"
           >
             Clear all
@@ -209,7 +217,7 @@ const ProductListContent = () => {
               variant="outline"
               size="sm"
               className="mt-4 rounded-lg text-xs"
-              onClick={() => { setFilter("search", ""); setFilter("categoryId", ""); setFilter("brandId", ""); }}
+              onClick={() => { resetSearch(); setFilter("categoryId", ""); setFilter("brandId", ""); }}
             >
               Clear filters
             </Button>

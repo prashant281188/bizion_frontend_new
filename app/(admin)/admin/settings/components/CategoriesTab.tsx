@@ -30,14 +30,23 @@ import {
   adminUpdateCategory,
   adminDeleteCategory,
   type Category,
+  type CreateCategoryPayload,
+  type UpdateCategoryPayload,
 } from "@/lib/api/admin";
+import { Switch } from "@/components/ui/switch";
 import { getS3Url } from "@/utils";
 import { useBackdrop } from "@/providers/backdrop-provider";
 
 const PAGE_SIZE = 10;
 
-type FormState = { categoryName: string; description: string; parentId: string };
-const empty: FormState = { categoryName: "", description: "", parentId: "" };
+type FormState = {
+  categoryName: string;
+  description: string;
+  parentId: string;
+  isActive: boolean;
+  order: string;
+};
+const empty: FormState = { categoryName: "", description: "", parentId: "", isActive: true, order: "" };
 
 export default function CategoriesTab() {
   const qc = useQueryClient();
@@ -57,25 +66,27 @@ export default function CategoriesTab() {
   });
 
   const save = useMutation({
-    mutationFn: () =>
-      editing
-        ? adminUpdateCategory(
-            editing.id,
-            {
-              categoryName: form.categoryName,
-              description: form.description || undefined,
-              parentId: form.parentId || undefined,
-            },
-            imageFile ?? undefined,
-          )
-        : adminCreateCategory(
-            {
-              categoryName: form.categoryName,
-              description: form.description || undefined,
-              parentId: form.parentId || undefined,
-            },
-            imageFile ?? undefined,
-          ),
+    mutationFn: () => {
+      const orderVal = form.order !== "" ? Number(form.order) : undefined;
+      if (editing) {
+        const payload: UpdateCategoryPayload = {
+          categoryName: form.categoryName,
+          description: form.description || undefined,
+          parentId: form.parentId || undefined,
+          isActive: form.isActive,
+          order: orderVal,
+        };
+        return adminUpdateCategory(editing.id, payload, imageFile ?? undefined);
+      }
+      const payload: CreateCategoryPayload = {
+        categoryName: form.categoryName,
+        description: form.description || undefined,
+        parentId: form.parentId || undefined,
+        isActive: form.isActive,
+        order: orderVal,
+      };
+      return adminCreateCategory(payload, imageFile ?? undefined);
+    },
     onMutate: () => show(editing ? "Updating category…" : "Creating category…"),
     onSettled: () => hide(),
     onSuccess: () => {
@@ -112,7 +123,13 @@ export default function CategoriesTab() {
 
   function openEdit(c: Category) {
     setEditing(c);
-    setForm({ categoryName: c.categoryName, description: c.description ?? "", parentId: c.parentId ?? "" });
+    setForm({
+      categoryName: c.categoryName,
+      description: c.description ?? "",
+      parentId: c.parentId ?? "",
+      isActive: c.isActive ?? true,
+      order: c.order != null ? String(c.order) : "",
+    });
     setImageFile(null);
     setImagePreview(getS3Url(c.categoryImage));
     setOpen(true);
@@ -269,6 +286,28 @@ export default function CategoriesTab() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <Label>Order <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.order}
+                  onChange={(e) => setForm((f) => ({ ...f, order: e.target.value }))}
+                  placeholder="e.g. 1"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Active</Label>
+                <div className="flex items-center h-9 gap-2">
+                  <Switch
+                    checked={form.isActive}
+                    onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))}
+                  />
+                  <span className="text-sm text-muted-foreground">{form.isActive ? "Yes" : "No"}</span>
+                </div>
+              </div>
             </div>
             <div className="grid gap-1.5">
               <Label>Image <span className="text-muted-foreground text-xs">(optional)</span></Label>

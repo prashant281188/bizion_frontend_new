@@ -40,7 +40,7 @@ export default function ImageUpload({
     return () => URL.revokeObjectURL(url);
   }, [pendingFile]);
 
-  const previewSrc = blobUrl || value;
+  const previewSrc = blobUrl || (value && (value.startsWith("http") || value.startsWith("/")) ? value : "");
   const trigger = () => inputRef.current?.click();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

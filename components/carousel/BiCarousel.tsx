@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { useCarouselData } from "@/hooks/useCarouselData";
+import { useCarouselData } from "@/hooks/use-carousel";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { getS3Url } from "@/utils";
@@ -105,8 +105,8 @@ export function BiCarousel() {
           ))
         )}
       </CarouselContent>
-      <CarouselPrevious className="left-6 bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/30 hover:text-white" />
-      <CarouselNext className="right-6 bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/30 hover:text-white" />
+      <CarouselPrevious className="hidden sm:flex left-4 sm:left-6 bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/30 hover:text-white" />
+      <CarouselNext className="hidden sm:flex right-4 sm:right-6 bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/30 hover:text-white" />
     </Carousel>
   );
 }

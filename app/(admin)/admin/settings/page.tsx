@@ -8,6 +8,7 @@ import {
   Bell,
   Settings2,
   Users,
+  ShieldCheck,
   FolderOpen,
   Tag,
   Hash,
@@ -21,6 +22,7 @@ import SecurityTab from "./components/SecurityTab";
 import NotificationTab from "./components/NotificationTab";
 import SystemTab from "./components/SystemTab";
 import UsersTab from "./components/UsersTab";
+import RolesTab from "./components/RolesTab";
 import CategoriesTab from "./components/CategoriesTab";
 import BrandsTab from "./components/BrandsTab";
 import HsnTab from "./components/HsnTab";
@@ -42,6 +44,7 @@ const groups = [
     label: "Access",
     items: [
       { value: "users", label: "Users", icon: Users },
+      { value: "roles", label: "Roles & Permissions", icon: ShieldCheck },
     ],
   },
   {
@@ -128,6 +131,7 @@ export default function SettingsPage() {
             <TabsContent value="gst"><GstTab /></TabsContent>
             <TabsContent value="units"><UnitsTab /></TabsContent>
             <TabsContent value="users"><UsersTab /></TabsContent>
+            <TabsContent value="roles"><RolesTab /></TabsContent>
             <TabsContent value="profile"><ProfileTab /></TabsContent>
             <TabsContent value="security"><SecurityTab /></TabsContent>
             <TabsContent value="business"><BusinessTab /></TabsContent>
@@ -144,6 +148,7 @@ export default function SettingsPage() {
           <TabsContent value="gst"><GstTab /></TabsContent>
           <TabsContent value="units"><UnitsTab /></TabsContent>
           <TabsContent value="users"><UsersTab /></TabsContent>
+          <TabsContent value="roles"><RolesTab /></TabsContent>
           <TabsContent value="profile"><ProfileTab /></TabsContent>
           <TabsContent value="security"><SecurityTab /></TabsContent>
           <TabsContent value="business"><BusinessTab /></TabsContent>

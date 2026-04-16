@@ -25,18 +25,38 @@ import {
 } from "@/components/ui/select";
 import {
   adminGetUsers,
+  adminGetRoles,
   adminCreateUser,
   adminUpdateUser,
   adminDeleteUser,
   type AdminUser,
+  type CreateUserPayload,
+  type UpdateUserPayload,
 } from "@/lib/api/admin";
+import { Switch } from "@/components/ui/switch";
 import { useBackdrop } from "@/providers/backdrop-provider";
 
 const PAGE_SIZE = 10;
-const ROLES = ["admin", "manager", "staff", "viewer"];
 
-type FormState = { name: string; email: string; password: string; role: string };
-const empty: FormState = { name: "", email: "", password: "", role: "staff" };
+type FormState = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  roleId: string;
+  isActive: boolean;
+};
+
+const empty: FormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  password: "",
+  roleId: "",
+  isActive: false,
+};
 
 export default function UsersTab() {
   const qc = useQueryClient();
@@ -53,11 +73,35 @@ export default function UsersTab() {
     queryFn: adminGetUsers,
   });
 
+  const { data: roles = [] } = useQuery({
+    queryKey: ["admin-roles"],
+    queryFn: adminGetRoles,
+  });
+
   const save = useMutation({
-    mutationFn: () =>
-      editing
-        ? adminUpdateUser(editing.id, { name: form.name, role: form.role })
-        : adminCreateUser({ name: form.name, email: form.email, password: form.password, role: form.role }),
+    mutationFn: () => {
+      if (editing) {
+        const payload: UpdateUserPayload = {
+          firstName: form.firstName || undefined,
+          lastName: form.lastName || undefined,
+          email: form.email || undefined,
+          phone: form.phone || undefined,
+          roleId: form.roleId || undefined,
+          isActive: form.isActive,
+          password: form.password || undefined,
+        };
+        return adminUpdateUser(editing.id, payload);
+      }
+      const payload: CreateUserPayload = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        password: form.password,
+        roleId: form.roleId,
+        isActive: form.isActive,
+      };
+      return adminCreateUser(payload);
+    },
     onMutate: () => show(editing ? "Updating user…" : "Creating user…"),
     onSettled: () => hide(),
     onSuccess: () => {
@@ -92,25 +136,53 @@ export default function UsersTab() {
   function openAdd() { setEditing(null); setForm(empty); setOpen(true); }
   function openEdit(u: AdminUser) {
     setEditing(u);
-    setForm({ name: u.name, email: u.email, password: "", role: u.role });
+    const roleId = typeof u.role === "object" ? u.role.id : (u.roleId ?? "");
+    setForm({
+      firstName: u.firstName,
+      lastName: u.lastName,
+      email: u.email,
+      phone: u.phone ?? "",
+      password: "",
+      roleId,
+      isActive: u.isActive,
+    });
     setOpen(true);
   }
 
+  const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+
   const roleColor: Record<string, string> = {
+    superadmin: "bg-purple-50 text-purple-700 ring-purple-200",
     admin:   "bg-red-50 text-red-600 ring-red-200",
     manager: "bg-blue-50 text-blue-600 ring-blue-200",
     staff:   "bg-emerald-50 text-emerald-600 ring-emerald-200",
     viewer:  "bg-neutral-100 text-neutral-600 ring-neutral-200",
   };
 
+  function isSuperAdmin(u: AdminUser): boolean {
+    return getRoleName(u).toLowerCase() === "superadmin";
+  }
+
+  function getRoleName(u: AdminUser): string {
+    if (u.role && typeof u.role === "object" && u.role.name) return u.role.name;
+    if (u.role && typeof u.role === "string") return u.role;
+    const found = roles.find((r) => r.id === u.roleId);
+    return found?.name ?? "—";
+  }
+
   const filtered = users.filter(
     (u) =>
-      // u.name.toLowerCase().includes(search.toLowerCase()) ||
+      `${u.firstName} ${u.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase())
   );
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const isFormValid = editing
+    ? !!form.firstName && !!form.lastName && !!form.roleId
+    : !!form.firstName && !!form.lastName && !!form.email && !!form.password && !!form.roleId;
 
   return (
     <>
@@ -122,7 +194,6 @@ export default function UsersTab() {
           </Button>
         </CardHeader>
         <CardContent>
-          {/* Search */}
           <div className="mb-3">
             <Input
               placeholder="Search by name or email…"
@@ -148,45 +219,57 @@ export default function UsersTab() {
           ) : (
             <>
               <div className="rounded-lg border border-black/5 overflow-hidden">
-                <div className="grid grid-cols-[1fr_1fr_100px_80px_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-4">
+                <div className="grid grid-cols-[1fr_1fr_1fr_100px_80px_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-4">
                   <span className="data-table-th">Name</span>
                   <span className="data-table-th">Email</span>
+                  <span className="data-table-th">Phone</span>
                   <span className="data-table-th">Role</span>
                   <span className="data-table-th">Status</span>
                   <span className="data-table-th text-right">Actions</span>
                 </div>
                 <div className="divide-y divide-black/5">
-                  {paged.map((u) => (
-                    <div key={u.id} className="grid grid-cols-[1fr_1fr_100px_80px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80">
-                      <span className="text-sm font-medium text-gray-900 truncate">{u.name}</span>
+                  {paged.map((u) => {
+                    const superAdmin = isSuperAdmin(u);
+                    return (
+                    <div key={u.id} className={`grid grid-cols-[1fr_1fr_1fr_100px_80px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 ${superAdmin ? "opacity-60" : ""}`}>
+                      <span className="text-sm font-medium text-gray-900 truncate">{u.firstName} {u.lastName}</span>
                       <span className="text-sm text-muted-foreground truncate">{u.email}</span>
-                      <span className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${roleColor[u.role] ?? roleColor.viewer}`}>
-                        {u.role}
+                      <span className="text-sm text-muted-foreground truncate">{u.phone ?? "—"}</span>
+                      <span className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 capitalize ${roleColor[getRoleName(u).toLowerCase()] ?? roleColor.viewer}`}>
+                        {getRoleName(u)}
                       </span>
                       <button
-                        onClick={() => toggleActive.mutate({ id: u.id, isActive: !u.isActive })}
+                        onClick={() => !superAdmin && toggleActive.mutate({ id: u.id, isActive: !u.isActive })}
+                        disabled={superAdmin}
+                        title={superAdmin ? "Superadmin status cannot be changed" : undefined}
                         className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 transition-colors ${
                           u.isActive
                             ? "bg-emerald-50 text-emerald-600 ring-emerald-200"
                             : "bg-neutral-100 text-neutral-500 ring-neutral-200"
-                        }`}
+                        } ${superAdmin ? "cursor-not-allowed" : ""}`}
                       >
                         {u.isActive ? "Active" : "Inactive"}
                       </button>
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEdit(u)} className="icon-btn-edit">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => setDeleteTarget(u)} className="icon-btn-delete">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        {superAdmin ? (
+                          <span className="text-[10px] text-muted-foreground italic px-1">protected</span>
+                        ) : (
+                          <>
+                            <button onClick={() => openEdit(u)} className="icon-btn-edit">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button onClick={() => setDeleteTarget(u)} className="icon-btn-delete">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Pagination */}
               <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                 <span>{filtered.length} user{filtered.length !== 1 ? "s" : ""}</span>
                 {totalPages > 1 && (
@@ -220,41 +303,56 @@ export default function UsersTab() {
             <DialogTitle>{editing ? "Edit User" : "Add User"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="grid gap-1.5">
-              <Label>Name</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Full name" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-1.5">
+                <Label>First Name</Label>
+                <Input value={form.firstName} onChange={set("firstName")} placeholder="First name" />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Last Name</Label>
+                <Input value={form.lastName} onChange={set("lastName")} placeholder="Last name" />
+              </div>
             </div>
-            {!editing && (
-              <>
-                <div className="grid gap-1.5">
-                  <Label>Email</Label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="user@example.com" />
-                </div>
-                <div className="grid gap-1.5">
-                  <Label>Password</Label>
-                  <Input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} placeholder="Min. 8 characters" />
-                </div>
-              </>
-            )}
             <div className="grid gap-1.5">
-              <Label>Role</Label>
-              <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ROLES.map((r) => (
-                    <SelectItem key={r} value={r} className="capitalize">{r}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Email</Label>
+              <Input type="email" value={form.email} onChange={set("email")} placeholder="user@example.com" />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>{editing ? "New Password" : "Password"} {editing && <span className="text-muted-foreground text-xs">(leave blank to keep current)</span>}</Label>
+              <Input type="password" value={form.password} onChange={set("password")} placeholder="Min. 8 chars, upper, lower, number, symbol" />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Phone <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Input type="tel" value={form.phone} onChange={set("phone")} placeholder="+91 98765 43210" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <Label>Role</Label>
+                <Select value={form.roleId} onValueChange={(v) => setForm((f) => ({ ...f, roleId: v }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((r) => (
+                      <SelectItem key={r.id} value={r.id} className="capitalize">{r.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Active</Label>
+                <div className="flex items-center h-9 gap-2">
+                  <Switch checked={form.isActive} onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))} />
+                  <span className="text-sm text-muted-foreground">{form.isActive ? "Yes" : "No"}</span>
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button
               onClick={() => save.mutate()}
-              disabled={!form.name || (!editing && (!form.email || !form.password)) || save.isPending}
+              disabled={!isFormValid || save.isPending}
               className="bg-amber-500 hover:bg-amber-400 text-black"
             >
               {save.isPending ? "Saving…" : "Save"}
@@ -267,7 +365,7 @@ export default function UsersTab() {
         open={!!deleteTarget}
         onOpenChange={(v) => !v && setDeleteTarget(null)}
         title="Delete User"
-        description={<>Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This cannot be undone.</>}
+        description={<>Are you sure you want to delete <strong>{deleteTarget?.firstName} {deleteTarget?.lastName}</strong>? This cannot be undone.</>}
         onConfirm={() => deleteTarget && remove.mutate(deleteTarget.id)}
         isPending={remove.isPending}
       />

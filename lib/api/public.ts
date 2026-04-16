@@ -169,29 +169,29 @@ export type CatalogProduct = z.infer<typeof catalogProductSchema>;
 
 /* ---------- API ---------- */
 export async function fetchCategories(): Promise<Category[]> {
-    const res = await api.get<ApiResponse<Category[]>>("/public/categories");
+    const res = await api.get("/store/categories");
     console.log(res)
     return res.data.data;
-    // return z.array(publicCategoriesSchema).parse(res.data.data);
 }
 
+
 export async function getBrands(): Promise<Brand[]> {
-    const res = await api.get<ApiResponse<Brand[]>>("/public/brands");
+    const res = await api.get<ApiResponse<Brand[]>>("/store/brands");
     return res.data.data
 }
 
 export async function getProducts(): Promise<Product[]> {
-    const res = await api.get<ApiResponse<Product[]>>("/public/products")
+    const res = await api.get<ApiResponse<Product[]>>("/store/products")
     return res.data.data
 }
 
 export async function getProduct(id: string): Promise<ProductDetail> {
-    const res = await api.get<ApiResponse<ProductDetail>>(`/public/products/${id}`)
+    const res = await api.get<ApiResponse<ProductDetail>>(`/store/products/${id}`)
     return res.data.data
 }
 
 export async function getCarouselData(): Promise<CarouselData[]> {
-    const res = await api.get<ApiResponse<CarouselData[]>>("/public/carousel")
+    const res = await api.get<ApiResponse<CarouselData[]>>("/store/carousel")
     return res.data.data
 }
 
@@ -202,7 +202,7 @@ export async function getCatalog(params: {
     const cleanParams = Object.fromEntries(
         Object.entries(params).filter(([, v]) => v !== "" && v !== undefined)
     );
-    const res = await api.get<ApiResponse<CatalogProduct[]>>("/public/products/catalog", { params: cleanParams });
+    const res = await api.get<ApiResponse<CatalogProduct[]>>("/store/products/catalog", { params: cleanParams });
     return res.data.data;
 }
 
@@ -219,6 +219,6 @@ export async function getProductsWithFilter(params: {
     const cleanParams = Object.fromEntries(
         Object.entries(params).filter(([, v]) => v !== "" && v !== undefined && v !== null)
     );
-    const res = await api.get<ApiResponse<Product[]>>("/public/products", { params: cleanParams })
+    const res = await api.get<ApiResponse<Product[]>>("/store/products", { params: cleanParams })
     return res.data
 }

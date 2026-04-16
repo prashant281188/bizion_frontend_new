@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "HINI | Architectural Hardware for Modern Interiors",
   description: "HINI by Himani Enterprises — premium door handles, cabinet hardware, aluminium profiles, and bathroom accessories crafted for architects, designers, and builders across India.",

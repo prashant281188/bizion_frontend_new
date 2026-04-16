@@ -67,8 +67,9 @@ const PublicNavbar = () => {
 
             {/* Mobile Hamburger */}
             <button
-              className="md:hidden"
+              className="md:hidden flex items-center justify-center h-9 w-9 rounded-full border border-black/10 transition hover:border-amber-500"
               onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
             >
               {isOpen ? (
                 <X className="h-6 w-6 text-gray-900" />
