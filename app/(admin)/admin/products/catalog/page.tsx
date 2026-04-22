@@ -236,8 +236,8 @@ const CatalogueSkeleton = () => (
     {Array.from({ length: 4 }).map((_, i) => (
       <div
         key={i}
-        className="animate-pulse overflow-hidden rounded-xl bg-white ring-1 ring-black/5"
-        style={{ animationDelay: `${i * 50}ms` }}
+        className="animate-pulse-stagger overflow-hidden rounded-xl bg-white ring-1 ring-black/5"
+        style={{ "--delay": `${i * 50}ms` } as React.CSSProperties}
       >
         <div className="flex gap-4 p-4">
           <div className="h-16 w-16 shrink-0 rounded-lg bg-neutral-100" />

@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useBrands } from "@/hooks/use-brands";
 import Image from "next/image";
 import { titleCase, getS3Url } from "@/utils";
@@ -33,8 +34,8 @@ const BrandSection = () => {
             : data?.map((brand, i) => (
                 <div
                   key={brand.id}
-                  className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-white px-3 sm:px-6 py-5 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:ring-amber-500/30 animate-fade-up"
-                  style={{ animationDelay: `${Math.min(i * 70, 350)}ms` }}
+                  className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-white px-3 sm:px-6 py-5 ring-1 ring-black/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:ring-amber-500/30 animate-stagger"
+                  style={{ "--delay": `${Math.min(i * 70, 350)}ms` } as React.CSSProperties}
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-amber-50 ring-1 ring-amber-200 group-hover:ring-amber-500 transition-all">
                     {brand.brandLogo ? (

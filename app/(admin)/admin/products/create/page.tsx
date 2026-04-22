@@ -55,9 +55,9 @@ import { cn } from "@/lib/utils";
 // ── Shared product module building blocks ──────────────────────────────────
 import { productFormSchema, type ProductFormValues } from "../product.schema";
 import { buildVariants } from "../product.utils";
-import { ProductSection, ProductField } from "../components/ProductSection";
-import { OptionNameField } from "../components/OptionNameField";
-import { TagInput } from "../components/TagInput";
+import { ProductSection, ProductField } from "../_components/ProductSection";
+import { OptionNameField } from "../_components/OptionNameField";
+import { TagInput } from "../_components/TagInput";
 
 /* ── Page ────────────────────────────────────────────────── */
 const CreateProductPage = () => {
@@ -419,8 +419,7 @@ const CreateProductPage = () => {
               {optionFields.map((field, oi) => (
                 <div
                   key={field.id}
-                  className="rounded-lg border border-black/5 bg-neutral-50 p-4 space-y-3"
-                  style={{ animation: "fade-up 0.3s ease both" }}
+                  className="rounded-lg border border-black/5 bg-neutral-50 p-4 space-y-3 animate-fade-up-fast"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
@@ -535,11 +534,8 @@ const CreateProductPage = () => {
                       {variantFields.map((field, vi) => (
                         <tr
                           key={field.id}
-                          className="hover:bg-neutral-50/80 transition-colors"
-                          style={{
-                            animation: "fade-up 0.25s ease both",
-                            animationDelay: `${vi * 25}ms`,
-                          }}
+                          className="hover:bg-neutral-50/80 transition-colors animate-stagger-fast"
+                          style={{ "--delay": `${vi * 25}ms` } as React.CSSProperties}
                         >
                           {/* Variant image upload */}
                           <td className="px-3 py-2">

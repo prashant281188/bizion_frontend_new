@@ -44,28 +44,15 @@ const LoginPage = () => {
         {/* LEFT: Login Form */}
         <div className="flex items-center justify-center px-6 py-12">
           <div
-            className="w-full max-w-md"
-            style={{ animation: "fade-up 0.55s cubic-bezier(.22,.68,0,1.2) both" }}
+            className="w-full max-w-md animate-fade-up-spring"
           >
             {/* Brand */}
-            <div
-              className="mb-10 text-center"
-              style={{ animation: "fade-up 0.5s ease both", animationDelay: "60ms" }}
-            >
-              <span
-                className="mx-auto mb-4 block h-1 rounded-full bg-amber-500"
-                style={{ animation: "bar-grow 0.6s ease both", animationDelay: "200ms" }}
-              />
-              <h1
-                className="text-3xl font-semibold text-gray-900"
-                style={{ animation: "fade-up 0.5s ease both", animationDelay: "150ms" }}
-              >
+            <div className="mb-10 text-center animate-fade-up-slow delay-60">
+              <span className="mx-auto mb-4 block h-1 rounded-full bg-amber-500 animate-bar-grow delay-200" />
+              <h1 className="text-3xl font-semibold text-gray-900 animate-fade-up-slow delay-150">
                 Welcome Back
               </h1>
-              <p
-                className="mt-2 text-muted-foreground"
-                style={{ animation: "fade-up 0.5s ease both", animationDelay: "220ms" }}
-              >
+              <p className="mt-2 text-muted-foreground animate-fade-up-slow delay-220">
                 Sign in to access the HINI admin portal
               </p>
             </div>
@@ -73,8 +60,7 @@ const LoginPage = () => {
             {/* Success overlay */}
             {success && (
               <div
-                className="mb-6 flex flex-col items-center justify-center gap-3 rounded-2xl bg-green-50 py-8 ring-1 ring-green-200"
-                style={{ animation: "success-pop 0.4s ease both" }}
+                className="mb-6 flex flex-col items-center justify-center gap-3 rounded-2xl bg-green-50 py-8 ring-1 ring-green-200 animate-success-pop"
               >
                 <CheckCircle className="h-10 w-10 text-green-500" />
                 <p className="text-sm font-medium text-green-700">Login successful! Redirecting…</p>
@@ -85,16 +71,11 @@ const LoginPage = () => {
             <form
               key={shakeKey}
               ref={formRef}
-              className="space-y-5"
+              className={shakeKey > 0 ? "space-y-5 animate-shake-fast" : "space-y-5"}
               onSubmit={handleSubmit}
-              style={
-                shakeKey > 0
-                  ? { animation: "shake 0.45s ease both" }
-                  : undefined
-              }
             >
               {/* Email */}
-              <div style={{ animation: "fade-up 0.5s ease both", animationDelay: "280ms" }}>
+              <div className="animate-fade-up-slow delay-280">
                 <label className="mb-1 block text-sm font-medium">Email Address</label>
                 <input
                   name="email"
@@ -106,7 +87,7 @@ const LoginPage = () => {
               </div>
 
               {/* Password */}
-              <div style={{ animation: "fade-up 0.5s ease both", animationDelay: "340ms" }}>
+              <div className="animate-fade-up-slow delay-340">
                 <label className="mb-1 block text-sm font-medium">Password</label>
                 <input
                   name="password"
@@ -118,10 +99,7 @@ const LoginPage = () => {
               </div>
 
               {/* Remember / Forgot */}
-              <div
-                className="flex items-center justify-between text-sm"
-                style={{ animation: "fade-up 0.5s ease both", animationDelay: "400ms" }}
-              >
+              <div className="flex items-center justify-between text-sm animate-fade-up-slow delay-400">
                 <label className="flex cursor-pointer items-center gap-2 select-none">
                   <input type="checkbox" className="accent-amber-500" />
                   Remember me
@@ -132,7 +110,7 @@ const LoginPage = () => {
               </div>
 
               {/* Submit */}
-              <div style={{ animation: "fade-up 0.5s ease both", animationDelay: "460ms" }}>
+              <div className="animate-fade-up-slow delay-460">
                 <button
                   type="submit"
                   disabled={mutation.isPending || success}
@@ -161,10 +139,7 @@ const LoginPage = () => {
             </form>
 
             {/* Footer */}
-            <p
-              className="mt-10 text-center text-sm text-muted-foreground"
-              style={{ animation: "fade-in 0.6s ease both", animationDelay: "600ms" }}
-            >
+            <p className="mt-10 text-center text-sm text-muted-foreground animate-fade-in-slow delay-600">
               © 2025–26 HINI. All rights reserved.
             </p>
           </div>
@@ -172,8 +147,7 @@ const LoginPage = () => {
 
         {/* RIGHT: Image panel */}
         <div
-          className="relative hidden md:block"
-          style={{ animation: "fade-in 0.8s ease both", animationDelay: "100ms" }}
+          className="relative hidden md:block animate-fade-in-slower delay-100"
         >
           <Image
             fill
@@ -188,8 +162,7 @@ const LoginPage = () => {
 
           {/* Branding text */}
           <div
-            className="relative z-10 flex h-full items-end p-12"
-            style={{ animation: "fade-up 0.7s ease both", animationDelay: "400ms" }}
+            className="relative z-10 flex h-full items-end p-12 animate-fade-up-slow delay-400"
           >
             <div>
               <span className="mb-4 block h-1 w-10 rounded-full bg-amber-500" />

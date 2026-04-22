@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { useCatalog } from "@/hooks/use-catalog";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useBrands } from "@/hooks/use-brands";
@@ -232,10 +232,8 @@ const CatalogContent = () => {
                           {cat.products.map((product, i) => (
                             <div
                               key={product.id}
-                              style={{
-                                animation: "fade-up 0.35s ease both",
-                                animationDelay: `${Math.min(i * 30, 300)}ms`,
-                              }}
+                              className="animate-stagger"
+                              style={{ "--delay": `${Math.min(i * 30, 300)}ms` } as React.CSSProperties}
                             >
                               <CatalogProductEntry product={product} />
                             </div>

@@ -1,6 +1,6 @@
-import { BiCarousel } from "@/components/carousel/BiCarousel";
-import CategorySection from "@/components/public/category-section";
-import BrandSection from "@/components/public/brand-section";
+import { Carousel } from "@/components/carousel/Carousel";
+import CategorySection from "@/components/public/CategorySection";
+import BrandSection from "@/components/public/BrandSection";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import NewProductsSection from "@/components/home/NewProductsSection";
 import { Metadata } from "next";
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 const HomePage = () => {
   return (
     <div className="bg-white">
-      <BiCarousel />
+      <Carousel />
       <CategorySection />
       <FeaturedProductsSection />
       <NewProductsSection />

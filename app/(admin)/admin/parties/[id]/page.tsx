@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowLeft, Building2, Phone, MapPin, Hash } from "lucide-react";
 import { adminGetParty } from "@/lib/api/admin";
-import PartyBalanceCard from "../components/PartyBalanceCard";
-import PartyOrdersCard from "../components/PartyOrdersCard";
+import PartyBalanceCard from "../_components/PartyBalanceCard";
+import PartyOrdersCard from "../_components/PartyOrdersCard";
 
 const typeColor: Record<string, string> = {
   retailer: "bg-blue-50 text-blue-600 ring-blue-200",

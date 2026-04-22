@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Ruler, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, Ruler } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
+import { DataTable } from "@/components/ui/DataTable";
 import {
   adminGetUnits,
   adminCreateUnit,
@@ -24,8 +25,7 @@ import {
   type Unit,
 } from "@/lib/api/admin";
 import { useBackdrop } from "@/providers/backdrop-provider";
-
-const PAGE_SIZE = 10;
+import { ColumnDef } from "@tanstack/react-table";
 
 type FormState = { unitName: string; unitSymbol: string };
 const empty: FormState = { unitName: "", unitSymbol: "" };
@@ -37,7 +37,6 @@ export default function UnitsTab() {
   const [editing, setEditing] = useState<Unit | null>(null);
   const [form, setForm] = useState<FormState>(empty);
   const [deleteTarget, setDeleteTarget] = useState<Unit | null>(null);
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
   const { data: units = [], isLoading } = useQuery({
@@ -55,7 +54,6 @@ export default function UnitsTab() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-units"] });
       setOpen(false);
-      setPage(1);
       toast.success("Unit saved");
     },
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to save"),
@@ -68,7 +66,6 @@ export default function UnitsTab() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-units"] });
       setDeleteTarget(null);
-      setPage(1);
       toast.success("Unit deleted");
     },
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to delete"),
@@ -81,14 +78,39 @@ export default function UnitsTab() {
     setOpen(true);
   }
 
-  const filtered = units.filter(
-    (u) =>
-      u.unitName.toLowerCase().includes(search.toLowerCase()) ||
-      u.unitSymbol.toLowerCase().includes(search.toLowerCase())
-  );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const columns: ColumnDef<Unit, unknown>[] = [
+    {
+      accessorKey: "unitName",
+      header: "Unit Name",
+      cell: ({ getValue }) => (
+        <span className="font-medium text-gray-900">{getValue() as string}</span>
+      ),
+    },
+    {
+      accessorKey: "unitSymbol",
+      header: "Symbol",
+      size: 120,
+      cell: ({ getValue }) => (
+        <span className="font-mono text-muted-foreground">{getValue() as string}</span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-1">
+          <button onClick={() => openEdit(row.original)} className="icon-btn-edit">
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={() => setDeleteTarget(row.original)} className="icon-btn-delete">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -100,80 +122,24 @@ export default function UnitsTab() {
           </Button>
         </CardHeader>
         <CardContent>
-          {/* Search */}
           <div className="mb-3">
             <Input
               placeholder="Search by name or symbol…"
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              onChange={(e) => setSearch(e.target.value)}
               className="h-8 text-xs"
             />
           </div>
-
-          {isLoading ? (
-            <div className="space-y-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="data-table-skeleton-row" />
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center py-12 text-center">
-              <Ruler className="h-8 w-8 text-neutral-300 mb-2" />
-              <p className="text-sm text-muted-foreground">
-                {search ? "No units match your search" : "No units yet"}
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="rounded-lg border border-black/5 overflow-hidden">
-                <div className="grid grid-cols-[1fr_120px_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-4">
-                  <span className="data-table-th">Unit Name</span>
-                  <span className="data-table-th">Symbol</span>
-                  <span className="data-table-th text-right">Actions</span>
-                </div>
-                <div className="divide-y divide-black/5">
-                  {paged.map((u) => (
-                    <div key={u.id} className="grid grid-cols-[1fr_120px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80">
-                      <span className="text-sm font-medium text-gray-900">{u.unitName}</span>
-                      <span className="text-sm font-mono text-muted-foreground">{u.unitSymbol}</span>
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEdit(u)} className="icon-btn-edit">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => setDeleteTarget(u)} className="icon-btn-delete">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pagination */}
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{filtered.length} unit{filtered.length !== 1 ? "s" : ""}</span>
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-1">
-                    <button
-                      disabled={safePage === 1}
-                      onClick={() => setPage((p) => p - 1)}
-                      className="pagination-btn"
-                    >
-                      <ChevronLeft className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="px-1.5">{safePage} / {totalPages}</span>
-                    <button
-                      disabled={safePage === totalPages}
-                      onClick={() => setPage((p) => p + 1)}
-                      className="pagination-btn"
-                    >
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+          <DataTable
+            columns={columns}
+            data={units}
+            isLoading={isLoading}
+            skeletonRows={4}
+            globalFilter={search}
+            pageSize={10}
+            emptyIcon={<Ruler className="h-8 w-8" />}
+            emptyTitle={search ? "No units match your search" : "No units yet"}
+          />
         </CardContent>
       </Card>
 

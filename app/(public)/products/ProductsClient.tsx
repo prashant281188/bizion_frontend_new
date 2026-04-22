@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useProducts } from "@/hooks/use-products";
 import { useDebounce } from "@/hooks/use-debounce";
 import Pagination from "@/components/shared/pagination";
-import ProductCard from "@/components/product/ProductCard";
+import ProductCard from "@/components/products/ProductCard";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useBrands } from "@/hooks/use-brands";
 import { useURLFilters } from "@/hooks/use-url-filters";
@@ -110,8 +110,8 @@ const ProductsContent = () => {
               {products.map((product, i) => (
                 <div
                   key={product.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${Math.min(i * 45, 400)}ms` }}
+                  className="animate-stagger"
+                  style={{ "--delay": `${Math.min(i * 45, 400)}ms` } as React.CSSProperties}
                 >
                   <ProductCard {...product} />
                 </div>

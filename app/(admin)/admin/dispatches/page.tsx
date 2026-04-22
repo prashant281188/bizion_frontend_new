@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Truck, Search, ChevronDown, ChevronUp } from "lucide-react";
@@ -18,8 +18,8 @@ function DispatchRow({ dispatch, index }: { dispatch: Dispatch; index: number })
   return (
     <>
       <div
-        className="animate-fade-up grid grid-cols-[160px_1fr_80px_100px_40px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
-        style={{ animationDelay: `${index * 30}ms` }}
+        className="animate-stagger grid grid-cols-[160px_1fr_80px_100px_40px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
+        style={{ "--delay": `${index * 30}ms` } as React.CSSProperties}
       >
         <button
           type="button"
@@ -115,7 +115,7 @@ export default function DispatchesPage() {
       {isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse" style={{ animationDelay: `${i * 40}ms` }} />
+            <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse-stagger" style={{ "--delay": `${i * 40}ms` } as React.CSSProperties} />
           ))}
         </div>
       ) : paged.length === 0 ? (

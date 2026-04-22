@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -122,7 +122,7 @@ export default function OrdersPage() {
         {isLoading ? (
           <div className="space-y-2">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse" style={{ animationDelay: `${i * 40}ms` }} />
+              <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse-stagger" style={{ "--delay": `${i * 40}ms` } as React.CSSProperties} />
             ))}
           </div>
         ) : paged.length === 0 ? (
@@ -153,8 +153,8 @@ export default function OrdersPage() {
               {paged.map((o, i) => (
                 <div
                   key={o.id}
-                  className="animate-fade-up grid grid-cols-[120px_1fr_140px_100px_100px_110px_40px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
-                  style={{ animationDelay: `${i * 30}ms` }}
+                  className="animate-stagger grid grid-cols-[120px_1fr_140px_100px_100px_110px_40px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
+                  style={{ "--delay": `${i * 30}ms` } as React.CSSProperties}
                 >
                   <Link href={`/admin/orders/${o.id}`} className="text-sm font-mono font-semibold text-gray-900 truncate hover:text-amber-600 transition-colors">
                     {o.orderNumber}

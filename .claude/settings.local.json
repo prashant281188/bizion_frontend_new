@@ -4,7 +4,15 @@
       "Bash(cat)",
       "Read(//tmp/**)",
       "Bash(npx tsc *)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(git mv *)",
+      "Bash(sed -i '' 's|@/components/product/ProductCard|@/components/products/ProductCard|g' \"/Users/prashant/Project/bizion_frontend_new/app/\\(public\\)/products/ProductsClient.tsx\")",
+      "Bash(sed -i '' 's|@/components/product/ProductDetailSkeleton|@/components/products/ProductDetailSkeleton|g' \"/Users/prashant/Project/bizion_frontend_new/app/\\(public\\)/products/[id]/ProductDetailClient.tsx\")",
+      "Bash(sed -i '' 's|@/components/product/ProductCard|@/components/products/ProductCard|g' \"/Users/prashant/Project/bizion_frontend_new/components/home/NewProductsSection.tsx\")",
+      "Bash(sed -i '' 's|@/components/product/ProductCard|@/components/products/ProductCard|g' \"/Users/prashant/Project/bizion_frontend_new/components/home/FeaturedProductsSection.tsx\")",
+      "Bash(git rm *)",
+      "Bash(sed -i '' 's|from \"\\\\./components/|from \"./_components/|g' '/Users/prashant/Project/bizion_frontend_new/app/\\(admin\\)/admin/settings/page.tsx' '/Users/prashant/Project/bizion_frontend_new/app/\\(admin\\)/admin/parties/page.tsx')",
+      "Bash(sed -i '' 's|from \"\\\\.\\\\./components/|from \"../_components/|g' '/Users/prashant/Project/bizion_frontend_new/app/\\(admin\\)/admin/products/[id]/page.tsx' '/Users/prashant/Project/bizion_frontend_new/app/\\(admin\\)/admin/products/create/page.tsx' '/Users/prashant/Project/bizion_frontend_new/app/\\(admin\\)/admin/parties/[id]/page.tsx')"
     ]
   }
 }

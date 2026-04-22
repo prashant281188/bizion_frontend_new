@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import PartyDataTable from "./components/PartyDataTable";
+import PartyDataTable from "./_components/PartyDataTable";
 
 const PartiesPage = () => (
   <div className="page-wrapper">

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useNewProducts } from "@/hooks/use-products";
-import ProductCard from "@/components/product/ProductCard";
+import ProductCard from "@/components/products/ProductCard";
 import { ArrowRight, Sparkles } from "lucide-react";
-import ProductCardSkeleton from "@/components/product/ProductCardSkeleton";
+import ProductCardSkeleton from "@/components/products/ProductCardSkeleton";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const NewProductsSection = () => {

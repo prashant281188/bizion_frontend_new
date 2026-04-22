@@ -71,7 +71,7 @@ export const sidebarConfig: NavGroup[] = [
           { title: "Product List",      url: "/admin/products",         icon: PackageSearch },
           { title: "Add Product",       url: "/admin/products/create",  icon: PackagePlus },
           { title: "Bulk Edit / Create",url: "/admin/products/bulk",    icon: Pencil },
-          { title: "Catalogue",         url: "/admin/products/catalouge", icon: BookOpen },
+          { title: "Catalogue",         url: "/admin/products/catalog",   icon: BookOpen },
         ],
       },
       {

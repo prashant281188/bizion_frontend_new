@@ -47,25 +47,93 @@
     animation: fade-up 0.4s ease both;
   }
 
+  .animate-fade-up-slow {
+    animation: fade-up 0.5s ease both;
+  }
+
+  .animate-fade-up-fast {
+    animation: fade-up 0.3s ease both;
+  }
+
+  .animate-fade-up-spring {
+    animation: fade-up 0.55s cubic-bezier(.22,.68,0,1.2) both;
+  }
+
   .animate-fade-in {
     animation: fade-in 0.3s ease both;
+  }
+
+  .animate-fade-in-slow {
+    animation: fade-in 0.6s ease both;
+  }
+
+  .animate-fade-in-slower {
+    animation: fade-in 0.8s ease both;
+  }
+
+  .animate-bar-grow {
+    animation: bar-grow 0.6s ease both;
   }
 
   .animate-shake {
     animation: shake 0.5s ease;
   }
 
+  .animate-shake-fast {
+    animation: shake 0.45s ease both;
+  }
+
   .animate-success-pop {
     animation: success-pop 0.35s ease both;
   }
 
+  .animate-success-pop-slow {
+    animation: success-pop 0.5s ease both;
+  }
+
+  .animate-shrink-bar {
+    animation: shrink-bar var(--duration, 4000ms) linear both;
+    transform-origin: left;
+  }
+
   /* Staggered fade-up delays — use with animate-fade-up */
   .delay-50  { animation-delay: 50ms;  }
+  .delay-60  { animation-delay: 60ms;  }
+  .delay-80  { animation-delay: 80ms;  }
   .delay-100 { animation-delay: 100ms; }
   .delay-150 { animation-delay: 150ms; }
+  .delay-160 { animation-delay: 160ms; }
   .delay-200 { animation-delay: 200ms; }
+  .delay-220 { animation-delay: 220ms; }
   .delay-250 { animation-delay: 250ms; }
+  .delay-280 { animation-delay: 280ms; }
   .delay-300 { animation-delay: 300ms; }
+  .delay-320 { animation-delay: 320ms; }
+  .delay-340 { animation-delay: 340ms; }
   .delay-400 { animation-delay: 400ms; }
+  .delay-460 { animation-delay: 460ms; }
   .delay-500 { animation-delay: 500ms; }
+  .delay-550 { animation-delay: 550ms; }
+  .delay-600 { animation-delay: 600ms; }
+
+  /* Dynamic stagger via CSS variable — set style={{ "--delay": `${i * X}ms` }} */
+  .animate-stagger {
+    animation: fade-up 0.35s ease both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .animate-stagger-fast {
+    animation: fade-up 0.25s ease both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .animate-stagger-slow {
+    animation: fade-up 0.5s ease both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .animate-pulse-stagger {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation-delay: var(--delay, 0ms);
+  }
 }

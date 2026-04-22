@@ -1,7 +1,7 @@
 "use client";
 
-import AdminNavbar from "@/components/navigation/admin/admin-navbar";
-import AdminSidebar from "@/components/navigation/admin/sidebar";
+import AdminNavbar from "@/components/navigation/admin/AdminNavbar";
+import AdminSidebar from "@/components/navigation/admin/Sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/providers/auth-provider";
 import React from "react";

@@ -1,7 +1,8 @@
 "use client";
 
+import React from "react";
 import { usePublicCategories } from "@/hooks/use-categories";
-import BiCategory from "@/components/category/BiCategory";
+import CategoryCard from "@/components/category/CategoryCard";
 import { getS3Url } from "@/utils";
 
 const CategorySection = () => {
@@ -35,10 +36,10 @@ const CategorySection = () => {
             : data?.map((cat, i) => (
                 <div
                   key={cat.id}
-                  className="animate-fade-up"
-                  style={{ animationDelay: `${Math.min(i * 75, 450)}ms` }}
+                  className="animate-stagger"
+                  style={{ "--delay": `${Math.min(i * 75, 450)}ms` } as React.CSSProperties}
                 >
-                  <BiCategory
+                  <CategoryCard
                     title={cat.categoryName}
                     image={cat.categoryImage ? getS3Url(cat.categoryImage) : "/products/dummy_photo.png"}
                     subtitle={cat.description ?? undefined}

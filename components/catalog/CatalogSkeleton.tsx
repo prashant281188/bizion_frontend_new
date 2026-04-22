@@ -1,10 +1,12 @@
+import React from "react";
+
 export const CatalogSkeleton = () => (
   <div className="space-y-3">
     {Array.from({ length: 5 }).map((_, i) => (
       <div
         key={i}
-        className="animate-pulse overflow-hidden rounded-2xl bg-white ring-1 ring-black/5"
-        style={{ animationDelay: `${i * 50}ms` }}
+        className="animate-pulse-stagger overflow-hidden rounded-2xl bg-white ring-1 ring-black/5"
+        style={{ "--delay": `${i * 50}ms` } as React.CSSProperties}
       >
         <div className="flex gap-4 p-4">
           <div className="h-20 w-20 shrink-0 rounded-xl bg-neutral-100" />

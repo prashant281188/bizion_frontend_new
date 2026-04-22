@@ -16,18 +16,18 @@ import {
   Ruler,
 } from "lucide-react";
 
-import ProfileTab from "./components/ProfileTab";
-import BusinessTab from "./components/BusinessTab";
-import SecurityTab from "./components/SecurityTab";
-import NotificationTab from "./components/NotificationTab";
-import SystemTab from "./components/SystemTab";
-import UsersTab from "./components/UsersTab";
-import RolesTab from "./components/RolesTab";
-import CategoriesTab from "./components/CategoriesTab";
-import BrandsTab from "./components/BrandsTab";
-import HsnTab from "./components/HsnTab";
-import GstTab from "./components/GstTab";
-import UnitsTab from "./components/UnitsTab";
+import ProfileTab from "./_components/ProfileTab";
+import BusinessTab from "./_components/BusinessTab";
+import SecurityTab from "./_components/SecurityTab";
+import NotificationTab from "./_components/NotificationTab";
+import SystemTab from "./_components/SystemTab";
+import UsersTab from "./_components/UsersTab";
+import RolesTab from "./_components/RolesTab";
+import CategoriesTab from "./_components/CategoriesTab";
+import BrandsTab from "./_components/BrandsTab";
+import HsnTab from "./_components/HsnTab";
+import GstTab from "./_components/GstTab";
+import UnitsTab from "./_components/UnitsTab";
 
 const groups = [
   {

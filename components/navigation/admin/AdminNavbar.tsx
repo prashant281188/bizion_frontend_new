@@ -4,9 +4,9 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { SidebarTrigger } from "../../ui/sidebar";
 import { usePathname } from "next/navigation";
-import BiNotification from "./BiNotification";
-import BiSearchBar from "./BiSearchBar";
-import BiUserIcon from "./BiUserIcon";
+import Notification from "./Notification";
+import SearchBar from "./SearchBar";
+import UserIcon from "./UserIcon";
 import { ChevronRight } from "lucide-react";
 
 const pageMeta: Record<string, { title: string; description: string; crumbs?: string[] }> = {
@@ -14,7 +14,7 @@ const pageMeta: Record<string, { title: string; description: string; crumbs?: st
   "/admin/products":            { title: "Products",       description: "Manage your catalogue",       crumbs: ["Products"] },
   "/admin/products/create":     { title: "Add Product",    description: "Create a new product listing", crumbs: ["Products", "Add Product"] },
   "/admin/products/bulk":       { title: "Bulk Edit",      description: "Edit multiple products at once", crumbs: ["Products", "Bulk Edit"] },
-  "/admin/products/catalouge":  { title: "Catalogue",      description: "Full product catalogue",       crumbs: ["Products", "Catalogue"] },
+  "/admin/products/catalog":    { title: "Catalogue",      description: "Full product catalogue",       crumbs: ["Products", "Catalogue"] },
   "/admin/parties":             { title: "Parties",        description: "Customers, suppliers & more",  crumbs: ["Parties"] },
   "/admin/carousel":            { title: "Carousel",       description: "Manage homepage slides",       crumbs: ["Carousel"] },
   "/admin/settings":            { title: "Settings",       description: "System configuration",         crumbs: ["Settings"] },
@@ -86,7 +86,7 @@ const AdminNavbar = ({ className }: { className?: string }) => {
         {/* Search — centered on large screens */}
         <div className="hidden flex-1 justify-center px-4 lg:flex">
           <div className="w-full max-w-xs">
-            <BiSearchBar />
+            <SearchBar />
           </div>
         </div>
 
@@ -99,12 +99,12 @@ const AdminNavbar = ({ className }: { className?: string }) => {
             </svg>
           </button>
 
-          <BiNotification />
+          <Notification />
 
           {/* Divider */}
           <div className="mx-1 h-5 w-px bg-black/8" />
 
-          <BiUserIcon />
+          <UserIcon />
         </div>
       </div>
 

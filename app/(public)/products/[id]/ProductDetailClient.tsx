@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useProduct } from "@/hooks/use-product";
 import { titleCase } from "@/utils";
 import { ArrowLeft, Sparkles, Star, Package, Tag, Layers, Hash } from "lucide-react";
@@ -7,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ElementType, useState } from "react";
-import { ProductDetailSkeleton } from "@/components/product/ProductDetailSkeleton";
+import { ProductDetailSkeleton } from "@/components/products/ProductDetailSkeleton";
 const ProductDetailPage = () => {
   const { id } = useParams();
   const { data, isLoading } = useProduct(id as string);
@@ -50,7 +51,7 @@ const ProductDetailPage = () => {
   return (
     <>
       {/* ── Hero Section ─────────────────────────────────── */}
-      <section className="w-full bg-white py-6 sm:py-10" style={{ animation: "fade-up 0.5s ease both" }}>
+      <section className="w-full bg-white py-6 sm:py-10 animate-fade-up-slow">
         <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
 
           {/* Back */}
@@ -66,7 +67,7 @@ const ProductDetailPage = () => {
           <div className="mt-6 sm:mt-8 grid gap-8 md:gap-12 md:grid-cols-[380px_1fr]">
 
             {/* ── Image Panel ── */}
-            <div className="max-w-sm mx-auto w-full md:max-w-none" style={{ animation: "fade-up 0.5s ease both", animationDelay: "80ms" }}>
+            <div className="max-w-sm mx-auto w-full md:max-w-none animate-fade-up-slow delay-80">
               <div className="relative aspect-square overflow-hidden rounded-3xl bg-neutral-50 ring-1 ring-black/5 shadow-sm">
                 <Image
                   src={imageSrc}
@@ -93,7 +94,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* ── Info Panel ── */}
-            <div className="flex flex-col" style={{ animation: "fade-up 0.5s ease both", animationDelay: "160ms" }}>
+            <div className="flex flex-col animate-fade-up-slow delay-160">
 
               {/* Brand + Category row */}
               <div className="flex flex-wrap items-center gap-2">
@@ -141,7 +142,8 @@ const ProductDetailPage = () => {
                   {data.options.map((option, oi) => (
                     <div
                       key={option.name}
-                      style={{ animation: "fade-up 0.4s ease both", animationDelay: `${240 + oi * 80}ms` }}
+                      className="animate-stagger"
+                      style={{ "--delay": `${240 + oi * 80}ms` } as React.CSSProperties}
                     >
                       <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-amber-600">
                         {option.name}
@@ -190,8 +192,7 @@ const ProductDetailPage = () => {
       {/* ── Variants ─────────────────────────────────────── */}
       {data.variants && data.variants.length > 0 && (
         <section
-          className="w-full bg-neutral-50 py-10 sm:py-16"
-          style={{ animation: "fade-up 0.5s ease both", animationDelay: "200ms" }}
+          className="w-full bg-neutral-50 py-10 sm:py-16 animate-fade-up-slow delay-200"
         >
           <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
             <div className="mb-6 sm:mb-8 flex items-center justify-between">
@@ -208,8 +209,8 @@ const ProductDetailPage = () => {
               {data.variants.map((variant, i) => (
                 <div
                   key={variant.id}
-                  className="group flex flex-col gap-3 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/40 hover:shadow-md transition-all duration-200"
-                  style={{ animation: "fade-up 0.35s ease both", animationDelay: `${Math.min(i * 50, 400)}ms` }}
+                  className="group flex flex-col gap-3 rounded-2xl bg-white px-5 py-4 ring-1 ring-black/5 hover:ring-amber-500/40 hover:shadow-md transition-all duration-200 animate-stagger"
+                  style={{ "--delay": `${Math.min(i * 50, 400)}ms` } as React.CSSProperties}
                 >
                   {/* SKU */}
                   <span className="self-start font-mono text-[10px] text-muted-foreground bg-neutral-50 rounded-md px-2 py-0.5 ring-1 ring-black/5">

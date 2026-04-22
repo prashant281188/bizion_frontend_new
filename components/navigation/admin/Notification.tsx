@@ -3,7 +3,7 @@
 import { Bell } from "lucide-react";
 import React from "react";
 
-const BiNotification = () => {
+const Notification = () => {
   // TODO: wire to real unread count
   const unreadCount = 0;
 
@@ -23,4 +23,4 @@ const BiNotification = () => {
   );
 };
 
-export default BiNotification;
+export default Notification;

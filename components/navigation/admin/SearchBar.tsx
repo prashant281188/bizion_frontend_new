@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const BiSearchBar = () => {
+const SearchBar = () => {
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,4 +70,4 @@ const BiSearchBar = () => {
   );
 };
 
-export default BiSearchBar;
+export default SearchBar;

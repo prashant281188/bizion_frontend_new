@@ -142,8 +142,8 @@ const AdminDashboardPage = () => {
                 <Link
                   key={product.id}
                   href={`/admin/products/${product.id}`}
-                  className="animate-fade-up flex items-center gap-4 px-5 py-3 hover:bg-neutral-50 transition-colors group"
-                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="animate-stagger flex items-center gap-4 px-5 py-3 hover:bg-neutral-50 transition-colors group"
+                  style={{ "--delay": `${i * 40}ms` } as React.CSSProperties}
                 >
                   <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-black/5">
                     <Image
@@ -278,8 +278,8 @@ const AdminDashboardPage = () => {
                   <Link
                     key={cat.id}
                     href={`/admin/products?categoryId=${cat.id}`}
-                    className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white px-3 py-4 text-center ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-sm transition-all group animate-fade-up"
-                    style={{ animationDelay: `${i * 40}ms` }}
+                    className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white px-3 py-4 text-center ring-1 ring-black/5 hover:ring-amber-500/30 hover:shadow-sm transition-all group animate-stagger"
+                    style={{ "--delay": `${i * 40}ms` } as React.CSSProperties}
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200 text-xs font-bold text-amber-600 group-hover:bg-amber-500 group-hover:text-black group-hover:ring-amber-500 transition-all">
                       {cat.categoryName.charAt(0).toUpperCase()}

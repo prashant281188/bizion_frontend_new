@@ -1,16 +1,11 @@
 import { getCatalog } from "@/lib/api/public";
+import { queryKeys, STALE } from "@/lib/query-config";
 import { useQuery } from "@tanstack/react-query";
 
-export function useCatalog({
-  brandId,
-  categoryId,
-}: {
-  brandId?: string;
-  categoryId?: string;
-} = {}) {
+export function useCatalog({ brandId, categoryId }: { brandId?: string; categoryId?: string } = {}) {
   return useQuery({
-    queryKey: ["catalog", brandId, categoryId],
+    queryKey: queryKeys.catalog(brandId, categoryId),
     queryFn: () => getCatalog({ brandId, categoryId }),
-    staleTime: 1000 * 60 * 10,
+    staleTime: STALE.medium,
   });
 }

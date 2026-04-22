@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/lib/api/auth";
 import { useAuth } from "@/providers/auth-provider";
 
-const BiUserIcon = () => {
+const UserIcon = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -102,4 +102,4 @@ const BiUserIcon = () => {
   );
 };
 
-export default BiUserIcon;
+export default UserIcon;

@@ -593,8 +593,8 @@ const BulkProductsPage = () => {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="h-11 animate-pulse rounded-xl bg-white ring-1 ring-black/5"
-                style={{ animationDelay: `${i * 40}ms` }}
+                className="h-11 animate-pulse-stagger rounded-xl bg-white ring-1 ring-black/5"
+                style={{ "--delay": `${i * 40}ms` } as React.CSSProperties}
               />
             ))}
           </div>

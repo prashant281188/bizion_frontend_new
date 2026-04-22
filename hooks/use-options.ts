@@ -1,11 +1,12 @@
 import { adminGetOptions, adminCreateOption } from "@/lib/api/admin";
+import { queryKeys, STALE } from "@/lib/query-config";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useOptions() {
   return useQuery({
-    queryKey: ["product-options"],
+    queryKey: queryKeys.adminOptions,
     queryFn: adminGetOptions,
-    staleTime: 1000 * 60 * 10,
+    staleTime: STALE.medium,
   });
 }
 
@@ -14,7 +15,7 @@ export function useCreateOption() {
   return useMutation({
     mutationFn: (optionName: string) => adminCreateOption(optionName),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["product-options"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminOptions });
     },
   });
 }

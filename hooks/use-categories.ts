@@ -1,10 +1,11 @@
 import { fetchCategories } from "@/lib/api/public";
+import { queryKeys, STALE } from "@/lib/query-config";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePublicCategories() {
   return useQuery({
-    queryKey: ["categories"],
+    queryKey: queryKeys.categories,
     queryFn: fetchCategories,
-    staleTime: 1000 * 60 * 10, // cache 10 min
+    staleTime: STALE.medium,
   });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import React, { use, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -259,8 +259,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   {order.items.map((item, i) => (
                     <div
                       key={item.id}
-                      className="grid grid-cols-[1fr_70px_80px_100px_110px] items-center gap-4 px-5 py-3 animate-fade-up"
-                      style={{ animationDelay: `${i * 20}ms` }}
+                      className="grid grid-cols-[1fr_70px_80px_100px_110px] items-center gap-4 px-5 py-3 animate-stagger"
+                      style={{ "--delay": `${i * 20}ms` } as React.CSSProperties}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-50 ring-1 ring-amber-100 text-amber-500">
@@ -285,8 +285,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 {order.items.map((item, i) => (
                   <div
                     key={item.id}
-                    className="px-4 py-3.5 space-y-2 animate-fade-up"
-                    style={{ animationDelay: `${i * 20}ms` }}
+                    className="px-4 py-3.5 space-y-2 animate-stagger"
+                    style={{ "--delay": `${i * 20}ms` } as React.CSSProperties}
                   >
                     {/* SKU + amount */}
                     <div className="flex items-start justify-between gap-2">

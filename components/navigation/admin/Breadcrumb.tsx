@@ -4,7 +4,7 @@ import React from "react";
 
 import { Home } from "lucide-react";
 import {
-  Breadcrumb,
+  Breadcrumb as UIBreadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -12,10 +12,10 @@ import {
   BreadcrumbSeparator,
 } from "../../ui/breadcrumb";
 import { usePathname } from "next/navigation";
-const BiBreadcrumb = () => {
+const Breadcrumb = () => {
   const path = usePathname();
   return (
-    <Breadcrumb>
+    <UIBreadcrumb>
     {path.toLowerCase()}
       <BreadcrumbList className="text-sm text-muted-foreground">
         <BreadcrumbItem>
@@ -48,8 +48,8 @@ const BiBreadcrumb = () => {
           </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
-    </Breadcrumb>
+    </UIBreadcrumb>
   );
 };
 
-export default BiBreadcrumb;
+export default Breadcrumb;

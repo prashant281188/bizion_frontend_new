@@ -3,7 +3,7 @@
 import * as React from "react";
 import Autoplay from "embla-carousel-autoplay";
 import {
-  Carousel,
+  Carousel as UICarousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -15,7 +15,7 @@ import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { getS3Url } from "@/utils";
 
-export function BiCarousel() {
+export function Carousel() {
   const { data, isLoading } = useCarouselData();
   const [current, setCurrent] = React.useState(0);
   const [api, setApi] = React.useState<CarouselApi>();
@@ -31,7 +31,7 @@ export function BiCarousel() {
   }, [api]);
 
   return (
-    <Carousel
+    <UICarousel
       className="w-full"
       plugins={[plugin.current]}
       setApi={setApi}
@@ -107,6 +107,6 @@ export function BiCarousel() {
       </CarouselContent>
       <CarouselPrevious className="hidden sm:flex left-4 sm:left-6 bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/30 hover:text-white" />
       <CarouselNext className="hidden sm:flex right-4 sm:right-6 bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/30 hover:text-white" />
-    </Carousel>
+    </UICarousel>
   );
 }

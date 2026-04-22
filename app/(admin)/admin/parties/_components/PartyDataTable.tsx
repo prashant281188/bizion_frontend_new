@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { Plus, Search, Pencil, Trash2, Building2, ChevronLeft, ChevronRight } from "lucide-react";
@@ -289,7 +289,7 @@ export default function PartyDataTable() {
         {isLoading ? (
           <div className="space-y-2">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse" style={{ animationDelay: `${i * 40}ms` }} />
+              <div key={i} className="h-12 rounded-xl bg-neutral-100 animate-pulse-stagger" style={{ "--delay": `${i * 40}ms` } as React.CSSProperties} />
             ))}
           </div>
         ) : paged.length === 0 ? (
@@ -311,8 +311,8 @@ export default function PartyDataTable() {
               {paged.map((p, i) => (
                 <div
                   key={p.id}
-                  className="animate-fade-up grid grid-cols-[1fr_140px_140px_120px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
-                  style={{ animationDelay: `${i * 30}ms` }}
+                  className="animate-stagger grid grid-cols-[1fr_140px_140px_120px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors"
+                  style={{ "--delay": `${i * 30}ms` } as React.CSSProperties}
                 >
                   <div className="min-w-0">
                     <Link href={`/admin/parties/${p.id}`} className="text-sm font-semibold text-gray-900 truncate block hover:text-amber-600 transition-colors">

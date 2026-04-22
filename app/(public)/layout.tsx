@@ -1,5 +1,5 @@
-import PublicFooter from "@/components/navigation/public/public-footer";
-import PublicNavbar from "@/components/navigation/public/public-navbar";
+import PublicFooter from "@/components/navigation/public/PublicFooter";
+import PublicNavbar from "@/components/navigation/public/PublicNavbar";
 import { Metadata } from "next";
 
 import { ReactNode } from "react";

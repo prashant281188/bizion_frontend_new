@@ -3,14 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { titleCase } from "@/utils";
 
-type BiCategoryProps = {
+type CategoryCardProps = {
   title: string;
   image: string;
   subtitle?: string;
   link: string;
 };
 
-const BiCategory = ({ title, image, subtitle, link }: BiCategoryProps) => {
+const CategoryCard = ({ title, image, subtitle, link }: CategoryCardProps) => {
   return (
     <>
      
@@ -67,4 +67,4 @@ const BiCategory = ({ title, image, subtitle, link }: BiCategoryProps) => {
   );
 };
 
-export default BiCategory;
+export default CategoryCard;

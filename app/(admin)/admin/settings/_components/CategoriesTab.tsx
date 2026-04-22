@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, FolderOpen, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, FolderOpen, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { DataTable } from "@/components/ui/DataTable";
 import {
   adminGetCategories,
   adminCreateCategory,
@@ -33,11 +35,9 @@ import {
   type CreateCategoryPayload,
   type UpdateCategoryPayload,
 } from "@/lib/api/admin";
-import { Switch } from "@/components/ui/switch";
 import { getS3Url } from "@/utils";
 import { useBackdrop } from "@/providers/backdrop-provider";
-
-const PAGE_SIZE = 10;
+import { ColumnDef } from "@tanstack/react-table";
 
 type FormState = {
   categoryName: string;
@@ -57,7 +57,6 @@ export default function CategoriesTab() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
   const { data: categories = [], isLoading } = useQuery({
@@ -93,7 +92,6 @@ export default function CategoriesTab() {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
       setOpen(false);
-      setPage(1);
       toast.success("Category saved");
     },
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to save"),
@@ -107,20 +105,14 @@ export default function CategoriesTab() {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
       setDeleteTarget(null);
-      setPage(1);
       toast.success("Category deleted");
     },
     onError: (err: unknown) => toast.error(typeof err === "string" ? err : "Failed to delete"),
   });
 
   function openAdd() {
-    setEditing(null);
-    setForm(empty);
-    setImageFile(null);
-    setImagePreview("");
-    setOpen(true);
+    setEditing(null); setForm(empty); setImageFile(null); setImagePreview(""); setOpen(true);
   }
-
   function openEdit(c: Category) {
     setEditing(c);
     setForm({
@@ -134,7 +126,6 @@ export default function CategoriesTab() {
     setImagePreview(getS3Url(c.categoryImage));
     setOpen(true);
   }
-
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -144,12 +135,66 @@ export default function CategoriesTab() {
 
   const rootCategories = categories.filter((c) => !c.parentId);
 
-  const filtered = categories.filter((c) =>
-    c.categoryName.toLowerCase().includes(search.toLowerCase())
-  );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const columns: ColumnDef<Category, unknown>[] = [
+    {
+      id: "image",
+      header: "",
+      size: 48,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="h-9 w-9 rounded-md overflow-hidden bg-neutral-100 flex items-center justify-center flex-shrink-0">
+          {row.original.categoryImage ? (
+            <Image
+              src={getS3Url(row.original.categoryImage)}
+              alt={row.original.categoryName}
+              width={36}
+              height={36}
+              className="object-cover h-full w-full"
+              onError={(e) => { (e.target as HTMLImageElement).src = "/products/dummy_photo.png"; }}
+            />
+          ) : (
+            <ImageIcon className="h-4 w-4 text-neutral-300" />
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "categoryName",
+      header: "Name",
+      cell: ({ getValue }) => (
+        <span className="font-medium text-gray-900 truncate">{getValue() as string}</span>
+      ),
+    },
+    {
+      id: "parent",
+      header: "Parent",
+      enableSorting: false,
+      cell: ({ row }) =>
+        row.original.parentId ? (
+          <span className="text-muted-foreground text-sm">
+            {categories.find((p) => p.id === row.original.parentId)?.categoryName ?? "—"}
+          </span>
+        ) : (
+          <span className="text-xs text-amber-600 font-medium">Root</span>
+        ),
+    },
+    {
+      id: "actions",
+      header: "",
+      size: 80,
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-1">
+          <button onClick={() => openEdit(row.original)} className="icon-btn-edit">
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={() => setDeleteTarget(row.original)} className="icon-btn-delete">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -161,104 +206,27 @@ export default function CategoriesTab() {
           </Button>
         </CardHeader>
         <CardContent>
-          {/* Search */}
           <div className="mb-3">
             <Input
               placeholder="Search categories…"
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              onChange={(e) => setSearch(e.target.value)}
               className="h-8 text-xs"
             />
           </div>
-
-          {isLoading ? (
-            <div className="space-y-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="data-table-skeleton-row" />
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center py-12 text-center">
-              <FolderOpen className="h-8 w-8 text-neutral-300 mb-2" />
-              <p className="text-sm text-muted-foreground">
-                {search ? "No categories match your search" : "No categories yet"}
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="rounded-lg border border-black/5 overflow-hidden">
-                <div className="grid grid-cols-[36px_1fr_1fr_80px] items-center px-4 py-2 bg-neutral-50 border-b border-black/5 gap-3">
-                  <span />
-                  <span className="data-table-th">Name</span>
-                  <span className="data-table-th">Parent</span>
-                  <span className="data-table-th text-right">Actions</span>
-                </div>
-                <div className="divide-y divide-black/5">
-                  {paged.map((c) => (
-                    <div key={c.id} className="grid grid-cols-[36px_1fr_1fr_80px] items-center px-4 py-2.5 gap-3 hover:bg-neutral-50/80">
-                      {/* Thumbnail */}
-                      <div className="h-9 w-9 rounded-md overflow-hidden bg-neutral-100 flex-shrink-0 flex items-center justify-center">
-                        {c.categoryImage ? (
-                          <Image
-                            src={getS3Url(c.categoryImage)}
-                            alt={c.categoryName}
-                            width={36}
-                            height={36}
-                            className="object-cover h-full w-full"
-                            onError={(e) => { (e.target as HTMLImageElement).src = "/products/dummy_photo.png"; }}
-                          />
-                        ) : (
-                          <ImageIcon className="h-4 w-4 text-neutral-300" />
-                        )}
-                      </div>
-                      <span className="text-sm font-medium text-gray-900 truncate">{c.categoryName}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {c.parentId
-                          ? (categories.find((p) => p.id === c.parentId)?.categoryName ?? "—")
-                          : <span className="text-xs text-amber-600 font-medium">Root</span>}
-                      </span>
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEdit(c)} className="icon-btn-edit">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => setDeleteTarget(c)} className="icon-btn-delete">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pagination */}
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{filtered.length} categor{filtered.length !== 1 ? "ies" : "y"}</span>
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-1">
-                    <button
-                      disabled={safePage === 1}
-                      onClick={() => setPage((p) => p - 1)}
-                      className="pagination-btn"
-                    >
-                      <ChevronLeft className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="px-1.5">{safePage} / {totalPages}</span>
-                    <button
-                      disabled={safePage === totalPages}
-                      onClick={() => setPage((p) => p + 1)}
-                      className="pagination-btn"
-                    >
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+          <DataTable
+            columns={columns}
+            data={categories}
+            isLoading={isLoading}
+            skeletonRows={4}
+            globalFilter={search}
+            pageSize={10}
+            emptyIcon={<FolderOpen className="h-8 w-8" />}
+            emptyTitle={search ? "No categories match your search" : "No categories yet"}
+          />
         </CardContent>
       </Card>
 
-      {/* Add / Edit dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
@@ -290,21 +258,12 @@ export default function CategoriesTab() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-1.5">
                 <Label>Order <span className="text-muted-foreground text-xs">(optional)</span></Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={form.order}
-                  onChange={(e) => setForm((f) => ({ ...f, order: e.target.value }))}
-                  placeholder="e.g. 1"
-                />
+                <Input type="number" min={0} value={form.order} onChange={(e) => setForm((f) => ({ ...f, order: e.target.value }))} placeholder="e.g. 1" />
               </div>
               <div className="grid gap-1.5">
                 <Label>Active</Label>
                 <div className="flex items-center h-9 gap-2">
-                  <Switch
-                    checked={form.isActive}
-                    onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))}
-                  />
+                  <Switch checked={form.isActive} onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))} />
                   <span className="text-sm text-muted-foreground">{form.isActive ? "Yes" : "No"}</span>
                 </div>
               </div>

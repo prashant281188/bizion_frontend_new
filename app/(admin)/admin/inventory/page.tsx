@@ -366,8 +366,8 @@ function Skeleton() {
       {Array.from({ length: 8 }).map((_, i) => (
         <div
           key={i}
-          className="grid grid-cols-[1fr_160px_100px_120px_120px] items-center px-4 py-3 gap-4 border-b border-black/5 last:border-0 animate-pulse"
-          style={{ animationDelay: `${i * 40}ms` }}
+          className="grid grid-cols-[1fr_160px_100px_120px_120px] items-center px-4 py-3 gap-4 border-b border-black/5 last:border-0 animate-pulse-stagger"
+          style={{ "--delay": `${i * 40}ms` } as React.CSSProperties}
         >
           <div className="space-y-1.5">
             <div className="h-3 w-2/3 rounded-full bg-neutral-100" />

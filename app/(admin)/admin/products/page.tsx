@@ -42,8 +42,8 @@ const TableSkeleton = () => (
     {Array.from({ length: 8 }).map((_, i) => (
       <div
         key={i}
-        className="grid grid-cols-[48px_1fr_140px_140px_100px_80px_80px] items-center px-4 py-3 gap-4 border-b border-black/5 last:border-0 animate-pulse"
-        style={{ animationDelay: `${i * 40}ms` }}
+        className="grid grid-cols-[48px_1fr_140px_140px_100px_80px_80px] items-center px-4 py-3 gap-4 border-b border-black/5 last:border-0 animate-pulse-stagger"
+        style={{ "--delay": `${i * 40}ms` } as React.CSSProperties}
       >
         <div className="h-9 w-9 rounded-lg bg-neutral-100" />
         <div className="space-y-1.5">
@@ -240,8 +240,8 @@ const ProductListContent = () => {
               {products.map((product, i) => (
                 <div
                   key={product.id}
-                  className="animate-fade-up grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors group"
-                  style={{ animationDelay: `${i * 30}ms` }}
+                  className="animate-stagger grid grid-cols-[44px_1fr_140px_140px_100px_90px_80px] items-center px-4 py-2.5 gap-4 hover:bg-neutral-50/80 transition-colors group"
+                  style={{ "--delay": `${i * 30}ms` } as React.CSSProperties}
                 >
                   {/* Image */}
                   <div className="relative h-9 w-9 rounded-lg overflow-hidden bg-neutral-100 ring-1 ring-black/5 shrink-0">
