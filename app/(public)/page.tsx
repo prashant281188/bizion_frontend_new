@@ -1,5 +1,4 @@
 import { BiCarousel } from "@/components/carousel/BiCarousel";
-import React from "react";
 import CategorySection from "@/components/public/category-section";
 import BrandSection from "@/components/public/brand-section";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";

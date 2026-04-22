@@ -1,6 +1,5 @@
 "use client";
 import { useBrands } from "@/hooks/use-brands";
-import React from "react";
 import Image from "next/image";
 import { titleCase, getS3Url } from "@/utils";
 

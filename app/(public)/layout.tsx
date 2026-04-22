@@ -2,7 +2,7 @@ import PublicFooter from "@/components/navigation/public/public-footer";
 import PublicNavbar from "@/components/navigation/public/public-navbar";
 import { Metadata } from "next";
 
-import React from "react";
+import { ReactNode } from "react";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
 };
 
-const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+const PublicLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="bg-neutral-50 w-full">
       <PublicNavbar />

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { useNewProducts } from "@/hooks/use-products";
 import ProductCard from "@/components/product/ProductCard";

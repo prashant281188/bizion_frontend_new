@@ -8,7 +8,7 @@ import { useURLFilters } from "@/hooks/use-url-filters";
 import { useDebounce } from "@/hooks/use-debounce";
 import { CatalogProduct } from "@/lib/api/public";
 import { cn } from "@/lib/utils";
-import { titleCase } from "@/utils";
+import { parseOptions, titleCase } from "@/utils";
 import {
   Select,
   SelectContent,
@@ -21,23 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Search, Pencil, Eye, Package, BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-/* ─── Helpers ────────────────────────────────────────────────── */
-
-function parseOptions(
-  optionValues: CatalogProduct["variants"][number]["optionValues"],
-): Record<string, string> {
-  return Object.fromEntries(
-    [...optionValues]
-      .sort(
-        (a, b) => (a.optionValue.position ?? 0) - (b.optionValue.position ?? 0),
-      )
-      .map((ov) => [
-        ov.optionValue.option.optionName,
-        ov.optionValue.optionValue,
-      ]),
-  );
-}
 
 /* ─── Variant table ──────────────────────────────────────────── */
 

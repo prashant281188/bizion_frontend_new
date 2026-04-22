@@ -1,45 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -r \"BiSettings\\\\|protected\\\\|BiDataTable\\\\|BiCategory\\\\|BiCarousel\" /d/project/bizion_frontend --include=*.tsx --include=*.ts --exclude-dir=node_modules --exclude-dir=.next)",
-      "Bash(grep -n \"TODO\\\\|FIXME\\\\|XXX\\\\|HACK\" /d/project/bizion_frontend/app -r --include=*.tsx --include=*.ts)",
-      "Bash(grep -r \"ItemsPerPage\\\\|PagrHeader\\\\|from.*Section\\\\|from.*container\" /d/project/bizion_frontend/app --include=*.tsx --include=*.ts)",
-      "mcp__ide__getDiagnostics",
-      "Bash(grep:*)",
-      "Bash(bc)",
-      "Bash(find D:/project/bizion_frontend/app -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
-      "Bash(find D:/project/bizion_frontend -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\) -path */components/* -o -path */hooks/* -o -path */lib/* -o -path */providers/*)",
-      "Bash(find D:/project/bizion_frontend/components D:/project/bizion_frontend/hooks D:/project/bizion_frontend/lib D:/project/bizion_frontend/providers -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
-      "Bash(for f:*)",
-      "Bash(do)",
-      "Bash(sed -i 's/<Card>/<Card className=\"\"border-0 shadow-none rounded-none\"\">/g' \"$f\")",
-      "Bash(echo \"$f done\")",
-      "Bash(done)",
-      "Bash(wc:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(ls:*)",
-      "Bash(npm install:*)",
-      "Bash(npm list:*)",
-      "Bash(npx tsc:*)",
-      "Bash(find C:/project/bizion_frontend -type f \\\\\\(-name *image* -o -name *Image* \\\\\\) ! -path */node_modules/* -not -name *.png -not -name *.jpg -not -name *.webp)",
-      "Bash(find \"C:\\\\project\\\\bizion_frontend/app/\\(public\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
-      "Bash(find \"C:\\\\project\\\\bizion_frontend/app/\\(admin\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
-      "Bash(find /c/project/bizion_frontend/app -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
-      "Bash(/tmp/components_audit.txt:*)",
+      "Bash(cat)",
       "Read(//tmp/**)",
-      "Bash(find /c/project/bizion_frontend/hooks -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
-      "Bash(find /c/project/bizion_frontend/lib -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
-      "Bash(grep -n \"useMutation\\\\|mutate\\\\|async\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)",
-      "Bash(grep -n \"^  return\\\\|<div class.*p-\" /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/dashboard/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/parties/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/carousel/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/create/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/bulk/page.tsx /c/project/bizion_frontend/app/\\\\\\(admin\\\\\\)/admin/products/[id]/page.tsx)",
-      "Bash(cat:*)",
-      "Bash(find \"C:\\\\project\\\\bizion_frontend\\\\app\\\\\\(admin\\)\\\\admin\\\\orders\" -type f -name \"*.tsx\")",
-      "Bash(python3:*)",
-      "Bash(curl -s \"https://api.github.com/repos/prashant281188/bizion_backend/git/trees/main?recursive=1\")",
-      "Bash(node -e ':*)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(curl:*)",
-      "Bash(node:*)"
+      "Bash(npx tsc *)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

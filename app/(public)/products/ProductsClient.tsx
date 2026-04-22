@@ -1,25 +1,22 @@
 "use client";
 
-import React, { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useProducts } from "@/hooks/use-products";
 import { useDebounce } from "@/hooks/use-debounce";
-import ItemsPerPage from "@/components/shared/ItemsPerPage";
 import Pagination from "@/components/shared/pagination";
 import ProductCard from "@/components/product/ProductCard";
-import SortToggle from "@/components/shared/SortToggle";
-import { ViewToggle } from "@/components/shared/ViewToggle";
-import Filter from "@/components/filters/Filter";
 import { usePublicCategories } from "@/hooks/use-categories";
 import { useBrands } from "@/hooks/use-brands";
 import { useURLFilters } from "@/hooks/use-url-filters";
-import FilterSearch from "@/components/filters/FilterSearch";
-import { SlidersHorizontal, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ProductFilterBar } from "@/components/products/ProductFilterBar";
+import { ProductGridSkeleton } from "@/components/products/ProductGridSkeleton";
 
 const ProductsContent = () => {
   const { filters, setFilter } = useURLFilters();
-  const [view, setView] = React.useState<"grid" | "list">("grid");
+  const [view, setView] = useState<"grid" | "list">("grid");
   const debouncedSearch = useDebounce(filters.search, 500);
 
   const { data, isLoading, isFetching } = useProducts({
@@ -35,16 +32,10 @@ const ProductsContent = () => {
   const brands = useBrands();
 
   const categoryOptions =
-    categories.data?.map((cat) => ({
-      label: cat.categoryName,
-      value: cat.id,
-    })) ?? [];
+    categories.data?.map((cat) => ({ label: cat.categoryName, value: cat.id })) ?? [];
 
   const brandOptions =
-    brands.data?.map((brand) => ({
-      label: brand.brandName,
-      value: brand.id,
-    })) ?? [];
+    brands.data?.map((brand) => ({ label: brand.brandName, value: brand.id })) ?? [];
 
   const products = data?.data ?? [];
   const meta = data?.meta;
@@ -69,121 +60,24 @@ const ProductsContent = () => {
         </div>
       </section>
 
-      {/* Filter Bar */}
-      <div className="sticky top-16 z-20  border-b border-black/5 bg-white/90 backdrop-blur-md">
-        <div className="container mx-auto px-4 sm:px-6 py-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-            {/* Row 1: search + right controls */}
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <div className="flex-1 min-w-0 sm:flex-none sm:min-w-[160px] sm:max-w-xs">
-                <FilterSearch
-                  onChange={(search) => setFilter({search: search})}
-                  value={filters.search ?? ""}
-                  placeholder="Search products…"
-                />
-              </div>
-              <div className="flex items-center gap-1.5 flex-shrink-0 sm:hidden">
-                <SortToggle
-                  sort={filters?.sort ?? ""}
-                  onSortChange={(v) => setFilter({sort: v})}
-                />
-                <ViewToggle value={view} onChange={setView} />
-              </div>
-            </div>
-
-            {/* Row 2 on mobile / inline on desktop: category + brand + right controls */}
-            <div className="flex items-center gap-2 flex-wrap sm:contents">
-              <Filter
-                label="Category"
-                options={categoryOptions}
-                value={filters.categoryId}
-                onChange={(opt) => setFilter({categoryId: opt.value})}
-              />
-              <Filter
-                label="Brand"
-                options={brandOptions}
-                value={filters.brandId}
-                onChange={(opt) => setFilter({brandId: opt.value})}
-              />
-              <div className="ml-auto hidden sm:flex items-center gap-2">
-                <SortToggle
-                  sort={filters?.sort ?? ""}
-                  onSortChange={(v) => setFilter({sort: v})}
-                />
-                <ViewToggle value={view} onChange={setView} />
-                <ItemsPerPage
-                  itemsPerPage={filters?.limit ?? 12}
-                  onChange={(v) => setFilter({limit: v})}
-                />
-              </div>
-              <div className="sm:hidden">
-                <ItemsPerPage
-                  itemsPerPage={filters?.limit ?? 12}
-                  onChange={(v) => setFilter({limit: v})}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Active filter pills */}
-          {activeFiltersCount > 0 && (
-            <div className="mt-2 flex flex-wrap items-center gap-2 pb-1">
-              <span className="text-xs text-muted-foreground">Active:</span>
-              {filters.search && (
-                <button
-                  onClick={() => setFilter({search: ""})}
-                  className="filter-pill"
-                >
-                  Search: {filters.search} ×
-                </button>
-              )}
-              {filters.categoryId && (
-                <button
-                  onClick={() => setFilter({categoryId: ""})}
-                  className="filter-pill"
-                >
-                  {categoryOptions.find((c) => c.value === filters.categoryId)
-                    ?.label ?? "Category"}{" "}
-                  ×
-                </button>
-              )}
-              {filters.brandId && (
-                <button
-                  onClick={() => setFilter({brandId:""})}
-                  className="filter-pill"
-                >
-                  {brandOptions.find((b) => b.value === filters.brandId)
-                    ?.label ?? "Brand"}{" "}
-                  ×
-                </button>
-              )}
-              {filters.sort && (
-                <button
-                  onClick={() => setFilter({sort: ""})}
-                  className="filter-pill"
-                >
-                  {filters.sort === "model_asc" ? "A → Z" : "Z → A"} ×
-                </button>
-              )}
-              <button
-                onClick={() =>
-                  setFilter({
-                    search: "",
-                    categoryId: "",
-                    brandId: "",
-                    sort: "",
-                    page: 1,
-                  })
-                }
-                className="text-xs text-muted-foreground hover:text-red-500 transition"
-              >
-                Clear all
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <ProductFilterBar
+        search={filters.search ?? ""}
+        categoryId={filters.categoryId}
+        brandId={filters.brandId}
+        sort={filters.sort}
+        limit={filters.limit ?? 12}
+        view={view}
+        categoryOptions={categoryOptions}
+        brandOptions={brandOptions}
+        activeFiltersCount={activeFiltersCount}
+        onSearch={(v) => setFilter({ search: v })}
+        onCategory={(v) => setFilter({ categoryId: v })}
+        onBrand={(v) => setFilter({ brandId: v })}
+        onSort={(v) => setFilter({ sort: v })}
+        onLimit={(v) => setFilter({ limit: v })}
+        onView={setView}
+        onClearAll={() => setFilter({ search: "", categoryId: "", brandId: "", sort: "", page: 1 })}
+      />
 
       {/* Results count */}
       {!isLoading && meta && (
@@ -204,22 +98,7 @@ const ProductsContent = () => {
           }
         >
           {isLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 xl:grid-cols-6">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="card-base overflow-hidden animate-pulse"
-                  style={{ animationDelay: `${i * 40}ms` }}
-                >
-                  <div className="aspect-square bg-neutral-100" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-3 bg-neutral-100 rounded-full w-3/4" />
-                    <div className="h-3 bg-neutral-100 rounded-full w-1/2" />
-                    <div className="h-3 bg-neutral-100 rounded-full w-1/3" />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ProductGridSkeleton />
           ) : products.length > 0 ? (
             <div
               className={
@@ -262,7 +141,7 @@ const ProductsContent = () => {
         <Pagination
           page={filters.page ?? 1}
           totalPages={meta.totalPages}
-          onPageChange={(p) => setFilter({page: p})}
+          onPageChange={(p) => setFilter({ page: p })}
         />
       )}
     </>

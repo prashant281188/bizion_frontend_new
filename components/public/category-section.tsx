@@ -1,7 +1,6 @@
 "use client";
 
 import { usePublicCategories } from "@/hooks/use-categories";
-import React from "react";
 import BiCategory from "@/components/category/BiCategory";
 import { getS3Url } from "@/utils";
 
